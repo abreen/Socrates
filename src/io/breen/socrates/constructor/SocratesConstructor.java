@@ -83,22 +83,23 @@ public class SocratesConstructor extends SafeConstructor {
         public Object construct(Node node) {
             String suffix = getSuffix(FILE_PREFIX, node);
 
-            //System.out.println("constructing a " + suffix + " file");
-
-            Map<Object, Object> map = cons.constructMapping((MappingNode)node);
-            //String path = (String)map.get("path");
-            //Double pointValue = (Double)map.get("point_value");
-
-            // loop through test listed, using the cons to construct them
-            List<Object> tests = (List<Object>)map.get("tests");
-
-            /*
-            if (tests != null) {
-                for (Object el : tests) {
-                    System.out.println(el);
-                }
+            Map<Object, Object> map = null;
+            try {
+                map = cons.constructMapping((MappingNode)node);
+            } catch (ClassCastException e) {
+                String msg = "invalid file: should be a mapping";
+                throw new InvalidCriteriaException(node.getStartMark(), msg);
             }
-            */
+
+            String path = (String)map.get("path");
+
+            if (path == null)
+                throw new InvalidCriteriaException(node.getStartMark(),
+                                                   "file must have 'path'");
+
+            Double pointValue = (Double)map.get("point_value");
+
+            List<Object> tests = (List<Object>)map.get("tests");
 
             File f = null;
             switch (suffix) {

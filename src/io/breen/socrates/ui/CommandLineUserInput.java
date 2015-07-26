@@ -26,7 +26,8 @@ public class CommandLineUserInput extends UserInput {
     }
 
     public String promptForPath(String message) {
-        System.out.print(message + ": ");
+        String cwd = System.getProperty("user.dir");
+        System.out.print(message + " (current directory: " + cwd + "): ");
         return input.nextLine();
     }
 

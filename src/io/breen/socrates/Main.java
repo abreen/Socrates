@@ -4,15 +4,13 @@ import io.breen.socrates.constructor.InvalidCriteriaException;
 import io.breen.socrates.constructor.SocratesConstructor;
 import io.breen.socrates.criteria.Criteria;
 import io.breen.socrates.ui.CommandLineUserInput;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.time.ZoneId;
 import java.util.Properties;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class Main {
@@ -32,10 +30,18 @@ public class Main {
         CommandLine cmd = null;
         try {
             cmd = new DefaultParser().parse(opts, args);
+        } catch (UnrecognizedOptionException e) {
+            System.err.println("error: unrecognized option: " + e.getOption());
+            System.exit(1);
         } catch (ParseException e) {
             System.err.println("error parsing command-line arguments");
             System.err.println(e);
             System.exit(1);
+        }
+
+        if (cmd.hasOption("help")) {
+            new HelpFormatter().printHelp("socrates", opts);
+            System.exit(0);
         }
 
         String home = System.getProperty("user.home");
@@ -145,8 +151,21 @@ public class Main {
     private static Options createOptions() {
         Options opts = new Options();
 
-        opts.addOption("p", "properties", true, "path to the socrates.properties file");
-        opts.addOption("c", "criteria", true, "path to a criteria .yml file");
+        opts.addOption(Option.builder("p")
+                           .longOpt("properties")
+                           .hasArg()
+                           .argName("path")
+                           .desc("path to socrates.properties file")
+                           .build());
+
+        opts.addOption(Option.builder("c")
+                           .longOpt("criteria")
+                           .hasArg()
+                           .argName("path")
+                           .desc("path to a criteria (.yml) file")
+                           .build());
+
+        opts.addOption("h", "help", false, "print this message");
 
         return opts;
     }
