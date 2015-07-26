@@ -10,7 +10,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.*;
 import java.time.ZoneId;
 import java.util.Properties;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class Main {
@@ -34,8 +33,8 @@ public class Main {
             System.err.println("error: unrecognized option: " + e.getOption());
             System.exit(1);
         } catch (ParseException e) {
+            logger.warning(e.toString());
             System.err.println("error parsing command-line arguments");
-            System.err.println(e);
             System.exit(1);
         }
 
@@ -95,7 +94,7 @@ public class Main {
             try {
                 criteria = (Criteria)yaml.load(critReader);
             } catch (InvalidCriteriaException e) {
-                logger.severe("error loading criteria file: " + e);
+                logger.warning("error loading criteria file: " + e);
                 Globals.userInput.error("error loading criteria file");
 
                 critPath = Globals.userInput.promptForPath("path to criteria file");
@@ -128,8 +127,8 @@ public class Main {
             FileWriter f = new FileWriter(path);
             Globals.properties.store(f, null);
         } catch (IOException e) {
-            System.err.println("error writing to .properties file");
-            System.err.println(e);
+            logger.severe("error storing .properties file: " + e);
+            System.err.println("error storing .properties file");
             System.exit(4);
         }
     }
@@ -140,8 +139,8 @@ public class Main {
         try {
             Globals.properties.load(f);
         } catch (IOException e) {
-            System.err.println("error reading from .properties file");
-            System.err.println(e);
+            logger.severe("error loading .properties file: " + e);
+            System.err.println("error loading .properties file");
             System.exit(3);
         }
 

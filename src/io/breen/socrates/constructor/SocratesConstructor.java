@@ -164,7 +164,7 @@ public class SocratesConstructor extends SafeConstructor {
             Map<Date, Double> datesMap = (Map<Date, Double>)map.get("due_dates");
 
             if (datesMap != null) {
-                dueDates = new TreeMap<DueDate, Double>();
+                dueDates = new TreeMap<>();
                 ZoneId thisZone = ZoneId.of(Globals.properties.getProperty("timezone"));
 
                 for (Map.Entry<Date, Double> entry : datesMap.entrySet()) {
