@@ -1,4 +1,4 @@
-package io.breen.socrates;
+package io.breen.socrates.test;
 
 /**
  * The class representing a single test that can be run on a file.

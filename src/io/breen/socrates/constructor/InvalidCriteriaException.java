@@ -1,4 +1,4 @@
-package io.breen.socrates;
+package io.breen.socrates.constructor;
 
 import org.yaml.snakeyaml.error.Mark;
 

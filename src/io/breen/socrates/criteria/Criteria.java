@@ -1,6 +1,9 @@
-package io.breen.socrates;
+package io.breen.socrates.criteria;
+
+import io.breen.socrates.file.File;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Class representing a criteria file containing required parts of the
@@ -28,26 +31,21 @@ public class Criteria {
      * Due dates for this assignment. If no due dates are specified (if this is
      * null), submission times will not be checked.
      */
-    private final Map<Calendar, Double> dueDates;
+    private Map<DueDate, Double> dueDates;
 
-    private final List<File> files;
+    private List<File> files;
 
-    public Criteria(Map<String, Object> map) {
-        name = (String)map.get("name");
-        id = (String)map.get("id");
-        group = (String)map.get("group");
+    public Criteria(String name, String id, String group,
+                    Map<DueDate, Double> dueDates,
+                    List<File> files)
+    {
+        this.name = name;
+        this.id = id;
+        this.group = group;
+        this.dueDates = dueDates;
+        this.files = files;
 
-        Map<Date, Double> datesMap = (Map<Date, Double>)map.get("due_dates");
-
-        dueDates = new TreeMap<Calendar, Double>();
-        for (Map.Entry<Date, Double> entry : datesMap.entrySet()) {
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.setTime(entry.getKey());
-
-            dueDates.put(cal, entry.getValue());
-        }
-
-        files = (List)map.get("files");
+        logger.fine("constructed a criteria object: " + this);
     }
 
     public String toString() {
@@ -61,6 +59,12 @@ public class Criteria {
     }
 
     public boolean hasDueDates() {
-        return dueDates != null && dueDates.size() == 0;
+        return dueDates != null;
     }
+
+    public boolean hasGroup() {
+        return group != null;
+    }
+
+    private static Logger logger = Logger.getLogger(Criteria.class.getName());
 }

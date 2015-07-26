@@ -1,8 +1,8 @@
-package io.breen.socrates;
+package io.breen.socrates.ui;
+
+import io.breen.socrates.test.Deduction;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class CommandLineUserInput extends UserInput {
@@ -11,6 +11,23 @@ public class CommandLineUserInput extends UserInput {
 
     public CommandLineUserInput() {
         input = new Scanner(System.in);
+    }
+
+    public void setup() {
+
+    }
+
+    public void finish() {
+
+    }
+
+    public void error(String errorMessage) {
+        System.err.println(errorMessage);
+    }
+
+    public String promptForPath(String message) {
+        System.out.print(message + ": ");
+        return input.nextLine();
     }
 
     public void showFile(java.io.File file) throws FileNotFoundException {

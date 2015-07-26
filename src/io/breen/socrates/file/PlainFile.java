@@ -1,8 +1,7 @@
-package io.breen.socrates;
+package io.breen.socrates.file;
 
-import org.yaml.snakeyaml.nodes.Node;
+import io.breen.socrates.test.TestGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PlainFile extends File {

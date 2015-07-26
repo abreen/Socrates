@@ -1,6 +1,4 @@
-package io.breen.socrates;
-
-import java.io.FileNotFoundException;
+package io.breen.socrates.test;
 
 public class ReviewTest extends Test {
 
@@ -19,6 +17,9 @@ public class ReviewTest extends Test {
     }
 
     public Deduction run() {
+        return null;
+        // TODO
+        /*
         try {
             Socrates.userInput.showFile(file);
         } catch (FileNotFoundException e) {
@@ -30,6 +31,6 @@ public class ReviewTest extends Test {
         if (result)
             return deduction;
         else
-            return null;
+            return null;*/
     }
 }
