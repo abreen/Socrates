@@ -1,12 +1,12 @@
 out/*
 
-.idea/*
+.idea/workspace.xml
+.idea/tasks.xml
 
 # Package Files #
 #*.jar
 *.war
 *.ear
-
 
 .classpath
 .project
