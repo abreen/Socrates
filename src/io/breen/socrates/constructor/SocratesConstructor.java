@@ -4,8 +4,7 @@ import io.breen.socrates.*;
 import io.breen.socrates.criteria.Criteria;
 import io.breen.socrates.criteria.DueDate;
 import io.breen.socrates.file.File;
-import io.breen.socrates.test.Test;
-import io.breen.socrates.test.TestGroup;
+import io.breen.socrates.test.*;
 import org.yaml.snakeyaml.constructor.*;
 import org.yaml.snakeyaml.nodes.*;
 
@@ -31,8 +30,16 @@ public class SocratesConstructor extends SafeConstructor {
             this.cons = cons;
         }
 
-        public Object construct(Node node) {
-            Map<Object, Object> map = cons.constructMapping((MappingNode)node);
+        public Object construct(Node anyNode) {
+            MappingNode node = null;
+            try {
+                node = (MappingNode)anyNode;
+            } catch (ClassCastException e) {
+                String msg = "invalid file: should be a mapping";
+                throw new InvalidCriteriaException(node.getStartMark(), msg);
+            }
+
+            Map<Object, Object> map = cons.constructMapping(node);
 
             List<Test> members = (List<Test>)map.get("members");
 
@@ -40,22 +47,22 @@ public class SocratesConstructor extends SafeConstructor {
                 throw new InvalidCriteriaException(node.getStartMark(),
                                                    "test group cannot be empty");
 
-            int maxNum = (Integer)map.getOrDefault("max", members.size());
-            Integer maxValue = (Integer)map.get("max_value");
+            Ceiling<Integer> maxNum;
+            Ceiling<Double> maxValue;
 
-            if (maxValue != null && maxValue < 0)
-                throw new InvalidCriteriaException(node.getStartMark(),
-                                                   "'max_value' cannot be negative");
+            Integer maxNumCrit = (Integer)map.get("max");
 
-            if (maxValue == null) {
-                maxValue = -1;
-            }
+            Double maxValueCrit = coerceToDouble(map.get("max_value"));
 
-            if (maxNum > members.size()) {
-                throw new InvalidCriteriaException(node.getStartMark(),
-                                                   "maximum cannot be greater than the" +
-                                                       " number of tests in the group");
-            }
+            if (maxNumCrit == null)
+                maxNum = Ceiling.ANY;
+            else
+                maxNum = new AtMost<Integer>(maxNumCrit);
+
+            if (maxValueCrit == null)
+                maxValue = Ceiling.ANY;
+            else
+                maxValue = new AtMost<Double>(maxValueCrit);
 
             try {
                 return new TestGroup(members, maxNum, maxValue);
@@ -80,16 +87,18 @@ public class SocratesConstructor extends SafeConstructor {
             super(cons);
         }
 
-        public Object construct(Node node) {
-            String suffix = getSuffix(FILE_PREFIX, node);
+        public Object construct(Node anyNode) {
+            String suffix = getSuffix(FILE_PREFIX, anyNode);
 
-            Map<Object, Object> map = null;
+            MappingNode node = null;
             try {
-                map = cons.constructMapping((MappingNode)node);
+                node = (MappingNode)anyNode;
             } catch (ClassCastException e) {
                 String msg = "invalid file: should be a mapping";
                 throw new InvalidCriteriaException(node.getStartMark(), msg);
             }
+
+            Map<Object, Object> map = cons.constructMapping(node);
 
             String path = (String)map.get("path");
 
@@ -97,7 +106,7 @@ public class SocratesConstructor extends SafeConstructor {
                 throw new InvalidCriteriaException(node.getStartMark(),
                                                    "file must have 'path'");
 
-            Double pointValue = (Double)map.get("point_value");
+            Double pointValue = coerceToDouble(map.get("point_value"));
 
             List<Object> tests = (List<Object>)map.get("tests");
 
@@ -131,10 +140,6 @@ public class SocratesConstructor extends SafeConstructor {
         }
     }
 
-    private static String getSuffix(String prefix, Node n) {
-        return n.getTag().getValue().substring(prefix.length());
-    }
-
     /**
      * Class that constructs the root object of the YAML file --- the Criteria object.
      */
@@ -145,14 +150,16 @@ public class SocratesConstructor extends SafeConstructor {
             this.cons = cons;
         }
 
-        public Object construct(Node node) {
-            Map<Object, Object> map = null;
+        public Object construct(Node anyNode) {
+            MappingNode node = null;
             try {
-                map = cons.constructMapping((MappingNode)node);
+                node = (MappingNode)anyNode;
             } catch (ClassCastException e) {
                 String msg = "invalid top-level: should be a mapping";
                 throw new InvalidCriteriaException(node.getStartMark(), msg);
             }
+
+            Map<Object, Object> map = cons.constructMapping(node);
 
             String name = (String)map.get("name");
             String id = (String)map.get("id");
@@ -190,5 +197,23 @@ public class SocratesConstructor extends SafeConstructor {
         this.yamlConstructors.put(new Tag(GROUP_TAG), new GroupConstruct(this));
         this.yamlMultiConstructors.put(FILE_PREFIX, new FileConstruct(this));
         this.yamlMultiConstructors.put(TEST_PREFIX, new TestConstruct(this));
+    }
+
+    private static String getSuffix(String prefix, Node n) {
+        // TODO check that tag even exists?
+        return n.getTag().getValue().substring(prefix.length());
+    }
+
+    private static Double coerceToDouble(Object obj) {
+        if (obj instanceof Integer)
+            return ((Integer)obj).doubleValue();
+
+        if (obj instanceof Double)
+            return (Double)obj;
+
+        if (obj == null)
+            return null;
+
+        throw new ClassCastException(obj + " is not coercible to Double");
     }
 }

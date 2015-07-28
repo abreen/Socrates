@@ -9,19 +9,33 @@ public class TestGroup {
 
     protected final List<Test> members;
 
-    protected final int maxNum;
+    protected final Ceiling<Integer> maxNum;
 
-    protected final int maxValue;
+    protected final Ceiling<Double> maxValue;
 
-    public TestGroup(List<Test> members, int maxNum, int maxValue) {
-        if (maxNum < 0) {
-            throw new IllegalArgumentException("max number of tests in group cannot " +
-                                                   "be negative");
+    public TestGroup(List<Test> members,
+                     Ceiling<Integer> maxNum,
+                     Ceiling<Double> maxValue)
+    {
+        if (maxNum == null)
+            throw new IllegalArgumentException("maxNum cannot be null");
+
+        if (maxValue == null)
+            throw new IllegalArgumentException("maxValue cannot be null");
+
+        if (maxNum != Ceiling.ANY) {
+            int num = AtMost.getValue(maxNum);
+
+            if (num < 0)
+                throw new IllegalArgumentException("maxNum cannot be negative");
+            if (num > members.size())
+                throw new IllegalArgumentException("maxNum cannot be greater than the " +
+                        "number of tests");
         }
 
-        if (maxNum == 0) {
-            throw new IllegalArgumentException("max number of tests cannot be zero");
-        }
+        if (maxValue != Ceiling.ANY)
+            if (AtMost.getValue(maxValue) < 0)
+                throw new IllegalArgumentException("maxValue cannot be negative");
 
         this.members = members;
         this.maxNum = maxNum;
