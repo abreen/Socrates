@@ -54,12 +54,12 @@ public class SocratesConstructor extends SafeConstructor {
 
             Double maxValueCrit = coerceToDouble(map.get("max_value"));
 
-            if (maxNumCrit == null)
+            if (maxNumCrit == null)         // was not specified in criteria file
                 maxNum = Ceiling.ANY;
             else
                 maxNum = new AtMost<Integer>(maxNumCrit);
 
-            if (maxValueCrit == null)
+            if (maxValueCrit == null)       // was not specified in criteria file
                 maxValue = Ceiling.ANY;
             else
                 maxValue = new AtMost<Double>(maxValueCrit);
