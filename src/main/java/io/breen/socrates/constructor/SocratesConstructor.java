@@ -204,7 +204,7 @@ public class SocratesConstructor extends SafeConstructor {
         return n.getTag().getValue().substring(prefix.length());
     }
 
-    private static Double coerceToDouble(Object obj) {
+    static Double coerceToDouble(Object obj) {
         if (obj instanceof Integer)
             return ((Integer)obj).doubleValue();
 
