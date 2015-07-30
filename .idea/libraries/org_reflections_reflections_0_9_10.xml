@@ -10,8 +10,6 @@
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/org/reflections/reflections/0.9.10/reflections-0.9.10-javadoc.jar!/" />
     </JAVADOC>
-    <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/reflections/reflections/0.9.10/reflections-0.9.10-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

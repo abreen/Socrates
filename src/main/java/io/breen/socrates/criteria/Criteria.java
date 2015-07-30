@@ -6,13 +6,13 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * Class representing a criteria file containing required parts of the
+ * An immutable class representing a criteria file containing required parts of the
  * assignment and other data (e.g., due dates, point values, and tests).
  */
 public class Criteria {
 
     /**
-     * Human-readable assignment name (e.g., "Problem Set 1").
+     * Human-readable assignment name (e.g., "Problem Set 1"). Cannot be null.
      */
     private final String name;
 
@@ -28,8 +28,8 @@ public class Criteria {
     private final String group;
 
     /**
-     * Due dates for this assignment. If no due dates are specified (if this is
-     * null), submission times will not be checked.
+     * Due dates for this assignment. May be null if the criteria file does not
+     * specify any due dates.
      */
     private Map<DueDate, Double> dueDates;
 
@@ -64,6 +64,18 @@ public class Criteria {
 
     public boolean hasGroup() {
         return group != null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getID() {
+        return id;
+    }
+
+    public String getGroup() {
+        return group;
     }
 
     private static Logger logger = Logger.getLogger(Criteria.class.getName());
