@@ -1,6 +1,6 @@
 package io.breen.socrates.file;
 
-import io.breen.socrates.test.TestGroup;
+import io.breen.socrates.immutable.test.TestGroup;
 
 import java.util.List;
 

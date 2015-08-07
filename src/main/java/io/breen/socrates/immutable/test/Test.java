@@ -1,4 +1,4 @@
-package io.breen.socrates.test;
+package io.breen.socrates.immutable.test;
 
 /**
  * The class representing a single test that can be run on a file.

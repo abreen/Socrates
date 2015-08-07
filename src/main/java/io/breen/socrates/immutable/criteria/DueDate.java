@@ -1,4 +1,4 @@
-package io.breen.socrates.criteria;
+package io.breen.socrates.immutable.criteria;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

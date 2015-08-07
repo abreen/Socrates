@@ -1,12 +1,9 @@
 package io.breen.socrates;
 
-import io.breen.socrates.constructor.InvalidCriteriaException;
-import io.breen.socrates.constructor.SocratesConstructor;
-import io.breen.socrates.criteria.Criteria;
-import io.breen.socrates.ui.CommandLineUserInput;
+import io.breen.socrates.controller.GraderController;
 import org.apache.commons.cli.*;
-import org.yaml.snakeyaml.Yaml;
 
+import javax.swing.*;
 import java.io.*;
 import java.time.ZoneId;
 import java.util.Properties;
@@ -16,7 +13,16 @@ public class Main {
 
     private static Logger logger = Logger.getLogger(Main.class.getName());
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
+        /*
+         * Set up System properties. These are ugly, platform-specific options.
+         */
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+        /*
+         * Set up default Socrates properties. These properties are the ones saved
+         * to socrates.properties.
+         */
         setDefaultProperties();
 
         /*
@@ -61,52 +67,8 @@ public class Main {
             }
         }
 
-        String critPath = null;
-        if (cmd.hasOption("criteria")) {
-            critPath = cmd.getOptionValue("criteria");
-        }
-
-        /*
-         * Set up user input facilities
-         */
-
-        Globals.userInput = new CommandLineUserInput();
-        Globals.userInput.setup();
-
-        if (critPath == null) {
-            critPath = Globals.userInput.promptForPath("path to criteria file");
-        }
-
-        Criteria criteria = null;
-        do {
-            FileReader critReader = null;
-            try {
-                critReader = new FileReader(critPath);
-            } catch (FileNotFoundException e) {
-                Globals.userInput.error("criteria file does not exist at '" + critPath + "'");
-
-                critPath = Globals.userInput.promptForPath("path to criteria file");
-                continue;
-            }
-
-            Yaml yaml = new Yaml(new SocratesConstructor());
-
-            try {
-                criteria = (Criteria)yaml.load(critReader);
-            } catch (InvalidCriteriaException e) {
-                logger.warning("error loading criteria file: " + e);
-                Globals.userInput.error("error loading criteria file");
-
-                critPath = Globals.userInput.promptForPath("path to criteria file");
-                continue;
-            }
-
-            break;
-        } while (true);
-
-        // do main loop
-
-        Globals.userInput.finish();
+        GraderController controller = new GraderController();
+        controller.run(cmd.getOptionValue("criteria", null));
     }
 
     private static void setDefaultProperties() {

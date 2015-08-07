@@ -1,4 +1,4 @@
-package io.breen.socrates.test;
+package io.breen.socrates.immutable.test;
 
 public class AtMost<T> extends Ceiling<T> {
     private T value;

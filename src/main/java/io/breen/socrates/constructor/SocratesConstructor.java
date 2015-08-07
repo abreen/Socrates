@@ -1,10 +1,10 @@
 package io.breen.socrates.constructor;
 
 import io.breen.socrates.*;
-import io.breen.socrates.criteria.Criteria;
-import io.breen.socrates.criteria.DueDate;
+import io.breen.socrates.immutable.criteria.Criteria;
+import io.breen.socrates.immutable.criteria.DueDate;
 import io.breen.socrates.file.File;
-import io.breen.socrates.test.*;
+import io.breen.socrates.immutable.test.*;
 import org.yaml.snakeyaml.constructor.*;
 import org.yaml.snakeyaml.nodes.*;
 
@@ -36,7 +36,7 @@ public class SocratesConstructor extends SafeConstructor {
                 node = (MappingNode)anyNode;
             } catch (ClassCastException e) {
                 String msg = "invalid file: should be a mapping";
-                throw new InvalidCriteriaException(node.getStartMark(), msg);
+                throw new InvalidCriteriaException(anyNode.getStartMark(), msg);
             }
 
             Map<Object, Object> map = cons.constructMapping(node);
@@ -44,7 +44,7 @@ public class SocratesConstructor extends SafeConstructor {
             List<Test> members = (List<Test>)map.get("members");
 
             if (members == null)
-                throw new InvalidCriteriaException(node.getStartMark(),
+                throw new InvalidCriteriaException(anyNode.getStartMark(),
                                                    "test group cannot be empty");
 
             Ceiling<Integer> maxNum;
@@ -67,7 +67,7 @@ public class SocratesConstructor extends SafeConstructor {
             try {
                 return new TestGroup(members, maxNum, maxValue);
             } catch (IllegalArgumentException e) {
-                throw new InvalidCriteriaException(node.getStartMark(), e.getMessage());
+                throw new InvalidCriteriaException(anyNode.getStartMark(), e.getMessage());
             }
         }
     }
@@ -95,7 +95,7 @@ public class SocratesConstructor extends SafeConstructor {
                 node = (MappingNode)anyNode;
             } catch (ClassCastException e) {
                 String msg = "invalid file: should be a mapping";
-                throw new InvalidCriteriaException(node.getStartMark(), msg);
+                throw new InvalidCriteriaException(anyNode.getStartMark(), msg);
             }
 
             Map<Object, Object> map = cons.constructMapping(node);
@@ -103,7 +103,7 @@ public class SocratesConstructor extends SafeConstructor {
             String path = (String)map.get("path");
 
             if (path == null)
-                throw new InvalidCriteriaException(node.getStartMark(),
+                throw new InvalidCriteriaException(anyNode.getStartMark(),
                                                    "file must have 'path'");
 
             Double pointValue = coerceToDouble(map.get("point_value"));
@@ -156,7 +156,7 @@ public class SocratesConstructor extends SafeConstructor {
                 node = (MappingNode)anyNode;
             } catch (ClassCastException e) {
                 String msg = "invalid top-level: should be a mapping";
-                throw new InvalidCriteriaException(node.getStartMark(), msg);
+                throw new InvalidCriteriaException(anyNode.getStartMark(), msg);
             }
 
             Map<Object, Object> map = cons.constructMapping(node);

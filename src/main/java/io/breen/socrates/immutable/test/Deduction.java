@@ -1,4 +1,4 @@
-package io.breen.socrates.test;
+package io.breen.socrates.immutable.test;
 
 /**
  * Represents a deduction resulting from any test (or group of tests) that
