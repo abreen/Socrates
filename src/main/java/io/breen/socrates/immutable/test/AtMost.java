@@ -17,4 +17,8 @@ public class AtMost<T> extends Ceiling<T> {
     public static <T> T getValue(Ceiling<T> ceiling) {
         return ((AtMost<T>)ceiling).getValue();
     }
+
+    public String toString() {
+        return "AtMost(" + value + ")";
+    }
 }

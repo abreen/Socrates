@@ -6,8 +6,11 @@ public class AnySingleton extends Ceiling {
     protected AnySingleton() { }
 
     public static AnySingleton getInstance() {
-        if (instance == null)
-            instance = new AnySingleton();
+        if (instance == null) instance = new AnySingleton();
         return instance;
+    }
+
+    public String toString() {
+        return "Any";
     }
 }

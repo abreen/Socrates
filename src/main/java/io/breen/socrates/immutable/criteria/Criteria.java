@@ -1,15 +1,20 @@
 package io.breen.socrates.immutable.criteria;
 
-import io.breen.socrates.file.File;
+import io.breen.socrates.constructor.SocratesConstructor;
+import io.breen.socrates.immutable.file.File;
+import org.yaml.snakeyaml.Yaml;
 
-import java.util.*;
+import java.io.FileReader;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * An immutable class representing a criteria file containing required parts of the
  * assignment and other data (e.g., due dates, point values, and tests).
  */
-public class Criteria {
+public final class Criteria {
 
     /**
      * Human-readable assignment name (e.g., "Problem Set 1"). Cannot be null.
@@ -49,13 +54,14 @@ public class Criteria {
     }
 
     public String toString() {
-        return "Criteria(" +
-                "name=" + name + ", " +
-                "id=" + id + ", " +
-                "group=" + group + ", " +
-                "dueDates=" + dueDates + ", " +
-                "files=" + files +
-                ")";
+        return "Criteria\n" +
+                "\tname=" + name + "\n" +
+                "\tid=" + id + "\n" +
+                "\tgroup=" + group + "\n" +
+                "\tdueDates=" + dueDates + "\n" +
+                "\tfiles=" + files.stream()
+                                  .map(f -> f.toString())
+                                  .collect(Collectors.joining("\n"));
     }
 
     public boolean hasDueDates() {
@@ -76,6 +82,17 @@ public class Criteria {
 
     public String getGroup() {
         return group;
+    }
+
+    /**
+     * @throws java.io.FileNotFoundException
+     * @throws io.breen.socrates.constructor.InvalidCriteriaException
+     */
+    public static Criteria loadFromYAML(java.io.File file)
+            throws java.io.FileNotFoundException
+    {
+        Yaml y = new Yaml(new SocratesConstructor());
+        return (Criteria)y.load(new FileReader(file));
     }
 
     private static Logger logger = Logger.getLogger(Criteria.class.getName());

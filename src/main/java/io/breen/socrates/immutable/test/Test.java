@@ -5,11 +5,19 @@ package io.breen.socrates.immutable.test;
  */
 public abstract class Test {
 
-    /**
-     * Runs the test. Returns a deduction if the fails and null if the test
-     * passes.
-     */
-    public abstract Deduction run();
+    protected final String description;
 
-    public abstract Deduction getDeduction();
+    protected final double deduction;
+
+    public Test(String description, double deduction) {
+        this.description = description;
+        this.deduction = deduction;
+    }
+
+    public String toString() {
+        return this.getClass().toString() + "(" +
+                "description=" + description + ", " +
+                "deduction=" + deduction +
+                ")";
+    }
 }

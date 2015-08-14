@@ -3,34 +3,9 @@ package io.breen.socrates.immutable.test;
 public class ReviewTest extends Test {
 
     protected final java.io.File file;
-    protected final String description;
-    protected final Deduction deduction;
 
-    public ReviewTest(java.io.File file, String description, Deduction deduction) {
+    public ReviewTest(java.io.File file, String description, double deduction) {
+        super(description, deduction);
         this.file = file;
-        this.description = description;
-        this.deduction = deduction;
-    }
-
-    public Deduction getDeduction() {
-        return deduction;
-    }
-
-    public Deduction run() {
-        return null;
-        // TODO
-        /*
-        try {
-            Socrates.userInput.showFile(file);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("file not found");
-        }
-
-        boolean result = Socrates.userInput.promptForDeduction(deduction, description);
-
-        if (result)
-            return deduction;
-        else
-            return null;*/
     }
 }
