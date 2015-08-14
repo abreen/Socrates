@@ -4,6 +4,12 @@ import io.breen.socrates.controller.MainController;
 import io.breen.socrates.controller.SetupController;
 import org.apache.commons.cli.*;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -48,30 +54,37 @@ public class Main {
             System.exit(0);
         }
 
-        String home = System.getProperty("user.home");
-        String sep = java.io.File.separator;
-
-        String propPath = cmd.getOptionValue(
-                "properties", home + sep + "socrates.properties"
+        final Path defaultPropPath = Paths.get(
+                System.getProperty("user.home"), "socrates.properties"
         );
 
-        try {
-            loadPropertiesFrom(propPath);
-        } catch (java.io.FileNotFoundException e) {
-            if (cmd.hasOption("properties")) {
-                System.err.println("specified .properties file does not exist");
+        Path propPath;
+        if (cmd.hasOption("properties")) {
+            propPath = Paths.get(cmd.getOptionValue("properties"));
+        } else {
+            propPath = defaultPropPath;
+        }
+
+        if (Files.exists(propPath)) {
+            try {
+                loadPropertiesFrom(propPath);
+            } catch (IOException e) {
+                logger.severe("could not load .properties file: " + e);
                 System.exit(2);
-            } else {
-                logger.info("creating new socrates.properties file at " + propPath);
-                String comment = "automatically created by Socrates";
-                try {
-                    Globals.properties.store(
-                            new java.io.FileOutputStream(propPath),
-                            comment
-                    );
-                } catch (java.io.IOException e2) {
-                    logger.warning("could not create a new .properties file");
-                }
+            }
+        } else if (cmd.hasOption("properties")) {
+            logger.severe("specified .properties file does not exist");
+            System.exit(2);
+        } else {
+            // create a new .properties file
+            logger.info("creating new socrates.properties file at " + propPath);
+            String comment = "automatically created by Socrates";
+            try {
+                Globals.properties.store(
+                        Files.newBufferedWriter(propPath), comment
+                );
+            } catch (IOException e) {
+                logger.warning("could not create a new .properties file");
             }
         }
 
@@ -95,41 +108,21 @@ public class Main {
 
     private static void setDefaultProperties() {
         Properties defaults = new Properties();
-
         defaults.setProperty("timezone", ZoneId.systemDefault().getId());
-
         Globals.properties = new Properties(defaults);
-
         logger.fine(defaults.toString());
     }
 
-    private static void storeProperties(String path) {
-        logger.fine("storing properties at " + path);
-        logger.fine(Globals.properties.toString());
-
-        try {
-            java.io.FileWriter f = new java.io.FileWriter(path);
-            Globals.properties.store(f, null);
-        } catch (java.io.IOException e) {
-            logger.severe("error storing .properties file: " + e);
-            System.err.println("error storing .properties file");
-            System.exit(4);
-        }
+    private static void storeProperties(Path path) throws IOException {
+        logger.fine("storing properties to: " + path);
+        BufferedWriter writer = Files.newBufferedWriter(path);
+        Globals.properties.store(writer, null);
     }
 
-    private static void loadPropertiesFrom(String path)
-            throws java.io.FileNotFoundException
-    {
-        java.io.FileInputStream f = new java.io.FileInputStream(new java.io.File(path));
-
-        try {
-            Globals.properties.load(f);
-        } catch (java.io.IOException e) {
-            logger.severe("error loading .properties file: " + e);
-            System.err.println("error loading .properties file");
-            System.exit(3);
-        }
-
+    private static void loadPropertiesFrom(Path path) throws IOException {
+        logger.fine("loading properties from: " + path);
+        BufferedReader reader = Files.newBufferedReader(path);
+        Globals.properties.load(reader);
         logger.fine("loaded properties from file: " + Globals.properties.toString());
     }
 
