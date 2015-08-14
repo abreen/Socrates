@@ -80,7 +80,7 @@
               <font name="Dialog"/>
               <lineWrap value="true"/>
               <opaque value="false"/>
-              <text value="Now select the student submissions you would like to grade. You must select at least one, but you may add more once you have started by using the File → Add Submissions... option.&#10;&#10;Each submission you select must be a folder containing the files submitted by one student. If you were sent a compressed archive (for example, a ZIP file) containing the submissions, decompress the archive before continuing.&#10;&#10;If you are using receipts, make sure the receipt for each student is at the top level of each submission folder you select."/>
+              <text value="Now select the student submissions you would like to grade. You must select at least one, but you may add more once you have started by using the File → Add Submissions... option.&#10;&#10;Each submission you select must be a folder containing the files submitted by one student. If you were sent a compressed archive (for example, a ZIP file) containing the submissions, decompress the archive before continuing.&#10;&#10;If you are using receipts, make sure each receipt is stored alongside its receipted file."/>
               <wrapStyleWord value="true"/>
             </properties>
           </component>

@@ -1,5 +1,8 @@
 package io.breen.socrates.immutable.submission;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,13 +45,24 @@ public class Submission {
         return new Submission(directory.getName(), submittedFiles);
     }
 
+    /**
+     * TODO this should not be recursive (just in case)
+     * @throws StackOverflowError
+     */
     private static void createSubmittedFiles(List<SubmittedFile> list, java.io.File dir,
                                              String pathPrefix)
     {
         for (java.io.File file : dir.listFiles()) {
             if (file.isFile()) {
-                String localPath = pathPrefix + file.getName();
-                SubmittedFile sf = new SubmittedFile(file, localPath);
+                // check for receipt
+                String name = file.getName();
+
+                Path receiptPath = Paths.get(name + ".receipt");
+                if (Files.exists(receiptPath)) {
+                    // TODO
+                }
+
+                SubmittedFile sf = new SubmittedFile(file, pathPrefix + name);
                 list.add(sf);
 
             } else if (file.isDirectory()) {

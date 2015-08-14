@@ -75,6 +75,8 @@ public class Main {
             }
         }
 
+        logger.fine("starting controllers");
+
         /*
          * Create the MainController. It will wait for the SetupController to send it
          * a message indicating that the criteria and initial submissions have been
