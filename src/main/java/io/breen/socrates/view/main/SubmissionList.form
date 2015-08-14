@@ -14,7 +14,10 @@
         <children>
           <component id="201f" class="javax.swing.JTree" binding="tree">
             <constraints/>
-            <properties/>
+            <properties>
+              <maximumSize width="-1" height="-1"/>
+              <preferredSize width="200" height="-1"/>
+            </properties>
           </component>
         </children>
       </scrollpane>

@@ -14,7 +14,10 @@
         <children>
           <component id="d2049" class="javax.swing.JList" binding="list">
             <constraints/>
-            <properties/>
+            <properties>
+              <maximumSize width="-1" height="-1"/>
+              <preferredSize width="200" height="-1"/>
+            </properties>
           </component>
         </children>
       </scrollpane>

@@ -125,12 +125,18 @@ public class SocratesConstructor extends SafeConstructor {
 
             FileType fileType = FileType.fromID(suffix);
 
+            List tests = (List)map.get("tests");
+
+            if (tests == null) throw new InvalidCriteriaException(
+                    anyNode.getStartMark(), "file must have 'tests'"
+            );
+
             return FileFactory.buildFile(
                     fileType,
                     path,
                     pointValue,
                     map,
-                    buildAllTests((List)map.get("tests"), fileType, anyNode)
+                    buildAllTests(tests, fileType, anyNode)
             );
         }
     }

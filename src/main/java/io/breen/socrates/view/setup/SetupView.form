@@ -21,7 +21,7 @@
           <component id="59a55" class="javax.swing.JLabel">
             <constraints border-constraint="North"/>
             <properties>
-              <font swing-font="OptionPane.font"/>
+              <font name="Dialog" size="14" style="1"/>
               <text value="Open a criteria file"/>
             </properties>
           </component>
@@ -29,6 +29,7 @@
             <constraints border-constraint="Center"/>
             <properties>
               <editable value="false"/>
+              <font name="Dialog"/>
               <lineWrap value="true"/>
               <opaque value="false"/>
               <text value="A criteria file is a special file prepared by a grading coordinator that contains the expected files in a student submission and how to grade them.&#10;&#10;Without a criteria file, you cannot use Socrates to grade submissions. If you do not have a criteria file, contact the grading coordinator for your course."/>
@@ -68,7 +69,7 @@
           <component id="55dd6" class="javax.swing.JLabel">
             <constraints border-constraint="North"/>
             <properties>
-              <font swing-font="OptionPane.font"/>
+              <font name="Dialog" size="14" style="1"/>
               <text value="Select student submissions"/>
             </properties>
           </component>
@@ -76,6 +77,7 @@
             <constraints border-constraint="Center"/>
             <properties>
               <editable value="false"/>
+              <font name="Dialog"/>
               <lineWrap value="true"/>
               <opaque value="false"/>
               <text value="Now select the student submissions you would like to grade. You must select at least one, but you may add more once you have started by using the File → Add Submissions... option.&#10;&#10;Each submission you select must be a folder containing the files submitted by one student. If you were sent a compressed archive (for example, a ZIP file) containing the submissions, decompress the archive before continuing.&#10;&#10;If you are using receipts, make sure the receipt for each student is at the top level of each submission folder you select."/>
