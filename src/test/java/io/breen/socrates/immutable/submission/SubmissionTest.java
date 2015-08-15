@@ -42,7 +42,7 @@ public class SubmissionTest {
         submissionDir = Paths.get("submissions");
         Files.createDirectory(submissionDir);
 
-        children = new Path[5];
+        children = new Path[SubDir.values().length];
         children[SubDir.ALPHA.i] = submissionDir.resolve("alpha");
         children[SubDir.BETA.i] = submissionDir.resolve("beta");
         children[SubDir.GAMMA.i] = submissionDir.resolve("gamma");
@@ -108,6 +108,9 @@ public class SubmissionTest {
         }
     }
 
+    /**
+     * Recursively deletes the file tree starting at submissionDir.
+     */
     @After
     public void tearDown() throws Exception {
         Files.walkFileTree(
