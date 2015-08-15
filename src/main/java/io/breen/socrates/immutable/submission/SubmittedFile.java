@@ -17,13 +17,13 @@ public class SubmittedFile {
      * match the path specified in a criteria file, if this SubmittedFile is indeed
      * relevant to grading.
      */
-    private final Path localPath;
+    final Path localPath;
 
     /**
      * This file's receipt, storing the submission timestamps. If there was no receipt
      * for this file, this is null.
      */
-    private final Receipt receipt;
+    final Receipt receipt;
 
     public SubmittedFile(Path localPath) {
         this.localPath = localPath;
@@ -41,5 +41,12 @@ public class SubmittedFile {
         }
 
         this.receipt = r;
+    }
+
+    public String toString() {
+        return "SubmittedFile(" +
+                "localPath=" + localPath + ", " +
+                "receipt=" + receipt +
+                ")";
     }
 }

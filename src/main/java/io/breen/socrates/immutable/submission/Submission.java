@@ -5,6 +5,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Class representing immutable objects that store the contents of a single student's
@@ -20,11 +21,11 @@ public class Submission {
      * The name of the student who made this submission. This could be a proper name or a
      * user name. It also may simply have the same name as the submission directory.
      */
-    private final String studentName;
+    final String studentName;
 
-    private final Path submissionDir;
+    final Path submissionDir;
 
-    private final List<SubmittedFile> files;
+    final List<SubmittedFile> files;
 
     public Submission(String studentName, Path submissionDir) {
         this(studentName, submissionDir, new LinkedList<>());
@@ -34,6 +35,15 @@ public class Submission {
         this.studentName = studentName;
         this.submissionDir = submissionDir;
         this.files = new LinkedList<>(files);
+    }
+
+    public String toString() {
+        return "Submission\n" +
+                "\tstudentName=" + studentName + "\n" +
+                "\tsubmissionDir=" + submissionDir + "\n" +
+                "\tfiles=" + files.stream()
+                                  .map(f -> f.toString())
+                                  .collect(Collectors.joining("\n"));
     }
 
     /**

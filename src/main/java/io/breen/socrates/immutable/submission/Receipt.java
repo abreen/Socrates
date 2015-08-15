@@ -23,6 +23,12 @@ public final class Receipt {
         this.dates = dates;
     }
 
+    public String toString() {
+        return "Receipt(" +
+                "dates=" + dates +
+                ")";
+    }
+
     /**
      * @throws IOException
      * @throws ReceiptFormatException
