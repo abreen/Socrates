@@ -1,5 +1,7 @@
 package io.breen.socrates.immutable.test;
 
+import io.breen.socrates.immutable.test.ceiling.AtMost;
+import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.util.Either;
 
 import java.util.List;

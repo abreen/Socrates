@@ -1,9 +1,9 @@
 package io.breen.socrates.immutable.file;
 
-import io.breen.socrates.immutable.test.AtMost;
-import io.breen.socrates.immutable.test.Ceiling;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
+import io.breen.socrates.immutable.test.ceiling.AtMost;
+import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.util.Either;
 
 import java.util.List;

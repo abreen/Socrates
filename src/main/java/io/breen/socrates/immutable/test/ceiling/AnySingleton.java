@@ -1,4 +1,4 @@
-package io.breen.socrates.immutable.test;
+package io.breen.socrates.immutable.test.ceiling;
 
 public class AnySingleton extends Ceiling {
     private static AnySingleton instance = null;
