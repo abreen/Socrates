@@ -63,10 +63,10 @@ public class SubmissionTest {
             Files.createFile(receipt2);
 
             Files.newBufferedWriter(receipt1)
-                 .append("2015-08-14T22:46:00-04:00")
+                 .append("2015-08-14T22:46:00")
                  .close();
             Files.newBufferedWriter(receipt2)
-                 .append("2015-08-14T20:12:00-04:00")
+                 .append("2015-08-14T20:12:00")
                  .close();
         }
 
@@ -81,7 +81,7 @@ public class SubmissionTest {
             Files.createFile(receipt2);
 
             Files.newBufferedWriter(receipt1)
-                 .append("2015-08-14T22:46:00-04:00")
+                 .append("2015-08-14T22:46:00")
                  .close();
             Files.newBufferedWriter(receipt2)
                  .append("foo")
