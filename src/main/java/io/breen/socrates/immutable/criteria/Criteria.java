@@ -4,7 +4,9 @@ import io.breen.socrates.constructor.SocratesConstructor;
 import io.breen.socrates.immutable.file.File;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -85,14 +87,12 @@ public final class Criteria {
     }
 
     /**
-     * @throws java.io.FileNotFoundException
      * @throws io.breen.socrates.constructor.InvalidCriteriaException
+     * @throws IOException
      */
-    public static Criteria loadFromYAML(java.io.File file)
-            throws java.io.FileNotFoundException
-    {
+    public static Criteria loadFromYAML(Path path) throws IOException {
         Yaml y = new Yaml(new SocratesConstructor());
-        return (Criteria)y.load(new FileReader(file));
+        return (Criteria)y.load(Files.newBufferedReader(path));
     }
 
     private static Logger logger = Logger.getLogger(Criteria.class.getName());

@@ -1,6 +1,7 @@
 package io.breen.socrates.immutable.submission;
 
-import java.time.format.DateTimeParseException;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.logging.Logger;
 
 /**
@@ -11,27 +12,32 @@ public class SubmittedFile {
 
     private static Logger logger = Logger.getLogger(SubmittedFile.class.getName());
 
-    private final java.io.File file;
-    private final String localPath;
+    /**
+     * This file's location relative to the submission directory. This path should
+     * match the path specified in a criteria file, if this SubmittedFile is indeed
+     * relevant to grading.
+     */
+    private final Path localPath;
+
+    /**
+     * This file's receipt, storing the submission timestamps. If there was no receipt
+     * for this file, this is null.
+     */
     private final Receipt receipt;
 
-    public SubmittedFile(java.io.File file, String localPath) {
-        this(file, localPath, null);
+    public SubmittedFile(Path localPath) {
+        this.localPath = localPath;
+        this.receipt = null;
     }
 
-    public SubmittedFile(java.io.File file, String localPath, java.io.File receiptFile) {
-        this.file = file;
+    public SubmittedFile(Path localPath, Path receipt)
+            throws IOException, ReceiptFormatException
+    {
         this.localPath = localPath;
 
         Receipt r = null;
-        if (receiptFile != null) {
-            try {
-                r = Receipt.fromReceiptFile(receiptFile);
-            } catch (DateTimeParseException e) {
-                logger.info("for file " + file + ", caught DTPE creating receipt: " + e);
-            } catch (java.io.FileNotFoundException e) {
-                logger.info("for file " + file + ", caught FNFE creating receipt: " + e);
-            }
+        if (receipt != null) {
+            r = Receipt.fromReceiptFile(receipt);
         }
 
         this.receipt = r;

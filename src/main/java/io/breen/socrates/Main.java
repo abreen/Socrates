@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
@@ -103,7 +104,14 @@ public class Main {
          * skipped, if the criteria path is valid and the criteria file is valid.
          */
         SetupController setup = new SetupController(main);
-        setup.start(cmd.getOptionValue("criteria"));
+
+        Path criteriaPath = null;
+        if (cmd.hasOption("criteria"))
+            try {
+                criteriaPath = Paths.get(cmd.getOptionValue("criteria"));
+            } catch (InvalidPathException ignored) { }
+
+        setup.start(criteriaPath);
     }
 
     private static void setDefaultProperties() {

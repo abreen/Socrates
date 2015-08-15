@@ -1,11 +1,14 @@
 package io.breen.socrates.immutable.submission;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Class representing a receipt file designed to store information about the submission
@@ -21,23 +24,30 @@ public final class Receipt {
     }
 
     /**
-     * @throws java.io.FileNotFoundException
-     * @throws DateTimeParseException If any line in the file is not in ISO 8601 format
+     * @throws IOException
+     * @throws ReceiptFormatException
      */
-    public static Receipt fromReceiptFile(java.io.File f)
-            throws java.io.FileNotFoundException, DateTimeParseException
+    public static Receipt fromReceiptFile(Path path)
+            throws IOException, ReceiptFormatException
     {
         List<ZonedDateTime> list = new LinkedList<>();
+        BufferedReader reader = Files.newBufferedReader(path);
 
-        Scanner s = new Scanner(f);
-        while (s.hasNextLine()) {
-            ZonedDateTime zdt = ZonedDateTime.parse(
-                    s.nextLine(), DateTimeFormatter.ISO_OFFSET_DATE_TIME
-            );
+        String line;
+        while ((line = reader.readLine()) != null) {
+            ZonedDateTime zdt;
+            try {
+                zdt = ZonedDateTime.parse(line, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            } catch (DateTimeParseException e) {
+                throw new ReceiptFormatException(
+                        "receipt " + path + " has invalid timestamp: " + line
+                );
+            }
+
             list.add(zdt);
         }
-        s.close();
 
+        reader.close();
         return new Receipt(list);
     }
 }

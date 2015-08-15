@@ -2,12 +2,14 @@ package io.breen.socrates.controller;
 
 import io.breen.socrates.constructor.InvalidCriteriaException;
 import io.breen.socrates.immutable.criteria.Criteria;
+import io.breen.socrates.immutable.submission.ReceiptFormatException;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.view.DetailOptionPane;
 import io.breen.socrates.view.setup.SetupView;
 
 import javax.swing.*;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,11 +27,11 @@ public class SetupController {
 
         view.addOpenCriteriaButtonActionListener(
                 e -> {
-                    java.io.File f = view.chooseCriteriaFile();
-                    if (f != null) {
+                    Path path = view.chooseCriteriaFile();
+                    if (path != null) {
                         try {
-                            criteria = Criteria.loadFromYAML(f);
-                        } catch (Exception x) {
+                            criteria = Criteria.loadFromYAML(path);
+                        } catch (IOException | InvalidCriteriaException x) {
                             DetailOptionPane.showMessageDialog(
                                     view,
                                     "There was an error opening the criteria file you "
@@ -49,11 +51,18 @@ public class SetupController {
 
         view.addSubmissionsButtonActionListener(
                 e -> {
-                    java.io.File[] fs = view.chooseSubmissions();
-                    if (fs != null) {
-                        List<Submission> submissions = new ArrayList<>(fs.length);
-                        for (java.io.File f : fs)
-                            submissions.add(Submission.fromDirectory(f));
+                    List<Path> ps = view.chooseSubmissions();
+                    if (ps != null) {
+                        List<Submission> submissions = new ArrayList<>(ps.size());
+                        for (Path p : ps) {
+                            try {
+                                submissions.add(Submission.fromDirectory(p));
+                            } catch (IOException x) {
+                                logger.warning("IOE thrown when adding submission: " + x);
+                            } catch (ReceiptFormatException x) {
+                                logger.warning("RFE thrown when adding submission: " + x);
+                            }
+                        }
 
                         view.setVisible(false);
                         view.dispose();
@@ -64,11 +73,11 @@ public class SetupController {
         );
     }
 
-    public void start(String criteriaPath) {
+    public void start(Path criteriaPath) {
         if (criteriaPath != null) {
             try {
-                criteria = Criteria.loadFromYAML(new java.io.File(criteriaPath));
-            } catch (FileNotFoundException | InvalidCriteriaException e) {
+                criteria = Criteria.loadFromYAML(criteriaPath);
+            } catch (IOException | InvalidCriteriaException x) {
                 logger.info(criteriaPath + " was an invalid criteria path");
             }
         }

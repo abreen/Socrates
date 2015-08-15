@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SetupView extends JFrame {
 
@@ -32,7 +35,7 @@ public class SetupView extends JFrame {
         quitButton.addActionListener(e -> System.exit(0));
     }
 
-    public java.io.File chooseCriteriaFile() {
+    public Path chooseCriteriaFile() {
         JFileChooser fc = new JFileChooser();
 
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -51,13 +54,13 @@ public class SetupView extends JFrame {
         int rv = fc.showOpenDialog(this);
 
         if (rv == JFileChooser.APPROVE_OPTION) {
-            return fc.getSelectedFile();
+            return fc.getSelectedFile().toPath();
         } else {
             return null;
         }
     }
 
-    public java.io.File[] chooseSubmissions() {
+    public List<Path> chooseSubmissions() {
         JFileChooser fc = new JFileChooser();
 
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -66,7 +69,10 @@ public class SetupView extends JFrame {
         int rv = fc.showOpenDialog(this);
 
         if (rv == JFileChooser.APPROVE_OPTION) {
-            return fc.getSelectedFiles();
+            List<Path> paths = new LinkedList<>();
+            for (java.io.File f : fc.getSelectedFiles())
+                paths.add(f.toPath());
+            return paths;
         } else {
             return null;
         }
