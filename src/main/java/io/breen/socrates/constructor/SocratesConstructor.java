@@ -1,8 +1,6 @@
 package io.breen.socrates.constructor;
 
-import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.criteria.Criteria;
-import io.breen.socrates.immutable.criteria.DueDate;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.file.FileFactory;
 import io.breen.socrates.immutable.file.FileType;
@@ -16,10 +14,9 @@ import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -202,7 +199,7 @@ public class SocratesConstructor extends SafeConstructor {
 
             String group = (String)map.get("group");
 
-            Map<DueDate, Double> dueDates = null;
+            Map<LocalDateTime, Double> dueDates = null;
 
             Map<Date, Double> datesMap;
             try {
@@ -214,15 +211,11 @@ public class SocratesConstructor extends SafeConstructor {
 
             if (datesMap != null) {
                 dueDates = new TreeMap<>();
-                ZoneId thisZone = ZoneId.of(Globals.properties.getProperty("timezone"));
 
                 for (Map.Entry<Date, Double> entry : datesMap.entrySet()) {
-                    Date d = entry.getKey();
-                    LocalDateTime ldt = LocalDateTime.ofInstant(d.toInstant(), ZoneOffset.UTC);
-                    ZonedDateTime zdt = ldt.atZone(thisZone);
-
-                    DueDate dd = new DueDate(zdt);
-                    dueDates.put(dd, entry.getValue());
+                    Instant i = entry.getKey().toInstant();
+                    LocalDateTime ldt = LocalDateTime.ofInstant(i, ZoneOffset.UTC);
+                    dueDates.put(ldt, entry.getValue());
                 }
             }
 

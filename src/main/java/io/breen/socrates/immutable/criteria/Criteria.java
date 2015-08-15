@@ -7,6 +7,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -38,12 +39,12 @@ public final class Criteria {
      * Due dates for this assignment. May be null if the criteria file does not
      * specify any due dates.
      */
-    private Map<DueDate, Double> dueDates;
+    private Map<LocalDateTime, Double> dueDates;
 
     private List<File> files;
 
     public Criteria(String name, String id, String group,
-                    Map<DueDate, Double> dueDates,
+                    Map<LocalDateTime, Double> dueDates,
                     List<File> files)
     {
         this.name = name;
