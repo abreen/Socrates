@@ -27,7 +27,7 @@ public class SubmissionTest {
         int i;
 
         SubDir(int i) {
-            this.i =i;
+            this.i = i;
         }
     }
 
