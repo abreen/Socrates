@@ -22,22 +22,30 @@ public class FileFactory {
         /*
          * Parse due dates for this file, if they exist.
          */
-        Map<Date, Double> datesMap;
-        try {
-            datesMap = (Map<Date, Double>)map.get("due_dates");
-        } catch (ClassCastException e) {
-            String msg = "invalid due dates: should map dates to doubles";
-            throw new InvalidFileException(type, msg);
-        }
+        Map<Date, Double> datesMap = (Map<Date, Double>)map.get("due_dates");
 
         Map<LocalDateTime, Double> dueDates = null;
         if (datesMap != null) {
             dueDates = new TreeMap<>();
 
             for (Map.Entry<Date, Double> entry : datesMap.entrySet()) {
-                Instant i = entry.getKey().toInstant();
+                Date date;
+                try {
+                    date = entry.getKey();
+                } catch (ClassCastException e) {
+                    throw new InvalidFileException(type, "'due_dates' key is not a date");
+                }
+
+                Double deduction;
+                try {
+                    deduction = SocratesConstructor.coerceToDouble(entry.getValue());
+                } catch (ClassCastException e) {
+                    throw new InvalidFileException(type, "'due_dates' value is not a double");
+                }
+
+                Instant i = date.toInstant();
                 LocalDateTime ldt = LocalDateTime.ofInstant(i, ZoneOffset.UTC);
-                dueDates.put(ldt, entry.getValue());
+                dueDates.put(ldt, deduction);
             }
         }
 

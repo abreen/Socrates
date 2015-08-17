@@ -123,7 +123,7 @@ public class SocratesConstructor extends SafeConstructor {
                         fileType, map, buildAllTests(tests, fileType, anyNode)
                 );
             } catch (InvalidFileException e) {
-                throw new InvalidCriteriaException(node.getStartMark(), e.toString());
+                throw new InvalidCriteriaException(anyNode.getStartMark(), e.toString());
             }
         }
     }
