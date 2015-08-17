@@ -7,8 +7,10 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * Class representing a receipt file designed to store information about the submission
@@ -20,16 +22,21 @@ import java.util.List;
  */
 public final class Receipt {
 
-    private final List<LocalDateTime> dates;
+    private final PriorityQueue<LocalDateTime> dates;
 
     public Receipt(List<LocalDateTime> dates) {
-        this.dates = dates;
+        this.dates = new PriorityQueue<>(Collections.reverseOrder());
+        this.dates.addAll(dates);
     }
 
     public String toString() {
         return "Receipt(" +
                 "dates=" + dates +
                 ")";
+    }
+
+    public LocalDateTime getLatestDate() {
+        return dates.peek();
     }
 
     /**
@@ -55,6 +62,9 @@ public final class Receipt {
 
             list.add(ldt);
         }
+
+        if (list.isEmpty())
+            throw new ReceiptFormatException("receipt file is empty");
 
         reader.close();
         return new Receipt(list);

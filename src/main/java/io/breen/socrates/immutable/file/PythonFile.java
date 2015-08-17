@@ -4,6 +4,7 @@ import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.util.Either;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +17,12 @@ public final class PythonFile extends File {
     /**
      * @throws io.breen.socrates.constructor.InvalidCriteriaException
      */
-    public PythonFile(String path, double pointValue, Map map, List<Either<Test, TestGroup>> tests) {
-        super(path, pointValue, tests);
-        // TODO set up other fields using map
+    public PythonFile(String path,
+                      double pointValue,
+                      Map<LocalDateTime, Double> dueDates,
+                      List<Either<Test, TestGroup>> tests)
+    {
+        super(path, pointValue, dueDates, tests);
+        // TODO add more parameters and fields
     }
 }

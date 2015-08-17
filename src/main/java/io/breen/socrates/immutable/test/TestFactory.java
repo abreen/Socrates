@@ -5,7 +5,9 @@ import io.breen.socrates.constructor.SocratesConstructor;
 import java.util.Map;
 
 public class TestFactory {
-    public static Test buildTest(TestType type, Map map) throws InvalidTestException {
+    public static Test buildTest(TestType type, Map map)
+            throws InvalidTestException
+    {
         switch (type) {
         case ALWAYS_PASSING_PLAIN: {
             return new io.breen.socrates.immutable.test.implementation.plain.AlwaysPassingTest(0);

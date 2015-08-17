@@ -4,6 +4,7 @@ import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.file.FileFactory;
 import io.breen.socrates.immutable.file.FileType;
+import io.breen.socrates.immutable.file.InvalidFileException;
 import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.immutable.test.ceiling.AtMost;
 import io.breen.socrates.immutable.test.ceiling.Ceiling;
@@ -16,10 +17,9 @@ import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A subclass of the SnakeYAML constructor that knows how to instantiate
@@ -110,18 +110,6 @@ public class SocratesConstructor extends SafeConstructor {
 
             Map<Object, Object> map = cons.constructMapping(node);
 
-            String path = (String)map.get("path");
-
-            if (path == null) throw new InvalidCriteriaException(
-                    anyNode.getStartMark(), "file must have 'path'"
-            );
-
-            Double pointValue = coerceToDouble(map.get("point_value"));
-
-            if (pointValue == null) throw new InvalidCriteriaException(
-                    anyNode.getStartMark(), "file must have 'pointValue'"
-            );
-
             FileType fileType = FileType.fromID(suffix);
 
             List tests = (List)map.get("tests");
@@ -130,13 +118,13 @@ public class SocratesConstructor extends SafeConstructor {
                     anyNode.getStartMark(), "file must have 'tests'"
             );
 
-            return FileFactory.buildFile(
-                    fileType,
-                    path,
-                    pointValue,
-                    map,
-                    buildAllTests(tests, fileType, anyNode)
-            );
+            try {
+                return FileFactory.buildFile(
+                        fileType, map, buildAllTests(tests, fileType, anyNode)
+                );
+            } catch (InvalidFileException e) {
+                throw new InvalidCriteriaException(node.getStartMark(), e.toString());
+            }
         }
     }
 
@@ -183,34 +171,22 @@ public class SocratesConstructor extends SafeConstructor {
 
             Map<Object, Object> map = cons.constructMapping(node);
 
-            String name = (String)map.get("name");
-            String id = (String)map.get("id");
-
-            String group = (String)map.get("group");
-
-            Map<LocalDateTime, Double> dueDates = null;
-
-            Map<Date, Double> datesMap;
+            String name;
             try {
-                datesMap = (Map<Date, Double>)map.get("due_dates");
+                name = (String)map.get("assignment_name");
+                if (name == null) throw new NullPointerException();
             } catch (ClassCastException e) {
-                String msg = "invalid due dates: should map dates to doubles";
+                String msg = "invalid type for 'assignment_name': should be string";
                 throw new InvalidCriteriaException(anyNode.getStartMark(), msg);
-            }
-
-            if (datesMap != null) {
-                dueDates = new TreeMap<>();
-
-                for (Map.Entry<Date, Double> entry : datesMap.entrySet()) {
-                    Instant i = entry.getKey().toInstant();
-                    LocalDateTime ldt = LocalDateTime.ofInstant(i, ZoneOffset.UTC);
-                    dueDates.put(ldt, entry.getValue());
-                }
+            } catch (NullPointerException e) {
+                throw new InvalidCriteriaException(
+                        anyNode.getStartMark(), "missing 'assignment_name'"
+                );
             }
 
             List<File> files = (List)map.get("files");
 
-            return new Criteria(name, id, group, dueDates, files);
+            return new Criteria(name, files);
         }
     }
 

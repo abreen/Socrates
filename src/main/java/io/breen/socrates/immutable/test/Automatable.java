@@ -24,5 +24,5 @@ public interface Automatable<T extends File> {
      *
      * @return Whether this test should pass (i.e. whether the target file is "correct")
      */
-    boolean shouldPass(T parent, SubmittedFile target, Submission submission);
+    boolean shouldPass(T parent, SubmittedFile target, Submission submission) throws CannotBeAutomatedException;
 }

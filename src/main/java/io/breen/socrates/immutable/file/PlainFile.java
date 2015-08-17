@@ -4,7 +4,9 @@ import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.util.Either;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The simplest kind of non-abstract File subclass. A PlainFile is any file that can
@@ -15,7 +17,11 @@ import java.util.List;
  * @see File
  */
 public final class PlainFile extends File {
-    public PlainFile(String path, double pointValue, List<Either<Test, TestGroup>> tests) {
-        super(path, pointValue, tests);
+    public PlainFile(String path,
+                     double pointValue,
+                     Map<LocalDateTime, Double> dueDates,
+                     List<Either<Test, TestGroup>> tests)
+    {
+        super(path, pointValue, dueDates, tests);
     }
 }

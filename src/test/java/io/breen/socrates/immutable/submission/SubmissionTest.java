@@ -34,10 +34,10 @@ public class SubmissionTest {
     @Before
     public void setUp() throws Exception {
         List<File> files = new ArrayList<>(2);
-        files.add(new PlainFile("ps0pr1.txt", 20.0, null));
-        files.add(new PlainFile("ps0pr2.txt", 25.0, null));
+        files.add(new PlainFile("ps0pr1.txt", 20.0, null, null));
+        files.add(new PlainFile("ps0pr2.txt", 25.0, null, null));
 
-        criteria = new Criteria("Problem Set 0", "ps0", null, null, files);
+        criteria = new Criteria("Problem Set 0", files);
 
         submissionDir = Paths.get("submissions");
         Files.createDirectory(submissionDir);
