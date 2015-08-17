@@ -5,19 +5,13 @@ package io.breen.socrates.immutable.test;
  */
 public abstract class Test {
 
-    protected final String description;
-
     protected final double deduction;
 
-    public Test(String description, double deduction) {
-        this.description = description;
+    public Test(double deduction) {
         this.deduction = deduction;
     }
 
     public String toString() {
-        return this.getClass().toString() + "(" +
-                "description=" + description + ", " +
-                "deduction=" + deduction +
-                ")";
+        return "Test(deduction=" + deduction + ")";
     }
 }

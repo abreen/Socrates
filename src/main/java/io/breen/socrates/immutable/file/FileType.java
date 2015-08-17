@@ -15,15 +15,19 @@ public enum FileType {
 
     HMMM("hmmm");
 
-    private String id;
+    private String type;
 
-    FileType(String id) {
-        this.id = id;
+    FileType(String type) {
+        this.type = type;
     }
 
-    public static FileType fromID(String id) {
+    public String toString() {
+        return type;
+    }
+
+    public static FileType fromID(String type) {
         for (FileType t : FileType.values())
-            if (t.id.equals(id))
+            if (t.type.equals(type))
                 return t;
 
         return null;

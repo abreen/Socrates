@@ -1,16 +1,48 @@
 package io.breen.socrates.immutable.test;
 
+import io.breen.socrates.constructor.SocratesConstructor;
+
 import java.util.Map;
 
 public class TestFactory {
-    public static Test buildTest(TestType type, String description, double deduction, Map map) {
+    public static Test buildTest(TestType type, Map map) throws InvalidTestException {
         switch (type) {
+        case ALWAYS_PASSING_PLAIN: {
+            return new io.breen.socrates.immutable.test.implementation.plain.AlwaysPassingTest(0);
+        }
         case REVIEW_PLAIN:
-            return new io.breen.socrates.immutable.test.plain.ReviewTest(description, deduction);
-        case REVIEW_PYTHON:
-            return new io.breen.socrates.immutable.test.python.ReviewTest(description, deduction);
+        case REVIEW_PYTHON: {
+            String description;
+            try {
+                description = (String)map.get("description");
+                if (description == null) throw new NullPointerException();
+            } catch (ClassCastException e) {
+                throw new InvalidTestException(type, "'description' field: " + e.getMessage());
+            } catch (NullPointerException e) {
+                throw new InvalidTestException(type, "missing 'description' field");
+            }
+
+            Double deduction;
+            try {
+                deduction = SocratesConstructor.coerceToDouble(map.get("deduction"));
+                if (deduction == null) throw new NullPointerException();
+            } catch (ClassCastException e) {
+                throw new InvalidTestException(type, "'deduction' field: " + e.getMessage());
+            } catch (NullPointerException e) {
+                throw new InvalidTestException(type, "missing 'deduction' field");
+            }
+
+            if (type == TestType.REVIEW_PLAIN)
+                return new io.breen.socrates.immutable.test.implementation.plain.ReviewTest(
+                    deduction, description
+                );
+            else if (type == TestType.REVIEW_PYTHON)
+                return new io.breen.socrates.immutable.test.implementation.python.ReviewTest(
+                        deduction, description
+                );
+        }
         default:
-            return null;
+            throw new IllegalArgumentException("invalid test type to build");
         }
     }
 }

@@ -4,10 +4,7 @@ import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.file.FileFactory;
 import io.breen.socrates.immutable.file.FileType;
-import io.breen.socrates.immutable.test.Test;
-import io.breen.socrates.immutable.test.TestFactory;
-import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.immutable.test.TestType;
+import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.immutable.test.ceiling.AtMost;
 import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.util.Either;
@@ -160,20 +157,7 @@ public class SocratesConstructor extends SafeConstructor {
             }
 
             Map<Object, Object> map = cons.constructMapping(node);
-
-            String description = (String)map.get("description");
-
-            if (description == null) throw new InvalidCriteriaException(
-                    anyNode.getStartMark(), "test must have 'description'"
-            );
-
-            Double deduction = coerceToDouble(map.get("deduction"));
-
-            if (deduction == null) throw new InvalidCriteriaException(
-                    anyNode.getStartMark(), "test must have 'deduction'"
-            );
-
-            return new TestWithoutFileType(suffix, description, deduction, map);
+            return new TestWithoutFileType(suffix, map);
         }
 
     }
@@ -244,7 +228,7 @@ public class SocratesConstructor extends SafeConstructor {
         return n.getTag().getValue().substring(prefix.length());
     }
 
-    static Double coerceToDouble(Object obj) {
+    public static Double coerceToDouble(Object obj) {
         if (obj instanceof Integer)
             return ((Integer)obj).doubleValue();
 
@@ -267,18 +251,10 @@ public class SocratesConstructor extends SafeConstructor {
      */
     private class TestWithoutFileType {
         public final String testType;
-
-        public final String description;
-        public final double deduction;
-
         public final Map<Object, Object> map;
 
-        public TestWithoutFileType(String testType, String description, double deduction,
-                                   Map<Object, Object> map)
-        {
+        public TestWithoutFileType(String testType, Map<Object, Object> map) {
             this.testType = testType;
-            this.description = description;
-            this.deduction = deduction;
             this.map = map;
         }
     }
@@ -310,13 +286,11 @@ public class SocratesConstructor extends SafeConstructor {
                         "unknown: '" + t.testType + "' test for '" + fileType + "' file"
                 );
 
-                newList.add(
-                        new Left<>(
-                                TestFactory.buildTest(
-                                        type, t.description, t.deduction, t.map
-                                )
-                        )
-                );
+                try {
+                    newList.add(new Left<>(TestFactory.buildTest(type, t.map)));
+                } catch (InvalidTestException e) {
+                    throw new InvalidCriteriaException(node.getStartMark(), e.toString());
+                }
 
             } else {
                 throw new IllegalArgumentException();

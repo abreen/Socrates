@@ -67,12 +67,4 @@ public class TestGroup {
                 .add("maxValue=" + maxValue)
                 .add("members=" + members);
     }
-
-//    public List<Deduction> runTests() {
-//        return null;
-//    }
-
-//    public List<Deduction> getPossibleDeductions() {
-//        return null;
-//    }
 }
