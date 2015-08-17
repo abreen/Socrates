@@ -77,12 +77,26 @@ public abstract class File {
 
             List<Either<Test, TestGroup>> lates = new ArrayList<>(sorted.size());
 
+            /*
+             * It is *very* important that we process these due dates latest-to-earliest,
+             * and that we add them to the list in that order. This will ensure that the
+             * highest-valued deduction is chosen first. In the case that there are many
+             * due dates specifying different late periods, we will want to take the
+             * deduction corresponding to the "latest" cutoff timestamp first.
+             */
             for (Map.Entry<LocalDateTime, Double> entry : sorted.entrySet()) {
                 LateSubmissionTest lst = new LateSubmissionTest(entry.getValue(), entry.getKey());
                 lates.add(new Left<>(lst));
             }
 
             TestGroup lateGroup = new TestGroup(lates, new AtMost<>(1), Ceiling.ANY);
+
+            /*
+             * Here we add the late tests before any of the other tests specified from
+             * the criteria file. This just makes sense, since we want any late
+             * deductions to be taken first, and therefore appear first in the grade
+             * report.
+             */
             tests.add(0, new Right<>(lateGroup));
         }
 
