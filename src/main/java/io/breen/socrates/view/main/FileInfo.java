@@ -1,6 +1,7 @@
 package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
+import io.breen.socrates.immutable.submission.SubmittedFile;
 
 import javax.swing.*;
 
@@ -19,5 +20,10 @@ public class FileInfo {
         if (Globals.operatingSystem == Globals.OS.OSX) {
             rootPanel.setBorder(UIManager.getBorder("InsetBorder.aquaVariant"));
         }
+    }
+
+    public void update(SubmittedFile file) {
+        fileName.setText(file.localPath.toString());
+        // TODO
     }
 }

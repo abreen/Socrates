@@ -7,6 +7,7 @@ import io.breen.socrates.immutable.submission.SubmittedFile;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
@@ -119,6 +120,20 @@ public class SubmissionList {
             Border border = new LineBorder(new Color(197, 197, 197));
             scrollPane.setBorder(border);
         }
+    }
+
+    public void addTreeSelectionListener(TreeSelectionListener listener) {
+        tree.addTreeSelectionListener(listener);
+    }
+
+    public SubmittedFile getSelectedSubmittedFile() {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        Object userObject = node.getUserObject();
+
+        if (userObject instanceof SubmittedFile)
+            return (SubmittedFile)userObject;
+        else
+            return null;
     }
 
     public void addUngraded(List<Submission> submissions) {

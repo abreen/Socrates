@@ -1,6 +1,7 @@
 package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
+import io.breen.socrates.immutable.submission.SubmittedFile;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -19,5 +20,9 @@ public class FileView {
             Border border = new LineBorder(new Color(197, 197, 197));
             scrollPane.setBorder(border);
         }
+    }
+
+    public void update(SubmittedFile file) {
+
     }
 }

@@ -25,6 +25,14 @@ public class MainView extends JFrame {
         this.setMinimumSize(new Dimension(800, 600));
         this.setSize(new Dimension(1100, 600));
         this.setLocationRelativeTo(null);
+
+        submissionList.addTreeSelectionListener(
+                event -> fileInfo.update(submissionList.getSelectedSubmittedFile())
+        );
+
+        submissionList.addTreeSelectionListener(
+                event -> fileView.update(submissionList.getSelectedSubmittedFile())
+        );
     }
 
     public void addUngradedSubmissions(List<Submission> submissions) {
