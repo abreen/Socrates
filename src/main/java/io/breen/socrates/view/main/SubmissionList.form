@@ -9,10 +9,13 @@
     <children>
       <scrollpane id="58c60" binding="scrollPane" custom-create="true">
         <constraints border-constraint="Center"/>
-        <properties/>
+        <properties>
+          <horizontalScrollBarPolicy value="32"/>
+          <verticalScrollBarPolicy value="22"/>
+        </properties>
         <border type="none"/>
         <children>
-          <component id="201f" class="javax.swing.JTree" binding="tree">
+          <component id="201f" class="javax.swing.JTree" binding="tree" custom-create="true">
             <constraints/>
             <properties>
               <maximumSize width="-1" height="-1"/>

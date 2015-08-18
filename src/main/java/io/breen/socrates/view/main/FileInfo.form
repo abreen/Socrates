@@ -7,10 +7,17 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="2dc51" class="javax.swing.JLabel">
+      <component id="999be" class="javax.swing.JTable" binding="properties">
         <constraints border-constraint="Center"/>
+        <properties/>
+      </component>
+      <component id="6a18" class="javax.swing.JTextArea" binding="fileName">
+        <constraints border-constraint="North"/>
         <properties>
-          <text value="File info"/>
+          <font name="Monospaced" size="12"/>
+          <opaque value="false"/>
+          <rows value="1"/>
+          <text value="example.txt"/>
         </properties>
       </component>
     </children>

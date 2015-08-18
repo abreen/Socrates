@@ -14,11 +14,11 @@
         <properties/>
         <border type="none"/>
         <children>
-          <nested-form id="5d2a8" form-file="io/breen/socrates/view/main/SubmissionInfo.form" binding="submissionInfo">
-            <constraints border-constraint="South"/>
-          </nested-form>
           <nested-form id="449fd" form-file="io/breen/socrates/view/main/SubmissionList.form" binding="submissionList">
             <constraints border-constraint="Center"/>
+          </nested-form>
+          <nested-form id="36314" form-file="io/breen/socrates/view/main/FileInfo.form" binding="fileInfo">
+            <constraints border-constraint="South"/>
           </nested-form>
         </children>
       </grid>
@@ -29,9 +29,6 @@
         <children>
           <nested-form id="e6a18" form-file="io/breen/socrates/view/main/FileView.form" binding="fileView">
             <constraints border-constraint="Center"/>
-          </nested-form>
-          <nested-form id="36314" form-file="io/breen/socrates/view/main/FileInfo.form" binding="fileInfo">
-            <constraints border-constraint="South"/>
           </nested-form>
         </children>
       </grid>

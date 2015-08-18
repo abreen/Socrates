@@ -11,7 +11,9 @@ import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class SetupController {
@@ -50,24 +52,51 @@ public class SetupController {
         );
 
         view.addSubmissionsButtonActionListener(
-                e -> {
+                event -> {
                     List<Path> ps = view.chooseSubmissions();
                     if (ps != null) {
+                        Map<Path, Exception> errors = new HashMap<>();
                         List<Submission> submissions = new ArrayList<>(ps.size());
                         for (Path p : ps) {
                             try {
                                 submissions.add(Submission.fromDirectory(p));
                             } catch (IOException x) {
+                                errors.put(p, x);
                                 logger.warning("IOE thrown when adding submission: " + x);
                             } catch (ReceiptFormatException x) {
+                                errors.put(p, x);
                                 logger.warning("RFE thrown when adding submission: " + x);
                             }
                         }
 
-                        view.setVisible(false);
-                        view.dispose();
+                        int numErrors = errors.size();
+                        int numAdded = submissions.size();
+                        if (numErrors > 0) {
+                            StringBuilder sb = new StringBuilder();
+                            for (Map.Entry<Path, Exception> e : errors.entrySet())
+                                sb.append(e.getKey() + ": " + e.getValue() + "\n");
 
-                        main.start(criteria, submissions);
+                            String msg = "There was a problem opening " + numErrors + " submission" + (numErrors == 1 ? "" : "s") + ".";
+                            if (numAdded > 0) {
+                                msg += " The remaining " + numAdded + " submission" + (numAdded == 1 ? " is" : "s are") + " available to grade.";
+                            }
+                            String title = (numErrors == 1 ? "Error" : "Errors") + " Opening Submissions";
+
+                            DetailOptionPane.showMessageDialog(
+                                    view,
+                                    msg,
+                                    title,
+                                    JOptionPane.INFORMATION_MESSAGE,
+                                    sb.toString()
+                            );
+                        }
+
+                        if (numAdded > 0) {
+                            view.setVisible(false);
+                            view.dispose();
+
+                            main.start(criteria, submissions);
+                        }
                     }
                 }
         );

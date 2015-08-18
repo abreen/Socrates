@@ -20,6 +20,10 @@ public class MainController {
         this.criteria = criteria;
         this.submissions = submissions;
 
+        mainView.addUngradedSubmissions(submissions);
+        //mainView.setActiveSubmission(submissions.get(0));
+        //mainView.setActiveFile(submissions.get(0).files.get(0));
+
         mainView.setVisible(true);
     }
 }

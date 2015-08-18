@@ -21,11 +21,11 @@ public class Submission {
      * The name of the student who made this submission. This could be a proper name or a
      * user name. It also may simply have the same name as the submission directory.
      */
-    final String studentName;
+    public final String studentName;
 
     final Path submissionDir;
 
-    final List<SubmittedFile> files;
+    public final List<SubmittedFile> files;
 
     public Submission(String studentName, Path submissionDir) {
         this(studentName, submissionDir, new LinkedList<>());

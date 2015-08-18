@@ -1,11 +1,14 @@
 package io.breen.socrates.view.main;
 
+import io.breen.socrates.immutable.submission.Submission;
+import io.breen.socrates.immutable.submission.SubmittedFile;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class MainView extends JFrame {
 
-    private SubmissionInfo submissionInfo;
     private SubmissionList submissionList;
     private FileView fileView;
     private FileInfo fileInfo;
@@ -22,5 +25,13 @@ public class MainView extends JFrame {
         this.setMinimumSize(new Dimension(800, 600));
         this.setSize(new Dimension(1100, 600));
         this.setLocationRelativeTo(null);
+    }
+
+    public void addUngradedSubmissions(List<Submission> submissions) {
+        submissionList.addUngraded(submissions);
+    }
+
+    public void setActiveSubmittedFile(SubmittedFile submittedFile) {
+        //submissionList.selectFile(submittedFile);
     }
 }

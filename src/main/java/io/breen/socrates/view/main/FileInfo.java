@@ -7,6 +7,8 @@ import javax.swing.*;
 public class FileInfo {
 
     private JPanel rootPanel;
+    private JTable properties;
+    private JTextArea fileName;
 
     private void createUIComponents() {
         rootPanel = new JPanel();
