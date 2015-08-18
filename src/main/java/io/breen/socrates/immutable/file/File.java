@@ -25,13 +25,18 @@ public abstract class File {
      * The relative path from the root of a user's submission directory specifying
      * where the expected file can be found.
      */
-    protected final String path;
+    public final String path;
 
     /**
      * The number of points that this file contributes to the total value of the
      * assignment being graded.
      */
-    protected final double pointValue;
+    public final double pointValue;
+
+    /**
+     * The MIME ContentType value for this file.
+     */
+    public final String contentType;
 
     /**
      * This file's "test tree" root. The root is a TestGroup object whose maxValue
@@ -44,10 +49,12 @@ public abstract class File {
 
     public File(String path,
                 double pointValue,
+                String contentType,
                 Map<LocalDateTime, Double> dueDates,
                 List<Either<Test, TestGroup>> tests)
     {
         this.path = path;
+        this.contentType = contentType;
         this.pointValue = pointValue;
         this.testRoot = createTestRoot(pointValue, dueDates, tests);
     }

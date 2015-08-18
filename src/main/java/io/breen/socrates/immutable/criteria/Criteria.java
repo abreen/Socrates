@@ -20,9 +20,9 @@ public final class Criteria {
     /**
      * Human-readable assignment name (e.g., "Problem Set 1"). Cannot be null.
      */
-    private final String assignmentName;
+    public final String assignmentName;
 
-    private List<File> files;
+    public final List<File> files;
 
     public Criteria(String name, List<File> files) {
         this.assignmentName = name;

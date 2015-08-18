@@ -71,15 +71,15 @@ public class Submission {
             Files.walkFileTree(
                     directory, new SimpleFileVisitor<Path>() {
                         @Override
-                        public FileVisitResult visitFile(Path file,
+                        public FileVisitResult visitFile(Path path,
                                                          BasicFileAttributes attr)
                                 throws IOException
                         {
                             if (!attr.isRegularFile()) return FileVisitResult.CONTINUE;
 
-                            Path localPath = directory.relativize(file);
+                            Path localPath = directory.relativize(path);
 
-                            if (file.getFileName().toString().endsWith(".receipt")) {
+                            if (path.getFileName().toString().endsWith(".receipt")) {
                                 // only consider receipts when we look at a file
                                 return FileVisitResult.CONTINUE;
                             } else {
@@ -88,13 +88,13 @@ public class Submission {
 
                                 // TODO does this work on Windows?
                                 Path receiptPath = Paths.get(
-                                        file.toString() + ".receipt"
+                                        path.toString() + ".receipt"
                                 );
 
                                 if (Files.exists(receiptPath)) {
                                     try {
                                         submittedFile = new SubmittedFile(
-                                                localPath, receiptPath
+                                                path, localPath, receiptPath
                                         );
                                     } catch (IOException e) {
                                         throw e;
@@ -102,7 +102,7 @@ public class Submission {
                                         throw new ReceiptFormatExceptionIO(e);
                                     }
                                 } else {
-                                    submittedFile = new SubmittedFile(localPath);
+                                    submittedFile = new SubmittedFile(path, localPath);
                                 }
 
                                 submittedFiles.add(submittedFile);

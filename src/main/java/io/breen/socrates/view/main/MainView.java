@@ -1,19 +1,15 @@
 package io.breen.socrates.view.main;
 
-import io.breen.socrates.immutable.submission.Submission;
-import io.breen.socrates.immutable.submission.SubmittedFile;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class MainView extends JFrame {
 
-    private SubmissionList submissionList;
-    private FileView fileView;
-    private FileInfo fileInfo;
-    private TestList testList;
-    private TestInfo testInfo;
+    public SubmissionTree submissionTree;
+    public FileView fileView;
+    public FileInfo fileInfo;
+    public TestList testList;
+    public TestInfo testInfo;
     private JPanel rootPanel;
 
     public MainView() {
@@ -26,20 +22,8 @@ public class MainView extends JFrame {
         this.setSize(new Dimension(1100, 600));
         this.setLocationRelativeTo(null);
 
-        submissionList.addTreeSelectionListener(
-                event -> fileInfo.update(submissionList.getSelectedSubmittedFile())
+        submissionTree.addTreeSelectionListener(
+                event -> fileInfo.update(submissionTree.getSelectedSubmittedFile())
         );
-
-        submissionList.addTreeSelectionListener(
-                event -> fileView.update(submissionList.getSelectedSubmittedFile())
-        );
-    }
-
-    public void addUngradedSubmissions(List<Submission> submissions) {
-        submissionList.addUngraded(submissions);
-    }
-
-    public void setActiveSubmittedFile(SubmittedFile submittedFile) {
-        //submissionList.selectFile(submittedFile);
     }
 }

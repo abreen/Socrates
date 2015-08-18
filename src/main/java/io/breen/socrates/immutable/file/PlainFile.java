@@ -22,6 +22,6 @@ public final class PlainFile extends File {
                      Map<LocalDateTime, Double> dueDates,
                      List<Either<Test, TestGroup>> tests)
     {
-        super(path, pointValue, dueDates, tests);
+        super(path, pointValue, "text/plain", dueDates, tests);
     }
 }

@@ -22,7 +22,7 @@ public final class PythonFile extends File {
                       Map<LocalDateTime, Double> dueDates,
                       List<Either<Test, TestGroup>> tests)
     {
-        super(path, pointValue, dueDates, tests);
+        super(path, pointValue, "text/x-python", dueDates, tests);
         // TODO add more parameters and fields
     }
 }

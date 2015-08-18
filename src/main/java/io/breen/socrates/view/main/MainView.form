@@ -14,7 +14,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <nested-form id="449fd" form-file="io/breen/socrates/view/main/SubmissionList.form" binding="submissionList">
+          <nested-form id="449fd" form-file="io/breen/socrates/view/main/SubmissionTree.form" binding="submissionTree">
             <constraints border-constraint="Center"/>
           </nested-form>
           <nested-form id="36314" form-file="io/breen/socrates/view/main/FileInfo.form" binding="fileInfo">

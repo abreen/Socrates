@@ -1,6 +1,8 @@
 package io.breen.socrates.immutable.submission;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
@@ -11,6 +13,11 @@ import java.util.logging.Logger;
 public class SubmittedFile {
 
     private static Logger logger = Logger.getLogger(SubmittedFile.class.getName());
+
+    /**
+     * This file's location on the file system.
+     */
+    public final Path fullPath;
 
     /**
      * This file's location relative to the submission directory. This path should
@@ -25,14 +32,16 @@ public class SubmittedFile {
      */
     public final Receipt receipt;
 
-    public SubmittedFile(Path localPath) {
+    public SubmittedFile(Path fullPath, Path localPath) {
+        this.fullPath = fullPath;
         this.localPath = localPath;
         this.receipt = null;
     }
 
-    public SubmittedFile(Path localPath, Path receipt)
+    public SubmittedFile(Path fullPath, Path localPath, Path receipt)
             throws IOException, ReceiptFormatException
     {
+        this.fullPath = fullPath;
         this.localPath = localPath;
 
         Receipt r = null;
@@ -48,5 +57,19 @@ public class SubmittedFile {
                 "localPath=" + localPath + ", " +
                 "receipt=" + receipt +
                 ")";
+    }
+
+    public String getContents() throws IOException {
+        BufferedReader reader = Files.newBufferedReader(fullPath);
+        StringBuilder builder = new StringBuilder();
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            builder.append(line);
+            builder.append('\n');
+        }
+
+        reader.close();
+        return builder.toString();
     }
 }

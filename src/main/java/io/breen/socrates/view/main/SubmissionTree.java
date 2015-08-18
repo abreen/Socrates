@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
-public class SubmissionList {
+public class SubmissionTree {
 
     private JPanel rootPanel;
     private JScrollPane scrollPane;

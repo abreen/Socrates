@@ -15,7 +15,7 @@
         </properties>
         <border type="none"/>
         <children>
-          <component id="1ff80" class="javax.swing.JEditorPane" binding="editor">
+          <component id="1ff80" class="javax.swing.JEditorPane" binding="editor" custom-create="true">
             <constraints/>
             <properties>
               <editable value="false"/>
