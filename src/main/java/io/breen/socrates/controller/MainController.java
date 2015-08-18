@@ -24,11 +24,13 @@ public class MainController {
         mainView.submissionTree.addTreeSelectionListener(
                 event -> {
                     SubmittedFile submitted = mainView.submissionTree.getSelectedSubmittedFile();
-                    File matchingFile = findMatchingFile(submitted);
-                    try {
-                        mainView.fileView.update(matchingFile, submitted);
-                    } catch (IOException x) {
-                        logger.warning("encountered IOE updating FileView");
+                    if (submitted != null) {
+                        File matchingFile = findMatchingFile(submitted);
+                        try {
+                            mainView.fileView.update(matchingFile, submitted);
+                        } catch (IOException x) {
+                            logger.warning("encountered IOE updating FileView");
+                        }
                     }
                 }
         );
@@ -39,8 +41,7 @@ public class MainController {
         this.submissions = submissions;
 
         mainView.submissionTree.addUngraded(submissions);
-        // TODO
-        //mainView.setActiveFile(submissions.get(0).files.get(0));
+        mainView.submissionTree.setActiveSubmittedFile(submissions.get(0).files.get(0));
 
         mainView.setVisible(true);
     }

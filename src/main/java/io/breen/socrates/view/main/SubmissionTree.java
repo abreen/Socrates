@@ -128,6 +128,9 @@ public class SubmissionTree {
 
     public SubmittedFile getSelectedSubmittedFile() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        if (node == null)
+            return null;
+
         Object userObject = node.getUserObject();
 
         if (userObject instanceof SubmittedFile)
@@ -147,13 +150,13 @@ public class SubmissionTree {
         }
     }
 
-    public void setActive(Submission s) {
-        Enumeration ungraded = ungradedRoot.children();
+    public void setActiveSubmittedFile(SubmittedFile submittedFile) {
+        Enumeration ungraded = ungradedRoot.depthFirstEnumeration();
         while (ungraded.hasMoreElements()) {
             Object node = ungraded.nextElement();
             if (node instanceof DefaultMutableTreeNode) {
                 DefaultMutableTreeNode mutableTreeNode = (DefaultMutableTreeNode)node;
-                if (mutableTreeNode.getUserObject() == s) {
+                if (mutableTreeNode.getUserObject() == submittedFile) {
                     tree.addSelectionPath(new TreePath(mutableTreeNode.getPath()));
                     break;
                 }

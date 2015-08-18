@@ -1,5 +1,7 @@
 package io.breen.socrates.view.main;
 
+import io.breen.socrates.immutable.submission.SubmittedFile;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -23,7 +25,11 @@ public class MainView extends JFrame {
         this.setLocationRelativeTo(null);
 
         submissionTree.addTreeSelectionListener(
-                event -> fileInfo.update(submissionTree.getSelectedSubmittedFile())
+                event -> {
+                    SubmittedFile file = submissionTree.getSelectedSubmittedFile();
+                    if (file != null)
+                        fileInfo.update(file);
+                }
         );
     }
 }
