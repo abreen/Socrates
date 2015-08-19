@@ -9,6 +9,7 @@ import io.breen.socrates.util.Either;
 import io.breen.socrates.util.Left;
 import io.breen.socrates.util.Right;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -25,7 +26,7 @@ public abstract class File {
      * The relative path from the root of any student's submission directory specifying
      * where the expected file can be found.
      */
-    public final String localPath;
+    public final Path localPath;
 
     /**
      * The number of points that this file contributes to the total value of the
@@ -47,7 +48,7 @@ public abstract class File {
      */
     protected final TestGroup testRoot;
 
-    public File(String localPath,
+    public File(Path localPath,
                 double pointValue,
                 String contentType,
                 Map<LocalDateTime, Double> dueDates,

@@ -5,6 +5,8 @@ import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.util.Either;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -65,10 +67,12 @@ public class FileFactory {
             }
         }
 
-        String path;
+        String pathStr;
+        Path path;
         try {
-            path = (String)map.get("path");
-            if (path == null) throw new NullPointerException();
+            pathStr = (String)map.get("path");
+            if (pathStr == null) throw new NullPointerException();
+            path = Paths.get(pathStr);
         } catch (ClassCastException e) {
             throw new InvalidFileException(type, "'path' field: " + e.getMessage());
         } catch (NullPointerException e) {
