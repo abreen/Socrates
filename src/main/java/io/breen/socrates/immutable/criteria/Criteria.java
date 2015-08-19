@@ -32,6 +32,11 @@ public final class Criteria {
     public final List<File> files;
 
     public Criteria(String name, List<File> files) {
+        if (name == null)
+            throw new IllegalArgumentException("'name' cannot be null");
+        if (files == null)
+            throw new IllegalArgumentException("'files' cannot be null");
+
         this.assignmentName = name;
         this.files = files;
 

@@ -20,23 +20,26 @@ import org.yaml.snakeyaml.nodes.Tag;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
- * A subclass of the SnakeYAML constructor that knows how to instantiate
- * our custom classes (e.g., Criteria, File, Test, or TestGroup objects).
+ * A subclass of the SnakeYAML constructor that knows how to instantiate our custom
+ * classes (e.g., Criteria, File, Test, or TestGroup objects).
  *
- * Integrates closely with io.breen.socrates.immutable.file.FileFactory
- * and io.breen.socrates.immutable.test.TestFactory.
+ * Integrates closely with io.breen.socrates.immutable.file.FileFactory and
+ * io.breen.socrates.immutable.test.TestFactory.
  *
  * @see io.breen.socrates.immutable.file.FileFactory
  * @see io.breen.socrates.immutable.test.TestFactory
  */
 public class SocratesConstructor extends SafeConstructor {
+
     private static final String GROUP_TAG = "!group";
     private static final String FILE_PREFIX = "!file:";
     private static final String TEST_PREFIX = "!test:";
 
     private class GroupConstruct extends AbstractConstruct {
+
         private SocratesConstructor cons;
 
         public GroupConstruct(SocratesConstructor cons) {
@@ -69,26 +72,24 @@ public class SocratesConstructor extends SafeConstructor {
 
             if (maxNumCrit == null)         // was not specified in criteria file
                 maxNum = Ceiling.ANY;
-            else
-                maxNum = new AtMost<Integer>(maxNumCrit);
+            else maxNum = new AtMost<Integer>(maxNumCrit);
 
             if (maxValueCrit == null)       // was not specified in criteria file
                 maxValue = Ceiling.ANY;
-            else
-                maxValue = new AtMost<Double>(maxValueCrit);
+            else maxValue = new AtMost<Double>(maxValueCrit);
 
             try {
                 return new TestGroup(members, maxNum, maxValue);
             } catch (IllegalArgumentException e) {
                 throw new InvalidCriteriaException(
-                        anyNode.getStartMark(),
-                        e.getMessage()
+                        anyNode.getStartMark(), e.getMessage()
                 );
             }
         }
     }
 
     private abstract class PrefixConstruct extends AbstractConstruct {
+
         protected SocratesConstructor cons;
 
         public PrefixConstruct(SocratesConstructor cons) {
@@ -99,6 +100,7 @@ public class SocratesConstructor extends SafeConstructor {
     }
 
     private class FileConstruct extends PrefixConstruct {
+
         public FileConstruct(SocratesConstructor cons) {
             super(cons);
         }
@@ -135,6 +137,7 @@ public class SocratesConstructor extends SafeConstructor {
     }
 
     private class TestConstruct extends PrefixConstruct {
+
         public TestConstruct(SocratesConstructor cons) {
             super(cons);
         }
@@ -160,6 +163,7 @@ public class SocratesConstructor extends SafeConstructor {
      * Class that constructs the root object of the YAML file --- the Criteria object.
      */
     private class RootConstruct extends AbstractConstruct {
+
         private SocratesConstructor cons;
 
         public RootConstruct(SocratesConstructor cons) {
@@ -181,6 +185,7 @@ public class SocratesConstructor extends SafeConstructor {
             try {
                 name = (String)map.get("assignment_name");
                 if (name == null) throw new NullPointerException();
+                map.remove("assignment_name");
             } catch (ClassCastException e) {
                 String msg = "invalid type for 'assignment_name': should be string";
                 throw new InvalidCriteriaException(anyNode.getStartMark(), msg);
@@ -191,6 +196,15 @@ public class SocratesConstructor extends SafeConstructor {
             }
 
             List<File> files = (List)map.get("files");
+            map.remove("files");
+
+            if (map.size() != 0) {
+                StringJoiner joiner = new StringJoiner(", ");
+                map.forEach((k, v) -> joiner.add(k.toString()));
+                throw new InvalidCriteriaException(
+                        "unexpected top-level key(s): " + joiner.toString()
+                );
+            }
 
             return new Criteria(name, files);
         }
@@ -211,27 +225,25 @@ public class SocratesConstructor extends SafeConstructor {
     }
 
     public static Double coerceToDouble(Object obj) {
-        if (obj instanceof Integer)
-            return ((Integer)obj).doubleValue();
+        if (obj instanceof Integer) return ((Integer)obj).doubleValue();
 
-        if (obj instanceof Double)
-            return (Double)obj;
+        if (obj instanceof Double) return (Double)obj;
 
-        if (obj == null)
-            return null;
+        if (obj == null) return null;
 
         throw new ClassCastException(obj + " is not coercible to Double");
     }
 
     /**
-     * Represents a test parsed from the YAML file which has an type (i.e., it has
-     * a "!test:..." tag) but cannot yet be associated with a file type (i.e., we
-     * do not yet know the type of the file that lists this test). We need to create
-     * temporary instances of this class so that the YAML parser will parse the
-     * values in the test, and then we will use TestFactory when control is passed
-     * back to the file constructor.
+     * Represents a test parsed from the YAML file which has an type (i.e., it has a
+     * "!test:..." tag) but cannot yet be associated with a file type (i.e., we do not yet
+     * know the type of the file that lists this test). We need to create temporary
+     * instances of this class so that the YAML parser will parse the values in the test,
+     * and then we will use TestFactory when control is passed back to the file
+     * constructor.
      */
     private class TestWithoutFileType {
+
         public final String testType;
         public final Map<Object, Object> map;
 
@@ -242,19 +254,25 @@ public class SocratesConstructor extends SafeConstructor {
     }
 
     /**
-     * Given a list of objects which may be TestWithoutFileType objects or
-     * TestGroup objects containing TestWithoutFileType members, "traverse" this
-     * "tree" of Tests, using the TestFactory to convert all TestWithoutFileType
-     * objects to actual instances, using the specified FileType.
+     * Given a list of objects which may be TestWithoutFileType objects or TestGroup
+     * objects containing TestWithoutFileType members, "traverse" this "tree" of Tests,
+     * using the TestFactory to convert all TestWithoutFileType objects to actual
+     * instances, using the specified FileType.
      */
-    private List<Either<Test, TestGroup>> buildAllTests(List tests, FileType fileType, Node node) {
+    private List<Either<Test, TestGroup>> buildAllTests(List tests, FileType fileType,
+                                                        Node node)
+    {
         List<Either<Test, TestGroup>> newList = new LinkedList<>();
 
         for (Object o : tests) {
             if (o instanceof TestGroup) {
                 TestGroup g = (TestGroup)o;
 
-                List<Either<Test, TestGroup>> newMembers = buildAllTests(g.getMembers(), fileType, node);
+                List<Either<Test, TestGroup>> newMembers = buildAllTests(
+                        g.getMembers(),
+                        fileType,
+                        node
+                );
 
                 newList.add(new Right<>(new TestGroup(newMembers, g)));
 
