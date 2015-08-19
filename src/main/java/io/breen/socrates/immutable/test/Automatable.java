@@ -23,6 +23,11 @@ public interface Automatable<T extends File> {
      * @param submission The Submission object containing the target
      *
      * @return Whether this test should pass (i.e. whether the target file is "correct")
+     *
+     * @throws CannotBeAutomatedException If, while running the test automatically, an
+     * error occurs or it becomes impossible to determine whether the test should pass
+     * automatically
      */
-    boolean shouldPass(T parent, SubmittedFile target, Submission submission) throws CannotBeAutomatedException;
+    boolean shouldPass(T parent, SubmittedFile target, Submission submission)
+            throws CannotBeAutomatedException;
 }

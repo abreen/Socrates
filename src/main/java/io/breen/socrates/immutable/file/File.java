@@ -22,10 +22,10 @@ import java.util.*;
 public abstract class File {
 
     /**
-     * The relative path from the root of a user's submission directory specifying
+     * The relative path from the root of any student's submission directory specifying
      * where the expected file can be found.
      */
-    public final String path;
+    public final String localPath;
 
     /**
      * The number of points that this file contributes to the total value of the
@@ -47,13 +47,13 @@ public abstract class File {
      */
     protected final TestGroup testRoot;
 
-    public File(String path,
+    public File(String localPath,
                 double pointValue,
                 String contentType,
                 Map<LocalDateTime, Double> dueDates,
                 List<Either<Test, TestGroup>> tests)
     {
-        this.path = path;
+        this.localPath = localPath;
         this.contentType = contentType;
         this.pointValue = pointValue;
         this.testRoot = createTestRoot(pointValue, dueDates, tests);
@@ -61,7 +61,7 @@ public abstract class File {
 
     public String toString() {
         return this.getClass().toString() + "(" +
-                "path=" + path + ", " +
+                "localPath=" + localPath + ", " +
                 "pointValue=" + pointValue + ", " +
                 "testRoot=" + testRoot +
                 ")";

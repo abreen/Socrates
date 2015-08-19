@@ -2,6 +2,10 @@ package io.breen.socrates;
 
 import java.util.Properties;
 
+/**
+ * The single location for a small number (as little as possible!) of runtime-set
+ * variables that are needed anywhere.
+ */
 public class Globals {
     public static Properties properties;
 

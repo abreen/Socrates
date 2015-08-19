@@ -22,6 +22,12 @@ public final class Criteria {
      */
     public final String assignmentName;
 
+    /**
+     * List of File objects created from the criteria file. These will all be instances
+     * of subclasses of File, since File is abstract.
+     *
+     * @see File
+     */
     public final List<File> files;
 
     public Criteria(String name, List<File> files) {

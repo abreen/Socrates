@@ -1,5 +1,15 @@
 package io.breen.socrates.immutable.file;
 
+/**
+ * An enumeration used to provide a lightweight representation of all known subclasses
+ * of File. Each enumeration value contains the string used in criteria files to refer
+ * to particular file types. This enumeration is used by SocratesConstructor, since it
+ * must map strings from the criteria file to an actual class in the source code to
+ * instantiate. Then FileFactory does the instantiation.
+ *
+ * @see io.breen.socrates.constructor.SocratesConstructor
+ * @see io.breen.socrates.immutable.file.FileFactory
+ */
 public enum FileType {
 
     /**
@@ -7,6 +17,9 @@ public enum FileType {
      */
     PLAIN("plain"),
 
+    /**
+     * @see PythonFile
+     */
     PYTHON("python"),
 
     JAVA("java"),

@@ -4,7 +4,17 @@ import io.breen.socrates.constructor.SocratesConstructor;
 
 import java.util.Map;
 
+/**
+ * This factory's single static method takes a TestType and a map of key-value pairs from
+ * a criteria file, and uses the data specified in the map to create the appropriate
+ * instance of the specified TestType.
+ */
 public class TestFactory {
+
+    /**
+     * @throws InvalidTestException If the map passed in does not contain valid data
+     * enough to create an instance of the desired TestType
+     */
     public static Test buildTest(TestType type, Map map)
             throws InvalidTestException
     {

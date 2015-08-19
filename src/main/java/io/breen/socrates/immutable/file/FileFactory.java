@@ -13,11 +13,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * This factory's single static method takes a FileType, a map of key-value pairs from a
+ * criteria file, and a list of tests (previously created by TestFactory). The list of
+ * tests is actually a list of tests or TestGroups (but a TestGroup is simply a container
+ * for more tests, or more TestGroups, recursively).
+ *
+ * @see io.breen.socrates.immutable.test.Test
+ * @see io.breen.socrates.immutable.test.TestGroup
+ */
 public class FileFactory {
-    public static File buildFile(FileType type,
-                                 Map map,
+
+    /**
+     * @throws InvalidFileException If the map passed in does not contain valid data
+     * enough to create an instance of the desired FileType
+     */
+    public static File buildFile(FileType type, Map map,
                                  List<Either<Test, TestGroup>> tests)
-        throws InvalidFileException
+            throws InvalidFileException
     {
         /*
          * Parse due dates for this file, if they exist.
@@ -40,7 +53,10 @@ public class FileFactory {
                 try {
                     deduction = SocratesConstructor.coerceToDouble(entry.getValue());
                 } catch (ClassCastException e) {
-                    throw new InvalidFileException(type, "'due_dates' value is not a double");
+                    throw new InvalidFileException(
+                            type,
+                            "'due_dates' value is not a double"
+                    );
                 }
 
                 Instant i = date.toInstant();
@@ -64,7 +80,10 @@ public class FileFactory {
             pointValue = SocratesConstructor.coerceToDouble(map.get("point_value"));
             if (pointValue == null) throw new NullPointerException();
         } catch (ClassCastException e) {
-            throw new InvalidFileException(type, "'point_value' field: " + e.getMessage());
+            throw new InvalidFileException(
+                    type,
+                    "'point_value' field: " + e.getMessage()
+            );
         } catch (NullPointerException e) {
             throw new InvalidFileException(type, "missing 'point_value' field");
         }

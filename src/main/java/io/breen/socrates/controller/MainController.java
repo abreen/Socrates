@@ -49,7 +49,7 @@ public class MainController {
     private File findMatchingFile(SubmittedFile submittedFile) {
         String localPath = submittedFile.localPath.toString();
         for (File f : criteria.files)
-            if (localPath.equals(f.path))
+            if (localPath.equals(f.localPath))
                 return f;
         return null;
     }

@@ -24,6 +24,12 @@ import java.util.Map;
 /**
  * A subclass of the SnakeYAML constructor that knows how to instantiate
  * our custom classes (e.g., Criteria, File, Test, or TestGroup objects).
+ *
+ * Integrates closely with io.breen.socrates.immutable.file.FileFactory
+ * and io.breen.socrates.immutable.test.TestFactory.
+ *
+ * @see io.breen.socrates.immutable.file.FileFactory
+ * @see io.breen.socrates.immutable.test.TestFactory
  */
 public class SocratesConstructor extends SafeConstructor {
     private static final String GROUP_TAG = "!group";
