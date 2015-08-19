@@ -17,7 +17,7 @@ public class MainView extends JFrame {
     public MainView() {
         super("Socrates");
 
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setContentPane(rootPanel);
 
         this.setMinimumSize(new Dimension(800, 600));

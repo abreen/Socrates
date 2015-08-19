@@ -23,7 +23,7 @@ public class SetupView extends JFrame {
     public SetupView() {
         super("Socrates");
 
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this.setResizable(false);
         this.setContentPane(rootPanel);
 
