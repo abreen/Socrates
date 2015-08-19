@@ -17,9 +17,20 @@ import io.breen.socrates.immutable.file.FileType;
  */
 public enum TestType {
 
+    /*
+     * Test types that can work for any file type
+     */
+    SCRIPT(null, "script"),
+
+    /*
+     * Test types for plain text files
+     */
     ALWAYS_PASSING_PLAIN(FileType.PLAIN, "alwayspassing"),
     REVIEW_PLAIN(FileType.PLAIN, "review"),
 
+    /*
+     * Test types for Python files
+     */
     REVIEW_PYTHON(FileType.PYTHON, "review");
 
     public final FileType forFileType;
@@ -32,10 +43,16 @@ public enum TestType {
 
     @Override
     public String toString() {
-        return type + " for " + forFileType;
+        String s = type + " test";
+        if (forFileType != null)
+            s += " for " + forFileType + " file";
+        return s;
     }
 
     public static TestType fromTypeAndID(FileType type, String testType) {
+        if (testType.equals("script"))
+            return SCRIPT;
+
         for (TestType t : TestType.values())
             if (t.forFileType == type && t.type.equals(testType))
                 return t;

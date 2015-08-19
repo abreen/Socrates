@@ -18,6 +18,10 @@ public abstract class Resource {
         this.fileName = fileName;
     }
 
+    public String toString() {
+        return this.getClass().getName() + "(fileName=" + fileName + ")";
+    }
+
     public abstract String getContents() throws IOException;
 
     public abstract void copyTo(Path path) throws IOException;

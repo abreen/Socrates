@@ -11,8 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -47,14 +48,14 @@ public final class Criteria {
      * Other resources provided by a criteria package
      */
 
-    public final List<Resource> staticResources;
+    public final Map<String, Resource> staticResources;
 
-    public final List<Resource> scripts;
+    public final Map<String, Resource> scripts;
 
-    public final List<Resource> hooks;
+    public final Map<String, Resource> hooks;
 
-    public Criteria(String name, List<File> files, List<Resource> staticResources,
-                    List<Resource> scripts, List<Resource> hooks)
+    public Criteria(String name, List<File> files, Map<String, Resource> staticResources,
+                    Map<String, Resource> scripts, Map<String, Resource> hooks)
     {
         if (name == null) throw new IllegalArgumentException("'name' cannot be null");
         if (files == null) throw new IllegalArgumentException("'files' cannot be null");
@@ -77,21 +78,15 @@ public final class Criteria {
     }
 
     public Criteria(String name, List<File> files) {
-        this(name, files, new LinkedList<>(), new LinkedList<>(), new LinkedList<>());
+        this(name, files, new HashMap<>(), new HashMap<>(), new HashMap<>());
     }
 
     public String toString() {
         return "Criteria\n" +
                 "\tassignment_name=" + assignmentName + "\n" +
-                "\tstaticResources=" + staticResources.stream()
-                                                      .map(f -> f.toString())
-                                                      .collect(Collectors.joining("\n")) +
-                "\tscripts=" + scripts.stream()
-                                      .map(f -> f.toString())
-                                      .collect(Collectors.joining("\n")) +
-                "\thooks=" + hooks.stream()
-                                  .map(f -> f.toString())
-                                  .collect(Collectors.joining("\n")) +
+                "\tstaticResources=" + staticResources + "\n" +
+                "\tscripts=" + scripts + "\n" +
+                "\thooks=" + hooks + "\n" +
                 "\tfiles=" + files.stream()
                                   .map(f -> f.toString())
                                   .collect(Collectors.joining("\n"));
@@ -109,24 +104,31 @@ public final class Criteria {
             Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>)zip.entries();
 
             InputStream criteriaFile = null;
-            List<Resource> staticResources = new LinkedList<>();
-            List<Resource> scripts = new LinkedList<>();
-            List<Resource> hooks = new LinkedList<>();
+            Map<String, Resource> staticResources = new HashMap<>();
+            Map<String, Resource> scripts = new HashMap<>();
+            Map<String, Resource> hooks = new HashMap<>();
 
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 if (entry.isDirectory()) continue;
 
-                String entryName = entry.getName();
-                String entryFileName = Paths.get(entryName).getFileName().toString();
-                if (looksLikeCriteriaFile(entryName)) {
+                String entryPath = entry.getName();
+                String entryFileName = Paths.get(entryPath).getFileName().toString();
+
+                if (looksLikeCriteriaFile(entryPath)) {
                     criteriaFile = zip.getInputStream(entry);
-                } else if (looksLikeStaticResource(entryName)) {
-                    staticResources.add(new ZipEntryResource(entryFileName, zip, entry));
-                } else if (looksLikeScriptResource(entryName)) {
-                    scripts.add(new ZipEntryResource(entryFileName, zip, entry));
-                } else if (looksLikeHookResource(entryName)) {
-                    hooks.add(new ZipEntryResource(entryFileName, zip, entry));
+                } else if (looksLikeStaticResource(entryPath)) {
+                    staticResources.put(
+                            entryFileName, new ZipEntryResource(entryFileName, zip, entry)
+                    );
+                } else if (looksLikeScriptResource(entryPath)) {
+                    scripts.put(
+                            entryFileName, new ZipEntryResource(entryFileName, zip, entry)
+                    );
+                } else if (looksLikeHookResource(entryPath)) {
+                    hooks.put(
+                            entryFileName, new ZipEntryResource(entryFileName, zip, entry)
+                    );
                 }
             }
 

@@ -28,6 +28,14 @@ public class ZipEntryResource extends Resource {
     }
 
     @Override
+    public String toString() {
+        return "ZipEntryResource(" +
+                "fileName=" + fileName + ", " +
+                "parent=" + parent + ", " +
+                "entry=" + entry + ")";
+    }
+
+    @Override
     public String getContents() throws IOException {
         StringBuilder builder = new StringBuilder();
         BufferedReader reader = new BufferedReader(

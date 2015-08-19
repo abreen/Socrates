@@ -18,10 +18,7 @@ import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * A subclass of the SnakeYAML constructor that knows how to instantiate our custom
@@ -39,9 +36,9 @@ public class SocratesConstructor extends SafeConstructor {
     private static final String FILE_PREFIX = "!file:";
     private static final String TEST_PREFIX = "!test:";
 
-    public List<Resource> staticResources;
-    public List<Resource> scripts;
-    public List<Resource> hooks;
+    public Map<String, Resource> staticResources;
+    public Map<String, Resource> scripts;
+    public Map<String, Resource> hooks;
 
     private class GroupConstruct extends AbstractConstruct {
 
@@ -212,15 +209,15 @@ public class SocratesConstructor extends SafeConstructor {
             }
 
             if (staticResources == null) {
-                staticResources = new LinkedList<>();
+                staticResources = new HashMap<>();
             }
 
             if (scripts == null) {
-                scripts = new LinkedList<>();
+                scripts = new HashMap<>();
             }
 
             if (hooks == null) {
-                hooks = new LinkedList<>();
+                hooks = new HashMap<>();
             }
 
             return new Criteria(name, files, staticResources, scripts, hooks);
@@ -236,8 +233,8 @@ public class SocratesConstructor extends SafeConstructor {
         this.yamlMultiConstructors.put(TEST_PREFIX, new TestConstruct(this));
     }
 
-    public SocratesConstructor(List<Resource> staticResources, List<Resource> scripts,
-                               List<Resource> hooks)
+    public SocratesConstructor(Map<String, Resource> staticResources,
+                               Map<String, Resource> scripts, Map<String, Resource> hooks)
     {
         this();
         this.staticResources = staticResources;
@@ -311,7 +308,7 @@ public class SocratesConstructor extends SafeConstructor {
                 );
 
                 try {
-                    newList.add(new Left<>(TestFactory.buildTest(type, t.map)));
+                    newList.add(new Left<>(TestFactory.buildTest(type, t.map, scripts)));
                 } catch (InvalidTestException e) {
                     throw new InvalidCriteriaException(node.getStartMark(), e.toString());
                 }
