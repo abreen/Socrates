@@ -32,7 +32,7 @@ public class SetupController {
                     Path path = view.chooseCriteriaFile();
                     if (path != null) {
                         try {
-                            criteria = Criteria.loadFromYAML(path);
+                            criteria = Criteria.loadFromPath(path);
                         } catch (IOException | InvalidCriteriaException x) {
                             DetailOptionPane.showMessageDialog(
                                     view,
@@ -108,7 +108,7 @@ public class SetupController {
     public void start(Path criteriaPath) {
         if (criteriaPath != null) {
             try {
-                criteria = Criteria.loadFromYAML(criteriaPath);
+                criteria = Criteria.loadFromPath(criteriaPath);
             } catch (IOException | InvalidCriteriaException x) {
                 logger.warning(criteriaPath + " specified an invalid criteria");
             }

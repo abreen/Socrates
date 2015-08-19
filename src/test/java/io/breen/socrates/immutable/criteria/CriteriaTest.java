@@ -92,28 +92,28 @@ public class CriteriaTest {
 
     @Test(expected = InvalidCriteriaException.class)
     public void emptyFileShouldThrowException() throws Exception {
-        Criteria.loadFromYAML(InputFile.EMPTY_FILE.p);
+        Criteria.loadFromPath(InputFile.EMPTY_FILE.p);
     }
 
     @Test(expected = InvalidCriteriaException.class)
     public void invalidTopLevelShouldThrowException() throws Exception {
-        Criteria.loadFromYAML(InputFile.INVALID_TOP.p);
+        Criteria.loadFromPath(InputFile.INVALID_TOP.p);
     }
 
     @Test
     public void basicShouldWork() throws Exception {
-        Criteria c = Criteria.loadFromYAML(InputFile.BASIC.p);
+        Criteria c = Criteria.loadFromPath(InputFile.BASIC.p);
         assertEquals(c.assignmentName, TEST_ASSIGNMENT_NAME);
         assertEquals(c.files.size(), 0);
     }
 
     @Test(expected = InvalidCriteriaException.class)
     public void unrecognizedMappingShouldThrowException() throws Exception {
-        Criteria.loadFromYAML(InputFile.BASIC_UNRECOGNIZED.p);
+        Criteria.loadFromPath(InputFile.BASIC_UNRECOGNIZED.p);
     }
 
     @Test(expected = InvalidCriteriaException.class)
     public void fileNonMappingShouldThrowException() throws Exception {
-        Criteria.loadFromYAML(InputFile.FILE_NONMAPPING.p);
+        Criteria.loadFromPath(InputFile.FILE_NONMAPPING.p);
     }
 }

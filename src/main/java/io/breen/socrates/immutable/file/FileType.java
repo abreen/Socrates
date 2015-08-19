@@ -28,7 +28,7 @@ public enum FileType {
 
     HMMM("hmmm");
 
-    private String type;
+    public final String type;
 
     FileType(String type) {
         this.type = type;

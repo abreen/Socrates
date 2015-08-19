@@ -1,5 +1,7 @@
 package io.breen.socrates.view.setup;
 
+import io.breen.socrates.immutable.criteria.Criteria;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -46,14 +48,22 @@ public class SetupView extends JFrame {
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setMultiSelectionEnabled(false);
         fc.setAcceptAllFileFilterUsed(false);
+
+        String[] any = concat(
+                Criteria.CRITERIA_FILE_EXTENSIONS,
+                Criteria.CRITERIA_PACKAGE_EXTENSIONS
+        );
+        fc.addChoosableFileFilter(new FileNameExtensionFilter("Any criteria type", any));
+
         fc.addChoosableFileFilter(
-                new FileNameExtensionFilter("Any criteria file", "scf", "sca")
+                new FileNameExtensionFilter(
+                        "Criteria files", Criteria.CRITERIA_FILE_EXTENSIONS
+                )
         );
         fc.addChoosableFileFilter(
-                new FileNameExtensionFilter("Criteria files (.scf)", "scf")
-        );
-        fc.addChoosableFileFilter(
-                new FileNameExtensionFilter("Criteria archives (.sca)", "sca")
+                new FileNameExtensionFilter(
+                        "Criteria packages", Criteria.CRITERIA_PACKAGE_EXTENSIONS
+                )
         );
 
         int rv = fc.showOpenDialog(this);
@@ -114,5 +124,12 @@ public class SetupView extends JFrame {
                 disableCancelButton((Container)c);
             }
         }
+    }
+
+    private static String[] concat(String[] a, String[] b) {
+        String[] newArray = new String[a.length + b.length];
+        System.arraycopy(a, 0, newArray, 0, a.length);
+        System.arraycopy(b, 0, newArray, a.length, b.length);
+        return newArray;
     }
 }

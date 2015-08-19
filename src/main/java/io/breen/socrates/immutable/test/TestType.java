@@ -22,8 +22,8 @@ public enum TestType {
 
     REVIEW_PYTHON(FileType.PYTHON, "review");
 
-    private FileType forFileType;
-    private String type;
+    public final FileType forFileType;
+    public final String type;
 
     TestType(FileType forFileType, String testType) {
         this.forFileType = forFileType;

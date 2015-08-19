@@ -1,6 +1,7 @@
 package io.breen.socrates.constructor;
 
 import io.breen.socrates.immutable.criteria.Criteria;
+import io.breen.socrates.immutable.criteria.Resource;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.file.FileFactory;
 import io.breen.socrates.immutable.file.FileType;
@@ -37,6 +38,10 @@ public class SocratesConstructor extends SafeConstructor {
     private static final String GROUP_TAG = "!group";
     private static final String FILE_PREFIX = "!file:";
     private static final String TEST_PREFIX = "!test:";
+
+    public List<Resource> staticResources;
+    public List<Resource> scripts;
+    public List<Resource> hooks;
 
     private class GroupConstruct extends AbstractConstruct {
 
@@ -206,7 +211,19 @@ public class SocratesConstructor extends SafeConstructor {
                 );
             }
 
-            return new Criteria(name, files);
+            if (staticResources == null) {
+                staticResources = new LinkedList<>();
+            }
+
+            if (scripts == null) {
+                scripts = new LinkedList<>();
+            }
+
+            if (hooks == null) {
+                hooks = new LinkedList<>();
+            }
+
+            return new Criteria(name, files, staticResources, scripts, hooks);
         }
     }
 
@@ -217,6 +234,15 @@ public class SocratesConstructor extends SafeConstructor {
         this.yamlConstructors.put(new Tag(GROUP_TAG), new GroupConstruct(this));
         this.yamlMultiConstructors.put(FILE_PREFIX, new FileConstruct(this));
         this.yamlMultiConstructors.put(TEST_PREFIX, new TestConstruct(this));
+    }
+
+    public SocratesConstructor(List<Resource> staticResources, List<Resource> scripts,
+                               List<Resource> hooks)
+    {
+        this();
+        this.staticResources = staticResources;
+        this.scripts = scripts;
+        this.hooks = hooks;
     }
 
     private static String getSuffix(String prefix, Node n) {
@@ -269,9 +295,7 @@ public class SocratesConstructor extends SafeConstructor {
                 TestGroup g = (TestGroup)o;
 
                 List<Either<Test, TestGroup>> newMembers = buildAllTests(
-                        g.getMembers(),
-                        fileType,
-                        node
+                        g.getMembers(), fileType, node
                 );
 
                 newList.add(new Right<>(new TestGroup(newMembers, g)));
