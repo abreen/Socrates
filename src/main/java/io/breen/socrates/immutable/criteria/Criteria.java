@@ -1,5 +1,6 @@
 package io.breen.socrates.immutable.criteria;
 
+import io.breen.socrates.constructor.InvalidCriteriaException;
 import io.breen.socrates.constructor.SocratesConstructor;
 import io.breen.socrates.immutable.file.File;
 import org.yaml.snakeyaml.Yaml;
@@ -51,7 +52,10 @@ public final class Criteria {
      */
     public static Criteria loadFromYAML(Path path) throws IOException {
         Yaml y = new Yaml(new SocratesConstructor());
-        return (Criteria)y.load(Files.newBufferedReader(path));
+        Criteria c = (Criteria)y.load(Files.newBufferedReader(path));
+        if (c == null)
+            throw new InvalidCriteriaException("criteria file is empty");
+        return c;
     }
 
     private static Logger logger = Logger.getLogger(Criteria.class.getName());

@@ -10,7 +10,11 @@ public class InvalidCriteriaException extends RuntimeException {
         this.mark = mark;
     }
 
+    public InvalidCriteriaException(String msg) {
+        this(null, msg);
+    }
+
     public String toString() {
-        return getMessage() + mark;
+        return getMessage() + (mark != null ? mark : "");
     }
 }
