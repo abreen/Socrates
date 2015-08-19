@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +33,11 @@ public class SetupView extends JFrame {
         this.setSize(new Dimension(500, 400));
         this.setLocationRelativeTo(null);
 
-        quitButton.addActionListener(e -> System.exit(0));
+        quitButton.addActionListener(
+                e -> this.dispatchEvent(
+                        new WindowEvent(this, WindowEvent.WINDOW_CLOSING)
+                )
+        );
     }
 
     public Path chooseCriteriaFile() {
