@@ -45,12 +45,13 @@ public class Main {
             System.err.println("error: unrecognized option: " + e.getOption());
             System.exit(1);
         } catch (ParseException e) {
-            logger.warning(e.toString());
+            logger.info("got ParseException for command-line args: " + e.toString());
             System.err.println("error parsing command-line arguments");
             System.exit(1);
         }
 
         if (cmd.hasOption("help")) {
+            logger.info("got --help command-line option");
             new HelpFormatter().printHelp("socrates", opts);
             System.exit(0);
         }
@@ -61,8 +62,11 @@ public class Main {
 
         Path propPath;
         if (cmd.hasOption("properties")) {
-            propPath = Paths.get(cmd.getOptionValue("properties"));
+            String value = cmd.getOptionValue("properties");
+            logger.config("using command-line argument for properties: " + value);
+            propPath = Paths.get(value);
         } else {
+            logger.config("using default properties path: " + defaultPropPath);
             propPath = defaultPropPath;
         }
 
@@ -89,8 +93,6 @@ public class Main {
             }
         }
 
-        logger.fine("starting controllers");
-
         /*
          * Create the MainController. It will wait for the SetupController to send it
          * a message indicating that the criteria and initial submissions have been
@@ -106,10 +108,13 @@ public class Main {
         SetupController setup = new SetupController(main);
 
         Path criteriaPath = null;
-        if (cmd.hasOption("criteria"))
+        if (cmd.hasOption("criteria")) {
             try {
                 criteriaPath = Paths.get(cmd.getOptionValue("criteria"));
-            } catch (InvalidPathException ignored) { }
+            } catch (InvalidPathException ignored) {
+                logger.warning("command-line option for criteria path was invalid");
+            }
+        }
 
         setup.start(criteriaPath);
     }
@@ -118,20 +123,20 @@ public class Main {
         Properties defaults = new Properties();
         defaults.setProperty("timezone", ZoneId.systemDefault().getId());
         Globals.properties = new Properties(defaults);
-        logger.fine(defaults.toString());
+        logger.config("setting default properties: " + defaults.toString());
     }
 
     private static void storeProperties(Path path) throws IOException {
-        logger.fine("storing properties to: " + path);
+        logger.config("storing properties to: " + path);
         BufferedWriter writer = Files.newBufferedWriter(path);
         Globals.properties.store(writer, null);
     }
 
     private static void loadPropertiesFrom(Path path) throws IOException {
-        logger.fine("loading properties from: " + path);
+        logger.config("loading properties from: " + path);
         BufferedReader reader = Files.newBufferedReader(path);
         Globals.properties.load(reader);
-        logger.fine("loaded properties from file: " + Globals.properties.toString());
+        logger.config("loaded these properties: " + Globals.properties.toString());
     }
 
     private static Options createOptions() {

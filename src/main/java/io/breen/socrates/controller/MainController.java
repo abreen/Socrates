@@ -46,6 +46,8 @@ public class MainController {
         mainView.submissionTree.setActiveSubmittedFile(submissions.get(0).files.get(0));
 
         mainView.setVisible(true);
+
+        logger.info("started MainView");
     }
 
     private File findMatchingFile(SubmittedFile submittedFile) {

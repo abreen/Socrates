@@ -45,7 +45,8 @@ public class SetupController {
                             return;
                         }
 
-                        // criteria was loaded correctly
+                        // criteria was successfully loaded
+                        logger.info("criteria was successfully loaded");
                         view.showSubmissionsCard();
                     }
                 }
@@ -96,6 +97,8 @@ public class SetupController {
                             view.dispose();
 
                             main.start(criteria, submissions);
+                        } else {
+                            logger.warning("no submissions could be added");
                         }
                     }
                 }
@@ -107,7 +110,7 @@ public class SetupController {
             try {
                 criteria = Criteria.loadFromYAML(criteriaPath);
             } catch (IOException | InvalidCriteriaException x) {
-                logger.info(criteriaPath + " was an invalid criteria path");
+                logger.warning(criteriaPath + " specified an invalid criteria");
             }
         }
 

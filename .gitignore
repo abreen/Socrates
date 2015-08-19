@@ -1,5 +1,7 @@
 out/*
 
+socrates.log
+
 .idea/workspace.xml
 .idea/tasks.xml
 
