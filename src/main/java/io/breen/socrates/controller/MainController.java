@@ -40,6 +40,8 @@ public class MainController {
         this.criteria = criteria;
         this.submissions = submissions;
 
+        mainView.setTitle("Socrates — " + criteria.assignmentName);
+
         mainView.submissionTree.addUngraded(submissions);
         mainView.submissionTree.setActiveSubmittedFile(submissions.get(0).files.get(0));
 
