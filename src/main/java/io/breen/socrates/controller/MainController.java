@@ -25,7 +25,7 @@ public class MainController {
                 event -> {
                     SubmittedFile submitted = mainView.submissionTree.getSelectedSubmittedFile();
                     if (submitted != null) {
-                        File matchingFile = findMatchingFile(submitted);
+                        File matchingFile = criteria.files.get(submitted.localPath);
                         try {
                             mainView.fileView.update(matchingFile, submitted);
                         } catch (IOException x) {
@@ -48,12 +48,5 @@ public class MainController {
         mainView.setVisible(true);
 
         logger.info("started MainView");
-    }
-
-    private File findMatchingFile(SubmittedFile submittedFile) {
-        for (File f : criteria.files)
-            if (submittedFile.localPath.equals(f.localPath))
-                return f;
-        return null;
     }
 }

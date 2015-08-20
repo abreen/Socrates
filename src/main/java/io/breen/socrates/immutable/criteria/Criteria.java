@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -37,12 +36,13 @@ public final class Criteria {
     public final String assignmentName;
 
     /**
-     * List of File objects created from the criteria file. These will all be instances of
-     * subclasses of File, since File is abstract.
+     * File objects created from the criteria file. These will all be instances of
+     * subclasses of File, since File is abstract. Each File's localPath Path is used
+     * as the key in this map.
      *
      * @see File
      */
-    public final List<File> files;
+    public final Map<Path, File> files;
 
     /*
      * Other resources provided by a criteria package
@@ -68,7 +68,10 @@ public final class Criteria {
             throw new IllegalArgumentException("'hooks' cannot be null");
 
         this.assignmentName = name;
-        this.files = files;
+
+        this.files = new HashMap<>(files.size());
+        for (File f : files)
+            this.files.put(f.localPath, f);
 
         this.staticResources = staticResources;
         this.scripts = scripts;
@@ -87,9 +90,7 @@ public final class Criteria {
                 "\tstaticResources=" + staticResources + "\n" +
                 "\tscripts=" + scripts + "\n" +
                 "\thooks=" + hooks + "\n" +
-                "\tfiles=" + files.stream()
-                                  .map(f -> f.toString())
-                                  .collect(Collectors.joining("\n"));
+                "\tfiles=" + files + ")";
     }
 
     /**
