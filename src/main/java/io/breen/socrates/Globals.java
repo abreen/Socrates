@@ -50,13 +50,15 @@ public class Globals {
         }
 
         List<Path> paths = new LinkedList<>();
-        paths.add(Paths.get("python3"));
         paths.add(Paths.get("python"));
+        paths.add(Paths.get("python3"));
 
         switch (Globals.operatingSystem) {
         case WINDOWS:
-            paths.add(Paths.get("C:\\Python\\python.exe"));
-            paths.add(Paths.get("C:\\Program Files\\Python\\python.exe"));
+            paths.add(Paths.get("C:\\Python34\\python.exe"));
+            paths.add(Paths.get("C:\\Python33\\python.exe"));
+            paths.add(Paths.get("C:\\Python32\\python.exe"));
+            paths.add(Paths.get("C:\\Python31\\python.exe"));
             break;
         case OSX:
         case LINUX:
@@ -71,12 +73,17 @@ public class Globals {
                     break;
                 }
             } catch (InterruptedException x) {
-                logger.severe("interrupted trying to test Python command: " + p);
-                System.exit(6);
+                logger.warning(
+                        "interrupted trying to test Python command " + p + ": " + x
+                );
             } catch (IOException x) {
-                logger.severe("I/O error trying to test Python command: " + p);
-                System.exit(6);
+                logger.warning("I/O error trying to test Python command " + p + ": " + x);
             }
+        }
+
+        if (python3Command == null) {
+            logger.severe("cannot find the Python 3 interpreter");
+            System.exit(6);
         }
     }
 
