@@ -111,7 +111,7 @@ public class Main {
         if (cmd.hasOption("criteria")) {
             try {
                 criteriaPath = Paths.get(cmd.getOptionValue("criteria"));
-            } catch (InvalidPathException ignored) {
+            } catch (InvalidPathException x) {
                 logger.warning("command-line option for criteria path was invalid");
             }
         }
