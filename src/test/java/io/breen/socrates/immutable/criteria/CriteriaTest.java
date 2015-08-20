@@ -18,12 +18,20 @@ public class CriteriaTest {
     private Path[] createdFiles;
 
     private enum InputFile {
-        NONEXISTENT(Paths.get("nonexistent.cf")),
-        EMPTY_FILE(Paths.get("empty.cf")),
-        INVALID_TOP(Paths.get("invalid_top.cf")),
-        BASIC(Paths.get("basic.cf")),
-        BASIC_UNRECOGNIZED(Paths.get("basic_unrecognized.cf")),
-        FILE_NONMAPPING(Paths.get("file_nonmapping.cf"));
+        NONEXISTENT(Paths.get("nonexistent." + Criteria.CRITERIA_FILE_EXTENSIONS[0])),
+        EMPTY_FILE(Paths.get("empty." + Criteria.CRITERIA_FILE_EXTENSIONS[0])),
+        INVALID_TOP(Paths.get("invalid_top." + Criteria.CRITERIA_FILE_EXTENSIONS[0])),
+        BASIC(Paths.get("basic." + Criteria.CRITERIA_FILE_EXTENSIONS[0])),
+        BASIC_UNRECOGNIZED(
+                Paths.get(
+                        "basic_unrecognized." + Criteria.CRITERIA_FILE_EXTENSIONS[0]
+                )
+        ),
+        FILE_NONMAPPING(
+                Paths.get(
+                        "file_nonmapping." + Criteria.CRITERIA_FILE_EXTENSIONS[0]
+                )
+        );
 
         Path p;
 
