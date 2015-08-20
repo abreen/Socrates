@@ -27,4 +27,6 @@ public abstract class Resource {
     public abstract void copyTo(Path path) throws IOException;
 
     public abstract void createLink(Path path) throws IOException;
+
+    public abstract Path getPath() throws IOException;
 }

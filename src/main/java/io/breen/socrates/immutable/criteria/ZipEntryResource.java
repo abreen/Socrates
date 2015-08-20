@@ -65,6 +65,13 @@ public class ZipEntryResource extends Resource {
         Files.createSymbolicLink(path, tempPath);
     }
 
+    @Override
+    public Path getPath() throws IOException {
+        Path tempPath = Files.createTempFile(null, fileName);
+        Files.copy(newInputStream(), tempPath);
+        return tempPath;
+    }
+
     private InputStream newInputStream() throws IOException {
         return parent.getInputStream(entry);
     }
