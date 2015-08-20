@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class PythonProcessBuilderTest {
 
@@ -18,7 +19,8 @@ public class PythonProcessBuilderTest {
 
     private enum PythonModule {
         SIMPLE(Paths.get("simple.py")),
-        SIMPLE_OUTPUT(Paths.get("output.py"));
+        SIMPLE_OUTPUT(Paths.get("output.py")),
+        SIMPLE_INPUT(Paths.get("input.py"));
 
         Path p;
 
@@ -43,6 +45,14 @@ public class PythonProcessBuilderTest {
             Files.createFile(PythonModule.SIMPLE_OUTPUT.p);
             Files.newBufferedWriter(PythonModule.SIMPLE_OUTPUT.p)
                  .append("print('" + SIMPLE_OUTPUT_STRING + "')\n")
+                 .close();
+        }
+
+        {
+            // simple program trying to get input
+            Files.createFile(PythonModule.SIMPLE_INPUT.p);
+            Files.newBufferedWriter(PythonModule.SIMPLE_INPUT.p)
+                 .append("input('What is your name?')\n")
                  .close();
         }
     }
@@ -75,5 +85,14 @@ public class PythonProcessBuilderTest {
         String line = Files.newBufferedReader(temp).readLine();
         Files.delete(temp);
         assertEquals(SIMPLE_OUTPUT_STRING, line);
+    }
+
+    @Test
+    public void shouldFailIfProgramNeedsInput() throws Exception {
+        PythonProcessBuilder builder = new PythonProcessBuilder(
+                PythonModule.SIMPLE_INPUT.p
+        );
+        Process process = builder.start();
+        assertNotEquals(Globals.NORMAL_EXIT_CODE, process.waitFor());
     }
 }

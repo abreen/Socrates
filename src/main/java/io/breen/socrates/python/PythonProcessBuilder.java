@@ -25,7 +25,8 @@ public class PythonProcessBuilder {
 
     /**
      * Create a new PythonProcessBuilder that will attempt to run the Python module
-     * specified. If the module needs to take
+     * specified. If the module needs to take command line arguments, these may be
+     * supplied after the path to the module.
      */
     public PythonProcessBuilder(Path pythonModule, String... args) {
         List<String> cmd = new LinkedList<>();
@@ -40,6 +41,7 @@ public class PythonProcessBuilder {
             pb.redirectInput(new java.io.File("NUL"));
             break;
         case OSX:
+        case LINUX:
             pb.redirectInput(new java.io.File("/dev/null"));
         }
     }
