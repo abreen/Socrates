@@ -2,6 +2,7 @@ package io.breen.socrates;
 
 import org.apache.commons.lang.SystemUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,8 +63,10 @@ public class Globals {
             break;
         case OSX:
         case LINUX:
-            paths.add(Paths.get("/usr/local/bin/python3"));
             paths.add(Paths.get("/usr/local/bin/python"));
+            paths.add(Paths.get("/usr/local/bin/python3"));
+            paths.add(Paths.get("/usr/bin/python"));
+            paths.add(Paths.get("/usr/bin/python3"));
         }
 
         for (Path p : paths) {
@@ -103,6 +106,11 @@ public class Globals {
         }
 
         String versionString = Files.newBufferedReader(temp).readLine();
-        return PYTHON3_VERSION_PATTERN.matcher(versionString).matches();
+
+        if (versionString == null)
+            // file was empty
+            return false;
+        else
+            return PYTHON3_VERSION_PATTERN.matcher(versionString).matches();
     }
 }
