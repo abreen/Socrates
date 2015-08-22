@@ -1,6 +1,6 @@
 package io.breen.socrates.immutable.test.implementation.plain;
 
-import io.breen.socrates.immutable.file.PlainFile;
+import io.breen.socrates.immutable.file.implementation.PlainFile;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.Automatable;

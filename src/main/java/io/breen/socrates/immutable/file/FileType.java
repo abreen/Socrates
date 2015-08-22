@@ -1,5 +1,8 @@
 package io.breen.socrates.immutable.file;
 
+import io.breen.socrates.immutable.file.implementation.PlainFile;
+import io.breen.socrates.immutable.file.implementation.PythonFile;
+
 /**
  * An enumeration used to provide a lightweight representation of all known subclasses
  * of File. Each enumeration value contains the string used in criteria files to refer

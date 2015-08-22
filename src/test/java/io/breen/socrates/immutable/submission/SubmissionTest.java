@@ -2,7 +2,7 @@ package io.breen.socrates.immutable.submission;
 
 import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.file.PlainFile;
+import io.breen.socrates.immutable.file.implementation.PlainFile;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

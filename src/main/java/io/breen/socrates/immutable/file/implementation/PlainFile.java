@@ -1,5 +1,6 @@
-package io.breen.socrates.immutable.file;
+package io.breen.socrates.immutable.file.implementation;
 
+import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.util.Either;
