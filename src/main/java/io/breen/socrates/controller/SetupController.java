@@ -2,6 +2,8 @@ package io.breen.socrates.controller;
 
 import io.breen.socrates.constructor.InvalidCriteriaException;
 import io.breen.socrates.immutable.criteria.Criteria;
+import io.breen.socrates.immutable.hooks.HookManager;
+import io.breen.socrates.immutable.hooks.triggers.Hook;
 import io.breen.socrates.immutable.submission.ReceiptFormatException;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.view.DetailOptionPane;
@@ -47,6 +49,7 @@ public class SetupController {
 
                         // criteria was successfully loaded
                         logger.info("criteria was successfully loaded");
+                        HookManager.runHook(Hook.BEFORE_FILE_SEARCH);
                         view.showSubmissionsCard();
                     }
                 }
@@ -96,6 +99,7 @@ public class SetupController {
                             view.setVisible(false);
                             view.dispose();
 
+                            HookManager.runHook(Hook.BEFORE_GRADING);
                             main.start(criteria, submissions);
                         } else {
                             logger.warning("no submissions could be added");
