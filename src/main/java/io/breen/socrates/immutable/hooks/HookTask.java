@@ -20,6 +20,11 @@ class HookTask implements Runnable {
     }
 
     @Override
+    public String toString() {
+        return "HookTask(script=" + script + ")";
+    }
+
+    @Override
     public void run() {
         logger.info("running HookTask: " + this);
 
