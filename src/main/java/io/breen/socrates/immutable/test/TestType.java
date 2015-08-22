@@ -49,7 +49,7 @@ public enum TestType {
         return s;
     }
 
-    public static TestType fromTypeAndID(FileType type, String testType) {
+    public static TestType fromTypeAndString(FileType type, String testType) {
         if (testType.equals("script"))
             return SCRIPT;
 
