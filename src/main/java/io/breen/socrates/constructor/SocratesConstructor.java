@@ -6,6 +6,8 @@ import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.file.FileFactory;
 import io.breen.socrates.immutable.file.FileType;
 import io.breen.socrates.immutable.file.InvalidFileException;
+import io.breen.socrates.immutable.hooks.HookManager;
+import io.breen.socrates.immutable.hooks.triggers.Hook;
 import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.immutable.test.ceiling.AtMost;
 import io.breen.socrates.immutable.test.ceiling.Ceiling;
@@ -37,8 +39,8 @@ public class SocratesConstructor extends SafeConstructor {
     private static final String TEST_PREFIX = "!test:";
 
     public Map<String, Resource> staticResources;
-    public Map<String, Resource> scripts;
-    public Map<String, Resource> hooks;
+    public Map<String, Resource> scriptResources;
+    public Map<String, Resource> hookResources;
 
     private class GroupConstruct extends AbstractConstruct {
 
@@ -120,7 +122,7 @@ public class SocratesConstructor extends SafeConstructor {
 
             Map<Object, Object> map = cons.constructMapping(node);
 
-            FileType fileType = FileType.fromID(suffix);
+            FileType fileType = FileType.fromString(suffix);
 
             List tests = (List)map.get("tests");
 
@@ -181,8 +183,16 @@ public class SocratesConstructor extends SafeConstructor {
                 throw new InvalidCriteriaException(anyNode.getStartMark(), msg);
             }
 
+            /*
+             * Continue to construct this mapping. This should use the other constructors
+             * in this file (e.g., the FileConstructor) recursively before returning
+             * here.
+             */
             Map<Object, Object> map = cons.constructMapping(node);
 
+            /*
+             * Get the assignment name.
+             */
             String name;
             try {
                 name = (String)map.get("assignment_name");
@@ -197,9 +207,43 @@ public class SocratesConstructor extends SafeConstructor {
                 );
             }
 
+            /*
+             * Get any hooks, if they are specified. If any hooks are specified, we
+             * make sure that the appropriate hook resources were also loaded. If not,
+             * we are missing the resources needed to run one or more required tasks.
+             * In this case, we throw an exception. Otherwise, we register the hook.
+             * An InvalidCriteriaException can also be thrown if the hook type is invalid.
+             */
+            Map<String, String> hooksMap = (Map)map.get("hooks");
+            if (hooksMap != null) {
+                for (Map.Entry<String, String> entry : hooksMap.entrySet()) {
+                    String hookType = entry.getKey();
+                    String scriptFileName = entry.getValue();
+
+                    Hook hook = Hook.fromString(hookType);
+                    if (hook == null) throw new InvalidCriteriaException(
+                            anyNode.getStartMark(), "unknown hook: " + hookType
+                    );
+
+                    if (!hookResources.containsKey(scriptFileName))
+                        throw new MissingResourceException(scriptFileName);
+
+                    HookManager.register(hook, hookResources.get(scriptFileName));
+                }
+
+                map.remove("hooks");
+            }
+
+            /*
+             * Get files.
+             */
             List<File> files = (List)map.get("files");
             map.remove("files");
 
+            /*
+             * If there are still key-value pairs in the map, there is data we did not
+             * expect. In this case, we can throw an InvalidCriteriaException.
+             */
             if (map.size() != 0) {
                 StringJoiner joiner = new StringJoiner(", ");
                 map.forEach((k, v) -> joiner.add(k.toString()));
@@ -208,38 +252,34 @@ public class SocratesConstructor extends SafeConstructor {
                 );
             }
 
-            if (staticResources == null) {
-                staticResources = new HashMap<>();
-            }
-
-            if (scripts == null) {
-                scripts = new HashMap<>();
-            }
-
-            if (hooks == null) {
-                hooks = new HashMap<>();
-            }
-
-            return new Criteria(name, files, staticResources, scripts, hooks);
+            return new Criteria(
+                    name,
+                    files,
+                    staticResources,
+                    scriptResources,
+                    hookResources
+            );
         }
     }
 
     public SocratesConstructor() {
+        this(null, null, null);
+    }
+
+    public SocratesConstructor(Map<String, Resource> staticResources,
+                               Map<String, Resource> scriptResources,
+                               Map<String, Resource> hookResources)
+    {
         this.rootTag = new Tag(Criteria.class);
         this.yamlConstructors.put(this.rootTag, new RootConstruct(this));
 
         this.yamlConstructors.put(new Tag(GROUP_TAG), new GroupConstruct(this));
         this.yamlMultiConstructors.put(FILE_PREFIX, new FileConstruct(this));
         this.yamlMultiConstructors.put(TEST_PREFIX, new TestConstruct(this));
-    }
 
-    public SocratesConstructor(Map<String, Resource> staticResources,
-                               Map<String, Resource> scripts, Map<String, Resource> hooks)
-    {
-        this();
-        this.staticResources = staticResources;
-        this.scripts = scripts;
-        this.hooks = hooks;
+        this.staticResources = staticResources != null ? staticResources : new HashMap<>();
+        this.scriptResources = scriptResources != null ? scriptResources : new HashMap<>();
+        this.hookResources = hookResources != null ? hookResources : new HashMap<>();
     }
 
     private static String getSuffix(String prefix, Node n) {
@@ -300,7 +340,7 @@ public class SocratesConstructor extends SafeConstructor {
             } else if (o instanceof TestWithoutFileType) {
                 TestWithoutFileType t = (TestWithoutFileType)o;
 
-                TestType type = TestType.fromTypeAndID(fileType, t.testType);
+                TestType type = TestType.fromTypeAndString(fileType, t.testType);
 
                 if (type == null) throw new InvalidCriteriaException(
                         node.getStartMark(),
@@ -308,7 +348,9 @@ public class SocratesConstructor extends SafeConstructor {
                 );
 
                 try {
-                    newList.add(new Left<>(TestFactory.buildTest(type, t.map, scripts)));
+                    newList.add(new Left<>(TestFactory.buildTest(type, t.map,
+                                                                 scriptResources
+                    )));
                 } catch (InvalidTestException e) {
                     throw new InvalidCriteriaException(node.getStartMark(), e.toString());
                 }

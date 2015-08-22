@@ -9,15 +9,34 @@ public enum Hook {
     /**
      * After a criteria file or package is loaded, but before submissions are loaded.
      */
-    BEFORE_FILE_SEARCH,
+    AFTER_CRITERIA_LOAD("after_criteria_load"),
 
     /**
      * After a criteria file or package is loaded and after submissions are loaded.
      */
-    BEFORE_GRADING,
+    BEFORE_GRADING("before_grading"),
 
     /**
      * Before Socrates exits.
      */
-    AFTER_GRADING
+    AFTER_GRADING("after_grading");
+
+    public final String type;
+
+    Hook(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return type;
+    }
+
+    public static Hook fromString(String type) {
+        for (Hook h : Hook.values())
+            if (h.type.equals(type))
+                return h;
+
+        return null;
+    }
 }

@@ -41,7 +41,7 @@ public enum FileType {
         return type;
     }
 
-    public static FileType fromID(String type) {
+    public static FileType fromString(String type) {
         for (FileType t : FileType.values())
             if (t.type.equals(type))
                 return t;

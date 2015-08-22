@@ -10,10 +10,29 @@ public enum FileHook {
     /**
      * Before any tests of a given file are run.
      */
-    BEFORE_TESTS,
+    BEFORE_TESTS("before_tests"),
 
     /**
      * After all tests of a given file are run.
      */
-    AFTER_TESTS
+    AFTER_TESTS("after_tests");
+
+    public final String type;
+
+    FileHook(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return type;
+    }
+
+    public static FileHook fromString(String type) {
+        for (FileHook h : FileHook.values())
+            if (h.type.equals(type))
+                return h;
+
+        return null;
+    }
 }

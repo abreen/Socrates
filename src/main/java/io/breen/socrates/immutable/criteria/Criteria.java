@@ -50,22 +50,25 @@ public final class Criteria {
 
     public final Map<String, Resource> staticResources;
 
-    public final Map<String, Resource> scripts;
+    public final Map<String, Resource> scriptResources;
 
-    public final Map<String, Resource> hooks;
+    public final Map<String, Resource> hookResources;
 
-    public Criteria(String name, List<File> files, Map<String, Resource> staticResources,
-                    Map<String, Resource> scripts, Map<String, Resource> hooks)
+    public Criteria(String name,
+                    List<File> files,
+                    Map<String, Resource> staticResources,
+                    Map<String, Resource> scriptResources,
+                    Map<String, Resource> hookResources)
     {
         if (name == null) throw new IllegalArgumentException("'name' cannot be null");
         if (files == null) throw new IllegalArgumentException("'files' cannot be null");
 
         if (staticResources == null)
             throw new IllegalArgumentException("'staticResources' cannot be null");
-        if (scripts == null)
-            throw new IllegalArgumentException("'scripts' cannot be null");
-        if (hooks == null)
-            throw new IllegalArgumentException("'hooks' cannot be null");
+        if (scriptResources == null)
+            throw new IllegalArgumentException("'scriptResources' cannot be null");
+        if (hookResources == null)
+            throw new IllegalArgumentException("'hookResources' cannot be null");
 
         this.assignmentName = name;
 
@@ -74,8 +77,8 @@ public final class Criteria {
             this.files.put(f.localPath, f);
 
         this.staticResources = staticResources;
-        this.scripts = scripts;
-        this.hooks = hooks;
+        this.scriptResources = scriptResources;
+        this.hookResources = hookResources;
 
         logger.info("constructed a criteria object: " + this);
     }
@@ -88,8 +91,8 @@ public final class Criteria {
         return "Criteria\n" +
                 "\tassignment_name=" + assignmentName + "\n" +
                 "\tstaticResources=" + staticResources + "\n" +
-                "\tscripts=" + scripts + "\n" +
-                "\thooks=" + hooks + "\n" +
+                "\tscriptResources=" + scriptResources + "\n" +
+                "\thookResources=" + hookResources + "\n" +
                 "\tfiles=" + files + ")";
     }
 
@@ -106,8 +109,8 @@ public final class Criteria {
 
             InputStream criteriaFile = null;
             Map<String, Resource> staticResources = new HashMap<>();
-            Map<String, Resource> scripts = new HashMap<>();
-            Map<String, Resource> hooks = new HashMap<>();
+            Map<String, Resource> scriptResources = new HashMap<>();
+            Map<String, Resource> hookResources = new HashMap<>();
 
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
@@ -123,17 +126,17 @@ public final class Criteria {
                             entryFileName, new ZipEntryResource(entryFileName, zip, entry)
                     );
                 } else if (looksLikeScriptResource(entryPath)) {
-                    scripts.put(
+                    scriptResources.put(
                             entryFileName, new ZipEntryResource(entryFileName, zip, entry)
                     );
                 } else if (looksLikeHookResource(entryPath)) {
-                    hooks.put(
+                    hookResources.put(
                             entryFileName, new ZipEntryResource(entryFileName, zip, entry)
                     );
                 }
             }
 
-            Yaml y = new Yaml(new SocratesConstructor(staticResources, scripts, hooks));
+            Yaml y = new Yaml(new SocratesConstructor(staticResources, scriptResources, hookResources));
             Criteria c = (Criteria)y.load(criteriaFile);
             checkCriteriaObject(c);
             return c;

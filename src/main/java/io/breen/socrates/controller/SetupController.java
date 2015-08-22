@@ -1,6 +1,7 @@
 package io.breen.socrates.controller;
 
 import io.breen.socrates.constructor.InvalidCriteriaException;
+import io.breen.socrates.constructor.MissingResourceException;
 import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.hooks.HookManager;
 import io.breen.socrates.immutable.hooks.triggers.Hook;
@@ -35,7 +36,8 @@ public class SetupController {
                     if (path != null) {
                         try {
                             criteria = Criteria.loadFromPath(path);
-                        } catch (IOException | InvalidCriteriaException x) {
+                        } catch (IOException | InvalidCriteriaException |
+                                MissingResourceException x) {
                             DetailOptionPane.showMessageDialog(
                                     view,
                                     "There was an error opening the criteria file you "
@@ -49,7 +51,7 @@ public class SetupController {
 
                         // criteria was successfully loaded
                         logger.info("criteria was successfully loaded");
-                        HookManager.runHook(Hook.BEFORE_FILE_SEARCH);
+                        HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
                         view.showSubmissionsCard();
                     }
                 }
@@ -80,11 +82,15 @@ public class SetupController {
                             for (Map.Entry<Path, Exception> e : errors.entrySet())
                                 sb.append(e.getKey() + ": " + e.getValue() + "\n");
 
-                            String msg = "There was a problem opening " + numErrors + " submission" + (numErrors == 1 ? "" : "s") + ".";
+                            String msg = "There was a problem opening " + numErrors + "" +
+                                    " submission" + (numErrors == 1 ? "" : "s") + ".";
                             if (numAdded > 0) {
-                                msg += " The remaining " + numAdded + " submission" + (numAdded == 1 ? " is" : "s are") + " available to grade.";
+                                msg += " The remaining " + numAdded + " submission" +
+                                        (numAdded == 1 ? " is" : "s are") + " available" +
+                                        " to grade.";
                             }
-                            String title = (numErrors == 1 ? "Error" : "Errors") + " Opening Submissions";
+                            String title = (numErrors == 1 ? "Error" : "Errors") + " " +
+                                    "Opening Submissions";
 
                             DetailOptionPane.showMessageDialog(
                                     view,
