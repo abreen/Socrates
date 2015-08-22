@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -60,15 +61,15 @@ public class ZipEntryResource extends Resource {
 
     @Override
     public void createLink(Path path) throws IOException {
-        Path tempPath = Files.createTempFile(null, fileName);
-        Files.copy(newInputStream(), tempPath);
+        Path tempPath = Files.createTempFile("createLink", fileName);
+        Files.copy(newInputStream(), tempPath, StandardCopyOption.REPLACE_EXISTING);
         Files.createSymbolicLink(path, tempPath);
     }
 
     @Override
     public Path getPath() throws IOException {
-        Path tempPath = Files.createTempFile(null, fileName);
-        Files.copy(newInputStream(), tempPath);
+        Path tempPath = Files.createTempFile("getPath", fileName);
+        Files.copy(newInputStream(), tempPath, StandardCopyOption.REPLACE_EXISTING);
         return tempPath;
     }
 
