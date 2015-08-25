@@ -27,14 +27,20 @@ public class SubmittedFile {
     public final Path localPath;
 
     /**
+     * This file's size in bytes.
+     */
+    public final long size;
+
+    /**
      * This file's receipt, storing the submission timestamps. If there was no receipt
      * for this file, this is null.
      */
     public final Receipt receipt;
 
-    public SubmittedFile(Path fullPath, Path localPath) {
+    public SubmittedFile(Path fullPath, Path localPath) throws IOException {
         this.fullPath = fullPath;
         this.localPath = localPath;
+        this.size = Files.size(fullPath);
         this.receipt = null;
     }
 
@@ -43,6 +49,7 @@ public class SubmittedFile {
     {
         this.fullPath = fullPath;
         this.localPath = localPath;
+        this.size = Files.size(fullPath);
 
         Receipt r = null;
         if (receipt != null) {
