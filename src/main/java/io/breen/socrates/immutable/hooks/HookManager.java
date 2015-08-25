@@ -48,6 +48,7 @@ public final class HookManager {
     public static void registerFileHook(FileHook hook, Resource script, File file) {
         Map<File, List<HookTask>> mapForTrigger = fileTasks.get(hook);
 
+        logger.info("registering " + script + " for " + file + " on " + hook);
         if (mapForTrigger.containsKey(file)) {
             mapForTrigger.get(file).add(new HookTask(script));
         } else {
@@ -60,6 +61,7 @@ public final class HookManager {
     public static void registerTestHook(TestHook hook, Resource script, Test test) {
         Map<Test, List<HookTask>> mapForTrigger = testTasks.get(hook);
 
+        logger.info("registering " + script + " for " + test + " on " + hook);
         if (mapForTrigger.containsKey(test)) {
             mapForTrigger.get(test).add(new HookTask(script));
         } else {

@@ -7,7 +7,9 @@ import io.breen.socrates.immutable.file.FileFactory;
 import io.breen.socrates.immutable.file.FileType;
 import io.breen.socrates.immutable.file.InvalidFileException;
 import io.breen.socrates.immutable.hooks.HookManager;
+import io.breen.socrates.immutable.hooks.triggers.FileHook;
 import io.breen.socrates.immutable.hooks.triggers.Hook;
+import io.breen.socrates.immutable.hooks.triggers.TestHook;
 import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.immutable.test.ceiling.AtMost;
 import io.breen.socrates.immutable.test.ceiling.Ceiling;
@@ -130,13 +132,39 @@ public class SocratesConstructor extends SafeConstructor {
                     anyNode.getStartMark(), "file must have 'tests'"
             );
 
+            File builtFile;
             try {
-                return FileFactory.buildFile(
+                builtFile = FileFactory.buildFile(
                         fileType, map, buildAllTests(tests, fileType, anyNode)
                 );
+
+                Map<String, String> hooksMap = (Map)map.get("hooks");
+                if (hooksMap != null) {
+                    for (Map.Entry<String, String> entry : hooksMap.entrySet()) {
+                        String hookType = entry.getKey();
+                        String scriptFileName = entry.getValue();
+
+                        FileHook hook = FileHook.fromString(hookType);
+                        if (hook == null) throw new InvalidCriteriaException(
+                                anyNode.getStartMark(), "unknown hook: " + hookType
+                        );
+
+                        if (!hookResources.containsKey(scriptFileName))
+                            throw new MissingResourceException(scriptFileName);
+
+                        HookManager.registerFileHook(
+                                hook,
+                                hookResources.get(scriptFileName),
+                                builtFile
+                        );
+                    }
+                }
+
             } catch (InvalidFileException e) {
                 throw new InvalidCriteriaException(anyNode.getStartMark(), e.toString());
             }
+
+            return builtFile;
         }
     }
 
@@ -253,11 +281,7 @@ public class SocratesConstructor extends SafeConstructor {
             }
 
             return new Criteria(
-                    name,
-                    files,
-                    staticResources,
-                    scriptResources,
-                    hookResources
+                    name, files, staticResources, scriptResources, hookResources
             );
         }
     }
@@ -277,8 +301,10 @@ public class SocratesConstructor extends SafeConstructor {
         this.yamlMultiConstructors.put(FILE_PREFIX, new FileConstruct(this));
         this.yamlMultiConstructors.put(TEST_PREFIX, new TestConstruct(this));
 
-        this.staticResources = staticResources != null ? staticResources : new HashMap<>();
-        this.scriptResources = scriptResources != null ? scriptResources : new HashMap<>();
+        this.staticResources = staticResources != null ? staticResources : new
+                HashMap<>();
+        this.scriptResources = scriptResources != null ? scriptResources : new
+                HashMap<>();
         this.hookResources = hookResources != null ? hookResources : new HashMap<>();
     }
 
@@ -348,9 +374,31 @@ public class SocratesConstructor extends SafeConstructor {
                 );
 
                 try {
-                    newList.add(new Left<>(TestFactory.buildTest(type, t.map,
-                                                                 scriptResources
-                    )));
+                    Test builtTest = TestFactory.buildTest(type, t.map, scriptResources);
+
+                    Map<String, String> hooksMap = (Map)t.map.get("hooks");
+                    if (hooksMap != null) {
+                        for (Map.Entry<String, String> entry : hooksMap.entrySet()) {
+                            String hookType = entry.getKey();
+                            String scriptFileName = entry.getValue();
+
+                            TestHook hook = TestHook.fromString(hookType);
+                            if (hook == null) throw new InvalidCriteriaException(
+                                    node.getStartMark(), "unknown hook: " + hookType
+                            );
+
+                            if (!hookResources.containsKey(scriptFileName))
+                                throw new MissingResourceException(scriptFileName);
+
+                            HookManager.registerTestHook(
+                                    hook,
+                                    hookResources.get(scriptFileName),
+                                    builtTest
+                            );
+                        }
+                    }
+
+                    newList.add(new Left<>(builtTest));
                 } catch (InvalidTestException e) {
                     throw new InvalidCriteriaException(node.getStartMark(), e.toString());
                 }
