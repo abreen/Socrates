@@ -105,7 +105,7 @@ public final class Criteria {
             return loadCriteriaFileFromPath(path);
         } else if (looksLikeCriteriaPackage(fileName)) {
             ZipFile zip = new ZipFile(path.toFile(), ZipFile.OPEN_READ);
-            Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>)zip.entries();
+            Enumeration<? extends ZipEntry> entries = zip.entries();
 
             InputStream criteriaFile = null;
             Map<String, Resource> staticResources = new HashMap<>();
