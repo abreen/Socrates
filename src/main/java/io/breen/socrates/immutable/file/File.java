@@ -69,6 +69,12 @@ public abstract class File {
     }
 
     /**
+     * Returns the human-readable, user-friendly string representing the type of the
+     * file. This is used by the GUI.
+     */
+    public abstract String getFileTypeName();
+
+    /**
      * This method creates this file's test "root". The root is a test group that limits
      * the maximum total value of the descendant tests to the total value of the file.
      * This method may also create a test group of LateSubmissionTest objects, if the

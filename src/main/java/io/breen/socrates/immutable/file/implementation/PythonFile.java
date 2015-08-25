@@ -27,4 +27,9 @@ public final class PythonFile extends File {
         super(path, pointValue, "text/x-python", dueDates, tests);
         // TODO add more parameters and fields
     }
+
+    @Override
+    public String getFileTypeName() {
+        return "Python source code";
+    }
 }

@@ -26,4 +26,9 @@ public final class PlainFile extends File {
     {
         super(path, pointValue, "text/plain", dueDates, tests);
     }
+
+    @Override
+    public String getFileTypeName() {
+        return "plain text file";
+    }
 }
