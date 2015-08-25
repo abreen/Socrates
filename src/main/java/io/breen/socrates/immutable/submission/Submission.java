@@ -42,7 +42,7 @@ public class Submission {
                 "\tstudentName=" + studentName + "\n" +
                 "\tsubmissionDir=" + submissionDir + "\n" +
                 "\tfiles=" + files.stream()
-                                  .map(f -> f.toString())
+                                  .map(SubmittedFile::toString)
                                   .collect(Collectors.joining("\n"));
     }
 
