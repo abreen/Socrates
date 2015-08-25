@@ -200,8 +200,8 @@ public class Main {
                 Option.builder("s")
                       .longOpt("submissions")
                       .hasArgs()
-                      .argName("path")
-                      .desc("paths to submission directories")
+                      .argName("paths")
+                      .desc("space-separated paths to submission directories")
                       .build()
         );
 
