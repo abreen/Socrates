@@ -1,6 +1,6 @@
 out/*
 
-socrates.log
+socrates.log*
 
 .idea/workspace.xml
 .idea/tasks.xml
