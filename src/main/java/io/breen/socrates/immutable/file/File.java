@@ -105,7 +105,7 @@ public abstract class File {
                 lates.add(new Left<>(lst));
             }
 
-            TestGroup lateGroup = new TestGroup(lates, new AtMost<>(1), Ceiling.ANY);
+            TestGroup lateGroup = new TestGroup(lates, new AtMost<>(1), Ceiling.getAny());
 
             /*
              * Here we add the late tests before any of the other tests specified from
@@ -116,6 +116,6 @@ public abstract class File {
             tests.add(0, new Right<>(lateGroup));
         }
 
-        return new TestGroup(tests, Ceiling.ANY, new AtMost<>(fileValue));
+        return new TestGroup(tests, Ceiling.getAny(), new AtMost<>(fileValue));
     }
 }
