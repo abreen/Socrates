@@ -31,6 +31,14 @@ public class ScriptTest extends Test implements Automatable {
         this.script = script;
     }
 
+    @Override
+    public String toString() {
+        return "ScriptTest(deduction=" + deduction + ", " +
+                "description=" + description + ", " +
+                "script=" + script +
+                ")";
+    }
+
     /**
      * @throws CannotBeAutomatedException
      * @throws ScriptTestRuntimeException
