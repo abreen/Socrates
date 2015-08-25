@@ -11,6 +11,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -53,18 +54,22 @@ public class SubmissionTree {
                 }
 
                 return super.convertValueToText(
-                        value,
-                        selected,
-                        expanded,
-                        leaf,
-                        row,
-                        hasFocus
+                        value, selected, expanded, leaf, row, hasFocus
                 );
             }
         };
 
+        /*
+         * This custom selection model ensures that only files in the submission
+         * tree can be selected any time --- this makes sure that the FileInfo view
+         * will never respond to selections on non-files.
+         */
         tree.setSelectionModel(
                 new DefaultTreeSelectionModel() {
+                    {
+                        this.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+                    }
+
                     private boolean pathEndsWithSubmittedFile(TreePath path) {
                         Object last = path.getLastPathComponent();
                         if (last instanceof DefaultMutableTreeNode) {
@@ -77,8 +82,7 @@ public class SubmissionTree {
 
                     @Override
                     public void setSelectionPath(TreePath path) {
-                        if (pathEndsWithSubmittedFile(path))
-                            super.setSelectionPath(path);
+                        if (pathEndsWithSubmittedFile(path)) super.setSelectionPath(path);
                     }
 
                     @Override
@@ -93,8 +97,7 @@ public class SubmissionTree {
 
                     @Override
                     public void addSelectionPath(TreePath path) {
-                        if (pathEndsWithSubmittedFile(path))
-                            super.addSelectionPath(path);
+                        if (pathEndsWithSubmittedFile(path)) super.addSelectionPath(path);
                     }
 
                     @Override
@@ -127,16 +130,14 @@ public class SubmissionTree {
     }
 
     public SubmittedFile getSelectedSubmittedFile() {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-        if (node == null)
-            return null;
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree
+                .getLastSelectedPathComponent();
+        if (node == null) return null;
 
         Object userObject = node.getUserObject();
 
-        if (userObject instanceof SubmittedFile)
-            return (SubmittedFile)userObject;
-        else
-            return null;
+        if (userObject instanceof SubmittedFile) return (SubmittedFile)userObject;
+        else return null;
     }
 
     public void addUngraded(List<Submission> submissions) {
