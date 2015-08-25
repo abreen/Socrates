@@ -35,7 +35,9 @@ public abstract class File {
     public final double pointValue;
 
     /**
-     * The MIME ContentType value for this file.
+     * The content type value for this file. This may not be a MIME type; it should
+     * be whatever is specified in the JSyntaxPane libraries in order for syntax
+     * highlighting to work.
      */
     public final String contentType;
 
