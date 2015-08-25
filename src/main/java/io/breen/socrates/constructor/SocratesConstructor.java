@@ -53,7 +53,7 @@ public class SocratesConstructor extends SafeConstructor {
         }
 
         public Object construct(Node anyNode) {
-            MappingNode node = null;
+            MappingNode node;
             try {
                 node = (MappingNode)anyNode;
             } catch (ClassCastException e) {
@@ -114,7 +114,7 @@ public class SocratesConstructor extends SafeConstructor {
         public Object construct(Node anyNode) {
             String suffix = getSuffix(FILE_PREFIX, anyNode);
 
-            MappingNode node = null;
+            MappingNode node;
             try {
                 node = (MappingNode)anyNode;
             } catch (ClassCastException e) {
@@ -177,7 +177,7 @@ public class SocratesConstructor extends SafeConstructor {
         public Object construct(Node anyNode) {
             String suffix = getSuffix(TEST_PREFIX, anyNode);
 
-            MappingNode node = null;
+            MappingNode node;
             try {
                 node = (MappingNode)anyNode;
             } catch (ClassCastException e) {
@@ -203,7 +203,7 @@ public class SocratesConstructor extends SafeConstructor {
         }
 
         public Object construct(Node anyNode) {
-            MappingNode node = null;
+            MappingNode node;
             try {
                 node = (MappingNode)anyNode;
             } catch (ClassCastException e) {
