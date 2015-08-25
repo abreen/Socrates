@@ -1,7 +1,11 @@
 package io.breen.socrates;
 
+import io.breen.socrates.constructor.InvalidCriteriaException;
 import io.breen.socrates.controller.MainController;
 import io.breen.socrates.controller.SetupController;
+import io.breen.socrates.immutable.criteria.Criteria;
+import io.breen.socrates.immutable.submission.ReceiptFormatException;
+import io.breen.socrates.immutable.submission.Submission;
 import org.apache.commons.cli.*;
 
 import java.io.BufferedReader;
@@ -12,6 +16,8 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -100,23 +106,53 @@ public class Main {
          */
         MainController main = new MainController();
 
-        /*
-         * Start the SetupController. If the --criteria command line option was
-         * specified, the "Open a criteria file" step of the SetupView step might be
-         * skipped, if the criteria path is valid and the criteria file is valid.
-         */
-        SetupController setup = new SetupController(main);
-
         Path criteriaPath = null;
+        Criteria criteria = null;
         if (cmd.hasOption("criteria")) {
             try {
                 criteriaPath = Paths.get(cmd.getOptionValue("criteria"));
+                criteria = Criteria.loadFromPath(criteriaPath);
             } catch (InvalidPathException x) {
                 logger.warning("command-line option for criteria path was invalid");
+            } catch (IOException | InvalidCriteriaException x) {
+                logger.warning(criteriaPath + " specified an invalid criteria");
             }
         }
 
-        setup.start(criteriaPath);
+        List<Submission> submissions = null;
+        if (cmd.hasOption("submissions")) {
+            String[] paths = cmd.getOptionValues("submissions");
+            submissions = new ArrayList<>(paths.length);
+            for (String str : paths) {
+                Path p = null;
+                try {
+                    p = Paths.get(str);
+                    submissions.add(Submission.fromDirectory(p));
+                } catch (InvalidPathException x) {
+                    logger.warning("invalid submission: '" + str + "' is not a valid path");
+                } catch (IllegalArgumentException x) {
+                    logger.warning("invalid submission: '" + p + "' " + x);
+                } catch (IOException x) {
+                    logger.warning("I/O exception occurred adding submission: " + x);
+                } catch (ReceiptFormatException x) {
+                    logger.warning("invalid receipt for submission '" + p + "'");
+                }
+            }
+
+            if (submissions.size() == 0) {
+                submissions = null;
+            }
+        }
+
+        /*
+         * Start the SetupController.
+         * If the --criteria command line option was specified and a Criteria object
+         * could be created, that step of the setup will be skipped.
+         * If the --submissions command line option was specified, and at least one
+         * submission could be added, that step of the setup will be skipped.
+         */
+        SetupController setup = new SetupController(main);
+        setup.start(criteria, submissions);
     }
 
     private static void setDefaultProperties() {
@@ -157,6 +193,15 @@ public class Main {
                       .hasArg()
                       .argName("path")
                       .desc("path to a criteria (.yml) file")
+                      .build()
+        );
+
+        opts.addOption(
+                Option.builder("s")
+                      .longOpt("submissions")
+                      .hasArgs()
+                      .argName("path")
+                      .desc("paths to submission directories")
                       .build()
         );
 

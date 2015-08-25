@@ -24,11 +24,14 @@ public class SetupController {
     private static Logger logger = Logger.getLogger(SetupController.class.getName());
 
     private Criteria criteria;
+    private List<Submission> submissions;
 
+    private MainController main;
     private SetupView view;
 
     public SetupController(MainController main) {
         view = new SetupView();
+        this.main = main;
 
         view.addOpenCriteriaButtonActionListener(
                 e -> {
@@ -52,7 +55,11 @@ public class SetupController {
                         // criteria was successfully loaded
                         logger.info("criteria was successfully loaded");
                         HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
-                        view.showSubmissionsCard();
+
+                        if (submissions == null)
+                            view.showSubmissionsCard();
+                        else
+                            transferToMain();
                     }
                 }
         );
@@ -62,7 +69,7 @@ public class SetupController {
                     List<Path> ps = view.chooseSubmissions();
                     if (ps != null) {
                         Map<Path, Exception> errors = new HashMap<>();
-                        List<Submission> submissions = new ArrayList<>(ps.size());
+                        submissions = new ArrayList<>(ps.size());
                         for (Path p : ps) {
                             try {
                                 submissions.add(Submission.fromDirectory(p));
@@ -102,11 +109,8 @@ public class SetupController {
                         }
 
                         if (numAdded > 0) {
-                            view.setVisible(false);
-                            view.dispose();
-
                             HookManager.runHook(Hook.BEFORE_GRADING);
-                            main.start(criteria, submissions);
+                            transferToMain();
                         } else {
                             logger.warning("no submissions could be added");
                         }
@@ -115,22 +119,26 @@ public class SetupController {
         );
     }
 
-    public void start(Path criteriaPath) {
-        if (criteriaPath != null) {
-            try {
-                criteria = Criteria.loadFromPath(criteriaPath);
-            } catch (IOException | InvalidCriteriaException x) {
-                logger.warning(criteriaPath + " specified an invalid criteria");
-            }
-        }
+    public void start(Criteria criteria, List<Submission> submissions) {
+        this.criteria = criteria;
+        this.submissions = submissions;
 
         if (criteria == null) {
             view.showCriteriaCard();
-        } else {
+            view.setVisible(true);
+        } else if (submissions == null) {
             // we can skip the "Choose a criteria file" step
             view.showSubmissionsCard();
+            view.setVisible(true);
+        } else {
+            // we can skip the setup entirely
+            main.start(criteria, submissions);
         }
+    }
 
-        view.setVisible(true);
+    public void transferToMain() {
+        view.setVisible(false);
+        view.dispose();
+        main.start(criteria, submissions);
     }
 }

@@ -62,6 +62,9 @@ public class Submission {
     public static Submission fromDirectory(Path directory)
             throws IOException, ReceiptFormatException
     {
+        if (Files.notExists(directory))
+            throw new IllegalArgumentException("does not exist");
+
         if (!Files.isDirectory(directory))
             throw new IllegalArgumentException("not a directory");
 
