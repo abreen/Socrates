@@ -11,7 +11,11 @@
     <children>
       <grid id="1dd1" layout-manager="BorderLayout" hgap="0" vgap="10">
         <constraints border-constraint="West"/>
-        <properties/>
+        <properties>
+          <maximumSize width="275" height="2147483647"/>
+          <minimumSize width="275" height="75"/>
+          <preferredSize width="275" height="437"/>
+        </properties>
         <border type="none"/>
         <children>
           <nested-form id="449fd" form-file="io/breen/socrates/view/main/SubmissionTree.form" binding="submissionTree">

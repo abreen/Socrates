@@ -27,7 +27,8 @@ public class MainController {
                     if (submitted != null) {
                         File matchingFile = criteria.files.get(submitted.localPath);
                         try {
-                            mainView.fileView.update(matchingFile, submitted);
+                            mainView.fileView.update(submitted, matchingFile);
+                            mainView.fileInfo.update(submitted, matchingFile);
                         } catch (IOException x) {
                             logger.warning("encountered IOE updating FileView");
                         }

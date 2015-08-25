@@ -33,9 +33,11 @@ public class FileView {
         }
     }
 
-    public void update(File file, SubmittedFile submittedFile) throws IOException {
-        if (file != null) {
-            editor.setContentType(file.contentType);
+    public void update(SubmittedFile submittedFile, File matchingFile)
+            throws IOException
+    {
+        if (matchingFile != null) {
+            editor.setContentType(matchingFile.contentType);
         }
         editor.setText(submittedFile.getContents());
     }

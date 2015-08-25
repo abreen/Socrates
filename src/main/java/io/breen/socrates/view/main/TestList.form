@@ -10,7 +10,6 @@
       <scrollpane id="422a0" binding="scrollPane" custom-create="true">
         <constraints border-constraint="Center"/>
         <properties>
-          <horizontalScrollBarPolicy value="32"/>
           <verticalScrollBarPolicy value="22"/>
         </properties>
         <border type="none"/>
