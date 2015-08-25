@@ -77,12 +77,12 @@ public class SocratesConstructor extends SafeConstructor {
             Double maxValueCrit = coerceToDouble(map.get("max_value"));
 
             if (maxNumCrit == null)         // was not specified in criteria file
-                maxNum = Ceiling.ANY;
-            else maxNum = new AtMost<Integer>(maxNumCrit);
+                maxNum = Ceiling.getAny();
+            else maxNum = new AtMost<>(maxNumCrit);
 
             if (maxValueCrit == null)       // was not specified in criteria file
-                maxValue = Ceiling.ANY;
-            else maxValue = new AtMost<Double>(maxValueCrit);
+                maxValue = Ceiling.getAny();
+            else maxValue = new AtMost<>(maxValueCrit);
 
             try {
                 return new TestGroup(members, maxNum, maxValue);
