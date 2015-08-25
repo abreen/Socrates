@@ -2,11 +2,11 @@ package io.breen.socrates;
 
 import org.apache.commons.lang.SystemUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneId;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -112,5 +112,10 @@ public class Globals {
             return false;
         else
             return PYTHON3_VERSION_PATTERN.matcher(versionString).matches();
+    }
+
+    public static ZoneId getZoneId() {
+        String zoneString = properties.getProperty("timezone");
+        return ZoneId.of(zoneString);
     }
 }
