@@ -14,8 +14,8 @@ import java.util.Map;
  * processes specifically. This class delegates its functionality to an underlying
  * ProcessBuilder. Its start() method always produces instances of Python subprocesses.
  *
- * The API of this class does not exactly match that of ProcessBuilder. Some methods
- * have been "updated" to more contemporary names.
+ * The API of this class does not exactly match that of ProcessBuilder. Some methods have
+ * been "updated" to more contemporary names.
  *
  * @see java.lang.ProcessBuilder
  */
@@ -31,10 +31,17 @@ public class PythonProcessBuilder {
     public PythonProcessBuilder(Path pythonModule, String... args) {
         List<String> cmd = new LinkedList<>();
         cmd.add(Globals.python3Command.toString());
+        cmd.add("-B");                      // turns off writing bytecode files (.py[co])
         cmd.add(pythonModule.toAbsolutePath().toString());
         cmd.addAll(Arrays.asList(args));
 
         pb = new ProcessBuilder(cmd);
+
+        Map<String, String> env = pb.environment();
+        env.put(
+                "PYTHONPATH",
+                PythonAPIManager.getPythonPathDirectory().toAbsolutePath().toString()
+        );
 
         switch (Globals.operatingSystem) {
         case WINDOWS:
