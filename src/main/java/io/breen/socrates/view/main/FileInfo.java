@@ -20,7 +20,7 @@ import java.util.Map;
 public class FileInfo {
 
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-            "EEE L/d hh:mm:ss a"
+            "EEE L/d h:mm:ss a"
     );
 
     private enum FileProperty {

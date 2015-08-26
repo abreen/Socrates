@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 public class LateSubmissionTest extends Test implements Automatable {
 
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-            "L/d hh:mm:ss a"
+            "L/d h:mm:ss a"
     );
 
     protected final LocalDateTime cutoff;
