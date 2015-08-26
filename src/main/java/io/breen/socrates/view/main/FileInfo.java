@@ -6,7 +6,6 @@ import io.breen.socrates.immutable.submission.SubmittedFile;
 import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,8 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FileInfo {
 
@@ -24,64 +21,51 @@ public class FileInfo {
     );
 
     private enum FileProperty {
-        FILE_TYPE("File type", "Unknown"),
-        FILE_SIZE("Size", "0 bytes"),
-        HAS_RECEIPT("Has receipt", "Unknown"),
-        SUBMITTED_DATE("Submitted", "Unknown"),
-        MODIFIED_DATE("Last modified", "Unknown");
+        FILE_TYPE(0, "File type", "Unknown"),
+        FILE_SIZE(1, "Size", "0 bytes"),
+        HAS_RECEIPT(2, "Has receipt", "Unknown"),
+        SUBMITTED_DATE(3, "Submitted", "Unknown"),
+        MODIFIED_DATE(4, "Last modified", "Unknown");
 
+        public final int index;
         public final String labelText;
         public final String defaultText;
 
-        FileProperty(String labelText, String defaultText) {
+        FileProperty(int index, String labelText, String defaultText) {
+            this.index = index;
             this.labelText = labelText;
             this.defaultText = defaultText;
         }
-    }
 
-    private Map<FileProperty, JTextField> properties;
+        public static String[] getKeys() {
+            String[] keys = new String[FileProperty.values().length];
+            int i = 0;
+            for (FileProperty p : FileProperty.values())
+                keys[i++] = p.labelText;
+            return keys;
+        }
+
+        public static String[] getDefaults() {
+            String[] defaults = new String[FileProperty.values().length];
+            int i = 0;
+            for (FileProperty p : FileProperty.values())
+                defaults[i++] = p.defaultText;
+            return defaults;
+        }
+    }
 
     private JPanel rootPanel;
     private JLabel fileName;
     private JPanel innerPanel;
-    private JPanel propertiesPanel;
-    private JPanel propertiesKeys;
-    private JPanel propertiesValues;
+    private PropertiesList properties;
 
     public FileInfo() {
-        propertiesKeys = new JPanel();
-        propertiesKeys.setLayout(new BoxLayout(propertiesKeys, BoxLayout.PAGE_AXIS));
-        propertiesKeys.setOpaque(false);
+        properties = new PropertiesList(
+                FileProperty.getKeys(), FileProperty.getDefaults()
+        );
 
-        propertiesValues = new JPanel();
-        propertiesValues.setLayout(new BoxLayout(propertiesValues, BoxLayout.PAGE_AXIS));
-        propertiesValues.setOpaque(false);
-
-        propertiesPanel.add(propertiesKeys, BorderLayout.LINE_START);
-        propertiesPanel.add(propertiesValues, BorderLayout.LINE_END);
-
-        properties = new HashMap<>();
-
-        for (FileProperty prop : FileProperty.values()) {
-            JLabel key = new JLabel(prop.labelText, SwingConstants.RIGHT);
-            key.setFont(Font.decode("Dialog-12"));
-            key.setForeground(UIManager.getColor("inactiveCaptionText"));
-            key.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            propertiesKeys.add(key);
-            propertiesKeys.add(Box.createRigidArea(new Dimension(0, 5)));
-
-            JTextField value = new JTextField(prop.defaultText, 13);
-            value.setOpaque(false);
-            value.setEditable(false);
-            value.setBackground(new Color(0, 0, 0, 0));
-            value.setBorder(new EmptyBorder(0, 0, 0, 0));
-            value.setFont(Font.decode("Dialog-12"));
-            value.setAlignmentX(Component.LEFT_ALIGNMENT);
-            propertiesValues.add(value);
-            propertiesValues.add(Box.createRigidArea(new Dimension(0, 5)));
-
-            properties.put(prop, value);
-        }
+        properties.setOpaque(false);
+        innerPanel.add(properties, BorderLayout.CENTER);
     }
 
     private void createUIComponents() {
@@ -99,40 +83,31 @@ public class FileInfo {
         fileName.setText(file.localPath.toString());
 
         if (matchingFile == null) {
-            setDefaultForProperty(FileProperty.FILE_TYPE);
+            properties.reset(FileProperty.FILE_TYPE.index);
         } else {
-            changeLabelForProperty(
-                    FileProperty.FILE_TYPE, matchingFile.getFileTypeName()
-            );
+            properties.set(FileProperty.FILE_TYPE.index, matchingFile.getFileTypeName());
         }
 
-        changeLabelForProperty(
-                FileProperty.FILE_SIZE, FileUtils.byteCountToDisplaySize(file.size)
+        properties.set(
+                FileProperty.FILE_SIZE.index,
+                FileUtils.byteCountToDisplaySize(file.size)
         );
-        changeLabelForProperty(
-                FileProperty.HAS_RECEIPT, file.receipt == null ? "No" : "Yes"
+
+        properties.set(
+                FileProperty.HAS_RECEIPT.index,
+                file.receipt == null ? "No" : "Yes"
         );
-        changeLabelForProperty(
-                FileProperty.SUBMITTED_DATE,
+
+        properties.set(
+                FileProperty.SUBMITTED_DATE.index,
                 file.receipt == null ? "Unknown" : file.receipt.getLatestDate()
                                                                .format(formatter)
         );
-        changeLabelForProperty(
-                FileProperty.MODIFIED_DATE, getModified(file.fullPath).format(formatter)
+
+        properties.set(
+                FileProperty.MODIFIED_DATE.index,
+                getModified(file.fullPath).format(formatter)
         );
-    }
-
-    private void setDefaultPropertyLabels() {
-        for (FileProperty property : FileProperty.values())
-            setDefaultForProperty(property);
-    }
-
-    private void setDefaultForProperty(FileProperty property) {
-        changeLabelForProperty(property, property.defaultText);
-    }
-
-    private void changeLabelForProperty(FileProperty property, String labelText) {
-        properties.get(property).setText(labelText);
     }
 
     private static LocalDateTime getModified(Path path) throws IOException {
