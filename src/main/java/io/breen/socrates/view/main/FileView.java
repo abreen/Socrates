@@ -14,6 +14,8 @@ import java.io.IOException;
 
 public class FileView {
 
+    private Configuration config;
+
     private JEditorPane editor;
     private JPanel rootPanel;
     private JScrollPane scrollPane;
@@ -21,10 +23,10 @@ public class FileView {
     private void createUIComponents() {
         DefaultSyntaxKit.initKit();
 
-        Configuration config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
-        config.put("DefaultFont", "Monospaced-PLAIN-14");
-
+        config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
         editor = new JEditorPane();
+
+        changeTheme(new DefaultTheme());
 
         scrollPane = new JScrollPane(editor);
         if (Globals.operatingSystem == Globals.OS.OSX) {
@@ -33,12 +35,43 @@ public class FileView {
         }
     }
 
-    public void update(SubmittedFile submittedFile, File matchingFile)
-            throws IOException
+    public void update(SubmittedFile submittedFile, File matchingFile) throws IOException
     {
         if (matchingFile != null) {
             editor.setContentType(matchingFile.contentType);
         }
         editor.setText(submittedFile.getContents());
+    }
+
+    public void changeTheme(DefaultTheme theme) {
+        editor.setBackground(Color.decode(theme.background));
+        editor.setForeground(Color.decode(theme.foreground));
+
+        config.put("SelectionColor", theme.selectionColor);
+
+        config.put("DefaultFont", theme.font);
+
+        config.put("LineNumbers.RightMargin", theme.lineNumberMargin);
+        config.put("LineNumbers.Foreground", theme.lineNumberForeground);
+        config.put("LineNumbers.Background", theme.lineNumberBackground);
+        config.put("LineNumbers.CurrentBack", theme.currentLineBackground);
+
+        config.put("Style.KEYWORD", theme.keyword);
+        config.put("Style.KEYWORD2", theme.keyword2);
+        config.put("Style.TYPE", theme.type);
+        config.put("Style.TYPE2", theme.type2);
+        config.put("Style.TYPE3", theme.type3);
+        config.put("Style.STRING", theme.string);
+        config.put("Style.STRING2", theme.string2);
+        config.put("Style.NUMBER", theme.number);
+        config.put("Style.REGEX", theme.regex);
+        config.put("Style.IDENTIFIER", theme.identifier);
+        config.put("Style.DEFAULT", theme.dephault);
+        config.put("Style.WARNING", theme.warning);
+        config.put("Style.ERROR", theme.error);
+        config.put("Style.COMMENT", theme.comment);
+        config.put("Style.COMMENT2", theme.comment2);
+        config.put("Style.OPERATOR", theme.operator);
+        config.put("Style.DELIMITER", theme.delimiter);
     }
 }
