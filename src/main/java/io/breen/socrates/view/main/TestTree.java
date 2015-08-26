@@ -15,6 +15,7 @@ import io.breen.socrates.view.icon.DefaultTestIcon;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -81,7 +82,7 @@ public class TestTree {
         Ceiling<Integer> maxNum = group.maxNum;
         Ceiling<Double> maxValue = group.maxValue;
 
-        DecimalFormat fmt = new DecimalFormat("#");
+        DecimalFormat fmt = new DecimalFormat("#.#");
 
         if (maxNum == Ceiling.ANY && maxValue == Ceiling.ANY) {
             return "fail any";
@@ -97,5 +98,13 @@ public class TestTree {
 
             return "fail ≤ " + maxN + " and take ≤ " + fmt.format(maxV) + " points";
         }
+    }
+
+    public void addTreeSelectionListener(TreeSelectionListener listener) {
+        tree.addTreeSelectionListener(listener);
+    }
+
+    public TestNode getSelectedTestNode() {
+        return (TestNode)tree.getLastSelectedPathComponent();
     }
 }
