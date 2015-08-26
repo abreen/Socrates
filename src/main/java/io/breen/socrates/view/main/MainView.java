@@ -19,7 +19,7 @@ public class MainView extends JFrame {
         this.setContentPane(rootPanel);
 
         this.setMinimumSize(new Dimension(800, 600));
-        this.setSize(new Dimension(1100, 600));
+        this.setSize(new Dimension(1200, 750));
         this.setLocationRelativeTo(null);
     }
 }
