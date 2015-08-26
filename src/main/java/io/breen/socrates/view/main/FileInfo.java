@@ -21,11 +21,11 @@ public class FileInfo {
     );
 
     private enum FileProperty {
-        FILE_TYPE(0, "File type", "Unknown"),
-        FILE_SIZE(1, "Size", "0 bytes"),
-        HAS_RECEIPT(2, "Has receipt", "Unknown"),
-        SUBMITTED_DATE(3, "Submitted", "Unknown"),
-        MODIFIED_DATE(4, "Last modified", "Unknown");
+        FILE_TYPE(0, "File type", "—"),
+        FILE_SIZE(1, "Size", "—"),
+        HAS_RECEIPT(2, "Has receipt", "—"),
+        SUBMITTED_DATE(3, "Submitted", "—"),
+        MODIFIED_DATE(4, "Last modified", "—");
 
         public final int index;
         public final String labelText;

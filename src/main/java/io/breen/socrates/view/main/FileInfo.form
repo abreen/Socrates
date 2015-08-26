@@ -23,7 +23,7 @@
             <properties>
               <font size="14"/>
               <horizontalAlignment value="0"/>
-              <text value="Label"/>
+              <text value="(no file selected)"/>
             </properties>
           </component>
         </children>
