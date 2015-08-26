@@ -11,8 +11,13 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.io.IOException;
+import java.util.Map;
 
 public class FileView {
+
+    private enum ThemeType {
+        DEFAULT
+    }
 
     private Configuration config;
 
@@ -26,7 +31,7 @@ public class FileView {
         config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
         editor = new JEditorPane();
 
-        changeTheme(new DefaultTheme());
+        changeTheme(ThemeType.DEFAULT);
 
         scrollPane = new JScrollPane(editor);
         if (Globals.operatingSystem == Globals.OS.OSX) {
@@ -43,35 +48,18 @@ public class FileView {
         editor.setText(submittedFile.getContents());
     }
 
-    public void changeTheme(DefaultTheme theme) {
-        editor.setBackground(Color.decode(theme.background));
-        editor.setForeground(Color.decode(theme.foreground));
+    public void changeTheme(ThemeType t) {
+        Map<String, String> themeEntries;
 
-        config.put("SelectionColor", theme.selectionColor);
+        switch (t) {
+        case DEFAULT:
+        default:
+            editor.setBackground(DefaultTheme.backgroundColor);
+            editor.setForeground(DefaultTheme.foregroundColor);
+            themeEntries = DefaultTheme.map;
+        }
 
-        config.put("DefaultFont", theme.font);
-
-        config.put("LineNumbers.RightMargin", theme.lineNumberMargin);
-        config.put("LineNumbers.Foreground", theme.lineNumberForeground);
-        config.put("LineNumbers.Background", theme.lineNumberBackground);
-        config.put("LineNumbers.CurrentBack", theme.currentLineBackground);
-
-        config.put("Style.KEYWORD", theme.keyword);
-        config.put("Style.KEYWORD2", theme.keyword2);
-        config.put("Style.TYPE", theme.type);
-        config.put("Style.TYPE2", theme.type2);
-        config.put("Style.TYPE3", theme.type3);
-        config.put("Style.STRING", theme.string);
-        config.put("Style.STRING2", theme.string2);
-        config.put("Style.NUMBER", theme.number);
-        config.put("Style.REGEX", theme.regex);
-        config.put("Style.IDENTIFIER", theme.identifier);
-        config.put("Style.DEFAULT", theme.dephault);
-        config.put("Style.WARNING", theme.warning);
-        config.put("Style.ERROR", theme.error);
-        config.put("Style.COMMENT", theme.comment);
-        config.put("Style.COMMENT2", theme.comment2);
-        config.put("Style.OPERATOR", theme.operator);
-        config.put("Style.DELIMITER", theme.delimiter);
+        for (Map.Entry<String, String> entry : themeEntries.entrySet())
+            config.put(entry.getKey(), entry.getValue());
     }
 }

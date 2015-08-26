@@ -1,6 +1,9 @@
 package io.breen.socrates.view.main;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class containing default style values for the JSyntaxPane.
@@ -20,48 +23,50 @@ public class DefaultTheme {
         }
     }
 
-    public final String background = "0xffffff";
-    public final String foreground = "0x000000";
-    public final String selectionColor = "#" + Integer.toHexString(
-            UIManager.getColor("textHighlight").getRGB()
-    ).substring(2);
+    public static final Map<String, String> map;
+    public static final Color backgroundColor;
+    public static final Color foregroundColor;
 
-    public final String font = "Monospaced-PLAIN-12";
+    static {
+        backgroundColor = Color.white;
+        foregroundColor = Color.black;
 
-    public final String lineNumberMargin = "10";
-    public final String lineNumberForeground = "0x888888";
-    public final String lineNumberBackground = background;
-    public final String currentLineBackground = background;
+        map = new HashMap<>();
 
-    public final String keyword = colorAndStyle("0x5555cc", Style.PLAIN);
-    public final String keyword2 = colorAndStyle("0x5555cc", Style.BOLD_ITALIC);
+        map.put("SelectionColor", toHex(UIManager.getColor("textHighlight")));
 
-    public final String type = colorAndStyle("0x000000", Style.ITALIC);
-    public final String type2 = colorAndStyle("0x000000", Style.BOLD);
-    public final String type3 = colorAndStyle("0x000000", Style.BOLD_ITALIC);
+        map.put("DefaultFont", "Monospaced-PLAIN-12");
 
-    public final String string = colorAndStyle("0xcc4400", Style.PLAIN);
-    public final String string2 = colorAndStyle("0xcc4400", Style.BOLD);
+        map.put("LineNumbers.RightMargin", "10");
+        map.put("LineNumbers.Foreground", toHex(new Color(100, 100, 100)));
+        map.put("LineNumbers.Background", toHex(backgroundColor));
+        map.put("LineNumbers.CurrentBack", toHex(backgroundColor));
 
-    public final String number = colorAndStyle("0x0099cc", Style.PLAIN);
-
-    public final String regex = colorAndStyle("0xcc6600", Style.PLAIN);
-
-    public final String identifier = colorAndStyle("0x000000", Style.PLAIN);
-
-    public final String dephault = colorAndStyle("0x000000", Style.PLAIN);
-    public final String warning = colorAndStyle("0xCC0000", Style.PLAIN);
-    public final String error = colorAndStyle("0xCC0000", Style.BOLD_ITALIC);
-
-    public final String comment = colorAndStyle("0x339933", Style.PLAIN);
-    public final String comment2 = colorAndStyle("0x339933", Style.PLAIN);
-
-    public final String operator = colorAndStyle("0x000000", Style.PLAIN);
-    public final String delimiter = colorAndStyle("0x000000", Style.BOLD);
+        map.put("Style.KEYWORD", colorAndStyle("0x5555cc", Style.PLAIN));
+        map.put("Style.KEYWORD2", colorAndStyle("0x5555cc", Style.BOLD_ITALIC));
+        map.put("Style.TYPE", colorAndStyle("0x000000", Style.ITALIC));
+        map.put("Style.TYPE2", colorAndStyle("0x000000", Style.BOLD));
+        map.put("Style.TYPE3", colorAndStyle("0x000000", Style.BOLD_ITALIC));
+        map.put("Style.STRING", colorAndStyle("0xcc4400", Style.PLAIN));
+        map.put("Style.STRING2", colorAndStyle("0xcc4400", Style.BOLD));
+        map.put("Style.NUMBER", colorAndStyle("0x0099cc", Style.PLAIN));
+        map.put("Style.REGEX", colorAndStyle("0xcc6600", Style.PLAIN));
+        map.put("Style.IDENTIFIER", colorAndStyle("0x000000", Style.PLAIN));
+        map.put("Style.DEFAULT", colorAndStyle("0x000000", Style.PLAIN));
+        map.put("Style.WARNING", colorAndStyle("0xCC0000", Style.PLAIN));
+        map.put("Style.ERROR", colorAndStyle("0xCC0000", Style.BOLD_ITALIC));
+        map.put("Style.COMMENT", colorAndStyle("0x339933", Style.PLAIN));
+        map.put("Style.COMMENT2", colorAndStyle("0x339933", Style.PLAIN));
+        map.put("Style.OPERATOR", colorAndStyle("0x000000", Style.PLAIN));
+        map.put("Style.DELIMITER", colorAndStyle("0x000000", Style.BOLD));
+    }
 
     protected static String colorAndStyle(String color, Style style) {
         return color + ", " + style.s;
     }
 
-    protected DefaultTheme() {}
+    protected static String toHex(Color c) {
+        String hex = Integer.toHexString(c.getRGB());
+        return "#"+ hex.substring(2);
+    }
 }
