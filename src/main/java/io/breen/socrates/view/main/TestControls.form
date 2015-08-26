@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="io.breen.socrates.view.main.TestControls">
+  <grid id="27dc6" binding="rootPanel" custom-create="true" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="c44ec" binding="innerPanel" layout-manager="BorderLayout" hgap="0" vgap="10">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <opaque value="false"/>
+        </properties>
+        <border type="empty">
+          <size top="10" left="10" bottom="10" right="10"/>
+        </border>
+        <children>
+          <grid id="93dca" layout-manager="BorderLayout" hgap="0" vgap="10">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <opaque value="false"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <scrollpane id="121ae" binding="notesScrollPane" custom-create="true">
+                <constraints border-constraint="Center"/>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="4d605" class="javax.swing.JTextArea" binding="notes" custom-create="true">
+                    <constraints/>
+                    <properties>
+                      <lineWrap value="true"/>
+                      <rows value="8"/>
+                      <wrapStyleWord value="true"/>
+                    </properties>
+                  </component>
+                </children>
+              </scrollpane>
+              <component id="d6b4a" class="io.breen.socrates.view.main.PropertiesList" binding="properties" custom-create="true">
+                <constraints border-constraint="North"/>
+                <properties/>
+              </component>
+            </children>
+          </grid>
+          <grid id="8d54d" binding="buttonPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints border-constraint="South"/>
+            <properties>
+              <opaque value="false"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="281a1" class="javax.swing.JButton" binding="passesButton">
+                <constraints/>
+                <properties>
+                  <focusable value="false"/>
+                  <text value="Passes"/>
+                </properties>
+              </component>
+              <component id="8b53b" class="javax.swing.JButton" binding="failsButton">
+                <constraints/>
+                <properties>
+                  <focusable value="false"/>
+                  <text value="Fails"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <component id="29abc" class="javax.swing.JTextArea" binding="description">
+            <constraints border-constraint="North"/>
+            <properties>
+              <editable value="false"/>
+              <opaque value="false"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

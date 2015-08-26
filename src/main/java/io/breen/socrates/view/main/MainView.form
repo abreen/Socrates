@@ -48,7 +48,7 @@
           <nested-form id="8adcb" form-file="io/breen/socrates/view/main/TestTree.form" binding="testTree">
             <constraints border-constraint="Center"/>
           </nested-form>
-          <nested-form id="b4535" form-file="io/breen/socrates/view/main/TestInfo.form" binding="testInfo">
+          <nested-form id="b4535" form-file="io/breen/socrates/view/main/TestControls.form" binding="testControls">
             <constraints border-constraint="South"/>
           </nested-form>
         </children>

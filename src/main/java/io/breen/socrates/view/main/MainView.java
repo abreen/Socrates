@@ -9,7 +9,7 @@ public class MainView extends JFrame {
     public FileView fileView;
     public FileInfo fileInfo;
     public TestTree testTree;
-    public TestInfo testInfo;
+    public TestControls testControls;
     private JPanel rootPanel;
 
     public MainView() {
