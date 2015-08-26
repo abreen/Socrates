@@ -39,7 +39,12 @@ public class FileFactory {
         /*
          * Parse due dates for this file, if they exist.
          */
-        Map<Date, Double> datesMap = (Map<Date, Double>)map.get("due_dates");
+        Map<Date, Double> datesMap;
+        try {
+            datesMap = (Map<Date, Double>)map.get("due_dates");
+        } catch (ClassCastException x) {
+            throw new InvalidFileException(type, "'due_dates' must be a map");
+        }
 
         Map<LocalDateTime, Double> dueDates = null;
         if (datesMap != null) {
