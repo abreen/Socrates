@@ -17,6 +17,7 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
 import java.awt.*;
 import java.text.DecimalFormat;
 
@@ -27,7 +28,7 @@ public class TestTree {
     private JTree tree;
 
     private void createUIComponents() {
-        tree = new JTree() {
+        tree = new JTree((TreeModel)null) {
             @Override
             public String convertValueToText(Object value, boolean selected,
                                              boolean expanded, boolean leaf, int row,
@@ -64,6 +65,9 @@ public class TestTree {
 
         tree.setShowsRootHandles(true);
 
+        /*
+         * Set up scroll pane.
+         */
         scrollPane = new JScrollPane(tree);
         if (Globals.operatingSystem == Globals.OS.OSX) {
             Border border = new LineBorder(new Color(197, 197, 197));

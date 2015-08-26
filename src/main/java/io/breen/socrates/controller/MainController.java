@@ -4,6 +4,7 @@ import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.model.TestNode;
 import io.breen.socrates.view.main.MainView;
 
 import java.io.IOException;
@@ -36,6 +37,17 @@ public class MainController {
                     }
                 }
         );
+
+        mainView.testTree.addTreeSelectionListener(
+                event -> {
+                    TestNode testNode = mainView.testTree.getSelectedTestNode();
+                    if (testNode != null) {
+                        mainView.testControls.update(testNode);
+                    }
+                }
+        );
+
+
     }
 
     public void start(Criteria criteria, List<Submission> submissions) {
@@ -45,7 +57,7 @@ public class MainController {
         mainView.setTitle("Socrates — " + criteria.assignmentName);
 
         mainView.submissionTree.addUngraded(submissions);
-        mainView.submissionTree.setActiveSubmittedFile(submissions.get(0).files.get(0));
+        //mainView.submissionTree.setActiveSubmittedFile(submissions.get(0).files.get(0));
 
         mainView.setVisible(true);
 
