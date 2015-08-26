@@ -24,11 +24,11 @@ import java.util.List;
  */
 public class TestGroup {
 
-    protected final List<Either<Test, TestGroup>> members;
+    public final List<Either<Test, TestGroup>> members;
 
-    protected final Ceiling<Integer> maxNum;
+    public final Ceiling<Integer> maxNum;
 
-    protected final Ceiling<Double> maxValue;
+    public final Ceiling<Double> maxValue;
 
     public TestGroup(List<Either<Test, TestGroup>> members, Ceiling<Integer> maxNum,
                      Ceiling<Double> maxValue)
@@ -59,18 +59,6 @@ public class TestGroup {
         this.members = newMembers;
         this.maxNum = oldGroup.maxNum;
         this.maxValue = oldGroup.maxValue;
-    }
-
-    public Ceiling<Integer> getMaxNum() {
-        return maxNum;
-    }
-
-    public Ceiling<Double> getMaxValue() {
-        return maxValue;
-    }
-
-    public List<Either<Test, TestGroup>> getMembers() {
-        return members;
     }
 
     public String toString() {

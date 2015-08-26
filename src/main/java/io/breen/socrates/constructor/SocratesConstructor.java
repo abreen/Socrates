@@ -358,7 +358,7 @@ public class SocratesConstructor extends SafeConstructor {
                 TestGroup g = (TestGroup)o;
 
                 List<Either<Test, TestGroup>> newMembers = buildAllTests(
-                        g.getMembers(), fileType, node
+                        g.members, fileType, node
                 );
 
                 newList.add(new Right<>(new TestGroup(newMembers, g)));
