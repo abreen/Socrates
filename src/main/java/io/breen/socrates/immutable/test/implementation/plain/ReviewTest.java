@@ -4,11 +4,8 @@ import io.breen.socrates.immutable.test.Test;
 
 public class ReviewTest extends Test {
 
-    protected final String description;
-
     public ReviewTest(double deduction, String description) {
-        super(deduction);
-        this.description = description;
+        super(deduction, description);
     }
 
     @Override

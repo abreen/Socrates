@@ -9,7 +9,7 @@ import io.breen.socrates.immutable.test.Test;
 public class AlwaysPassingTest extends Test implements Automatable<PlainFile> {
 
     public AlwaysPassingTest(double deduction) {
-        super(deduction);
+        super(deduction, "(always passing)");
     }
 
     @Override

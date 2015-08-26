@@ -8,6 +8,7 @@ import io.breen.socrates.immutable.test.CannotBeAutomatedException;
 import io.breen.socrates.immutable.test.Test;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * A test that checks the submitted file's receipt to determine whether it was submitted
@@ -16,10 +17,14 @@ import java.time.LocalDateTime;
  */
 public class LateSubmissionTest extends Test implements Automatable {
 
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+            "L/d hh:mm:ss a"
+    );
+
     protected final LocalDateTime cutoff;
 
     public LateSubmissionTest(double deduction, LocalDateTime cutoff) {
-        super(deduction);
+        super(deduction, "submitted after " + cutoff.format(formatter));
         this.cutoff = cutoff;
     }
 

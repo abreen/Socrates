@@ -21,10 +21,12 @@ package io.breen.socrates.immutable.test;
  */
 public abstract class Test {
 
-    protected final double deduction;
+    public final double deduction;
+    public final String description;
 
-    public Test(double deduction) {
+    public Test(double deduction, String description) {
         this.deduction = deduction;
+        this.description = description;
     }
 
     public String toString() {

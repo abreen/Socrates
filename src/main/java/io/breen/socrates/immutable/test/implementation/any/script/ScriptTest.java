@@ -22,12 +22,10 @@ public class ScriptTest extends Test implements Automatable {
 
     private static Logger logger = Logger.getLogger(ScriptTest.class.getName());
 
-    protected final String description;
     protected final Resource script;
 
     public ScriptTest(double deduction, String description, Resource script) {
-        super(deduction);
-        this.description = description;
+        super(deduction, description);
         this.script = script;
     }
 
