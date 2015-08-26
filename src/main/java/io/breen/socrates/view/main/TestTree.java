@@ -10,7 +10,7 @@ import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.model.FileReport;
 import io.breen.socrates.model.TestGroupNode;
 import io.breen.socrates.model.TestNode;
-import io.breen.socrates.view.icon.PassedTestIcon;
+import io.breen.socrates.view.icon.DefaultTestIcon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -48,7 +48,7 @@ public class TestTree {
         };
 
         DefaultTreeCellRenderer r = (DefaultTreeCellRenderer)tree.getCellRenderer();
-        r.setLeafIcon(new PassedTestIcon());
+        r.setLeafIcon(new DefaultTestIcon());
         r.setClosedIcon(null);
         r.setOpenIcon(null);
 
