@@ -8,7 +8,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by abreen on 2015-08-26.
+ * A custom Swing component that displays "properties" --- a list of key-value pairs,
+ * both strings. The keys are right-aligned on the left, and the values are left-aligned
+ * on the right. Key-value pairs can be added after the component is created. Any
+ * pair can be "reset" to default values.
  */
 public class PropertiesList extends JPanel {
 
