@@ -9,11 +9,8 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -60,56 +57,21 @@ public class SubmissionTree {
         };
 
         /*
-         * This custom selection model ensures that only files in the submission
-         * tree can be selected any time --- this makes sure that the FileInfo view
-         * will never respond to selections on non-files.
+         * This ensures that only submitted files in the tree can be selected --- not
+         * submission directories or anything else.
          */
         tree.setSelectionModel(
-                new DefaultTreeSelectionModel() {
-                    {
-                        this.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-                    }
-
-                    private boolean pathEndsWithSubmittedFile(TreePath path) {
-                        Object last = path.getLastPathComponent();
-                        if (last instanceof DefaultMutableTreeNode) {
-                            DefaultMutableTreeNode node = (DefaultMutableTreeNode)last;
-                            return node.getUserObject() instanceof SubmittedFile;
+                new PredicateTreeSelectionModel(
+                        path -> {
+                            Object last = path.getLastPathComponent();
+                            if (last instanceof DefaultMutableTreeNode) {
+                                DefaultMutableTreeNode n = (DefaultMutableTreeNode)last;
+                                return n.getUserObject() instanceof SubmittedFile;
+                            } else {
+                                return false;
+                            }
                         }
-
-                        return false;
-                    }
-
-                    @Override
-                    public void setSelectionPath(TreePath path) {
-                        if (pathEndsWithSubmittedFile(path)) super.setSelectionPath(path);
-                    }
-
-                    @Override
-                    public void setSelectionPaths(TreePath[] paths) {
-                        TreePath[] filteredPaths = Arrays.copyOf(paths, paths.length);
-                        for (int i = 0; i < filteredPaths.length; i++)
-                            if (!pathEndsWithSubmittedFile(filteredPaths[i]))
-                                filteredPaths[i] = null;
-
-                        super.setSelectionPaths(filteredPaths);
-                    }
-
-                    @Override
-                    public void addSelectionPath(TreePath path) {
-                        if (pathEndsWithSubmittedFile(path)) super.addSelectionPath(path);
-                    }
-
-                    @Override
-                    public void addSelectionPaths(TreePath[] paths) {
-                        TreePath[] filteredPaths = Arrays.copyOf(paths, paths.length);
-                        for (int i = 0; i < filteredPaths.length; i++)
-                            if (!pathEndsWithSubmittedFile(filteredPaths[i]))
-                                filteredPaths[i] = null;
-
-                        super.addSelectionPaths(filteredPaths);
-                    }
-                }
+                )
         );
 
         tree.setRootVisible(false);

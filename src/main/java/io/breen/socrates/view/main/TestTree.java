@@ -47,6 +47,15 @@ public class TestTree {
             }
         };
 
+        /*
+         * This ensures that only tests can be selected.
+         */
+        tree.setSelectionModel(
+                new PredicateTreeSelectionModel(
+                        path -> path.getLastPathComponent() instanceof TestNode
+                )
+        );
+
         DefaultTreeCellRenderer r = (DefaultTreeCellRenderer)tree.getCellRenderer();
         r.setLeafIcon(new DefaultTestIcon());
         r.setClosedIcon(null);
