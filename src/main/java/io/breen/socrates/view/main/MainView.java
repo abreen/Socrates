@@ -8,7 +8,7 @@ public class MainView extends JFrame {
     public SubmissionTree submissionTree;
     public FileView fileView;
     public FileInfo fileInfo;
-    public TestList testList;
+    public TestTree testTree;
     public TestInfo testInfo;
     private JPanel rootPanel;
 

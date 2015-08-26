@@ -29,8 +29,9 @@ public class MainController {
                         try {
                             mainView.fileView.update(submitted, matchingFile);
                             mainView.fileInfo.update(submitted, matchingFile);
+                            mainView.testTree.update(submitted, matchingFile);
                         } catch (IOException x) {
-                            logger.warning("encountered IOE updating FileView");
+                            logger.warning("encountered I/O exception updating view");
                         }
                     }
                 }

@@ -38,10 +38,14 @@
       </grid>
       <grid id="80877" layout-manager="BorderLayout" hgap="0" vgap="10">
         <constraints border-constraint="East"/>
-        <properties/>
+        <properties>
+          <maximumSize width="300" height="2147483647"/>
+          <minimumSize width="300" height="44"/>
+          <preferredSize width="300" height="406"/>
+        </properties>
         <border type="none"/>
         <children>
-          <nested-form id="8adcb" form-file="io/breen/socrates/view/main/TestList.form" binding="testList">
+          <nested-form id="8adcb" form-file="io/breen/socrates/view/main/TestTree.form" binding="testTree">
             <constraints border-constraint="Center"/>
           </nested-form>
           <nested-form id="b4535" form-file="io/breen/socrates/view/main/TestInfo.form" binding="testInfo">

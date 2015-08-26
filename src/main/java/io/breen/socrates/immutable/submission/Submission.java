@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * submission. For each actual file found on the file system, an immutable SubmittedFile
  * object is created and referenced by instances of this class.
  *
- * GradeReport objects are built using the requirements read from the criteria and the
+ * FileReport objects are built using the requirements read from the criteria and the
  * contents of these objects.
  */
 public class Submission {
