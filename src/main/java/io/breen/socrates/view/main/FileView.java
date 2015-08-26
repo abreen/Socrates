@@ -17,7 +17,8 @@ public class FileView {
 
     private enum ThemeType {
         DEFAULT,
-        BASE16_LIGHT
+        BASE16_LIGHT,
+        BASE16_DARK
     }
 
     private Configuration config;
@@ -57,6 +58,11 @@ public class FileView {
             editor.setBackground(Base16LightTheme.backgroundColor);
             editor.setForeground(Base16LightTheme.foregroundColor);
             themeEntries = Base16LightTheme.map;
+            break;
+        case BASE16_DARK:
+            editor.setBackground(Base16DarkTheme.backgroundColor);
+            editor.setForeground(Base16DarkTheme.foregroundColor);
+            themeEntries = Base16DarkTheme.map;
             break;
         case DEFAULT:
         default:
