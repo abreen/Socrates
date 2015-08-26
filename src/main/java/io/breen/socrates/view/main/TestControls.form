@@ -71,7 +71,12 @@
             <constraints border-constraint="North"/>
             <properties>
               <editable value="false"/>
+              <font size="14"/>
+              <lineWrap value="true"/>
               <opaque value="false"/>
+              <rows value="3"/>
+              <text value="(no test selected)"/>
+              <wrapStyleWord value="true"/>
             </properties>
           </component>
         </children>
