@@ -53,8 +53,8 @@ public class DefaultTheme {
         map.put("Style.REGEX", colorAndStyle("0xcc6600", Style.PLAIN));
         map.put("Style.IDENTIFIER", colorAndStyle("0x000000", Style.PLAIN));
         map.put("Style.DEFAULT", colorAndStyle("0x000000", Style.PLAIN));
-        map.put("Style.WARNING", colorAndStyle("0xCC0000", Style.PLAIN));
-        map.put("Style.ERROR", colorAndStyle("0xCC0000", Style.BOLD_ITALIC));
+        map.put("Style.WARNING", colorAndStyle("0xcc0000", Style.PLAIN));
+        map.put("Style.ERROR", colorAndStyle("0xcc0000", Style.BOLD_ITALIC));
         map.put("Style.COMMENT", colorAndStyle("0x339933", Style.PLAIN));
         map.put("Style.COMMENT2", colorAndStyle("0x339933", Style.PLAIN));
         map.put("Style.OPERATOR", colorAndStyle("0x000000", Style.PLAIN));

@@ -16,7 +16,8 @@ import java.util.Map;
 public class FileView {
 
     private enum ThemeType {
-        DEFAULT
+        DEFAULT,
+        BASE16_LIGHT
     }
 
     private Configuration config;
@@ -52,6 +53,11 @@ public class FileView {
         Map<String, String> themeEntries;
 
         switch (t) {
+        case BASE16_LIGHT:
+            editor.setBackground(Base16LightTheme.backgroundColor);
+            editor.setForeground(Base16LightTheme.foregroundColor);
+            themeEntries = Base16LightTheme.map;
+            break;
         case DEFAULT:
         default:
             editor.setBackground(DefaultTheme.backgroundColor);
