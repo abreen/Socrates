@@ -57,7 +57,7 @@ public class MainController {
         mainView.setTitle("Socrates — " + criteria.assignmentName);
 
         mainView.submissionTree.addUngraded(submissions);
-        //mainView.submissionTree.setActiveSubmittedFile(submissions.get(0).files.get(0));
+        mainView.submissionTree.expandSubmission(submissions.get(0));
 
         mainView.setVisible(true);
 

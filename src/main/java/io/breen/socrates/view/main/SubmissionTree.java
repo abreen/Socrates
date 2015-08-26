@@ -126,4 +126,18 @@ public class SubmissionTree {
             }
         }
     }
+
+    public void expandSubmission(Submission submission) {
+        Enumeration ungraded = ungradedRoot.breadthFirstEnumeration();
+        while (ungraded.hasMoreElements()) {
+            Object node = ungraded.nextElement();
+            if (node instanceof DefaultMutableTreeNode) {
+                DefaultMutableTreeNode mutableTreeNode = (DefaultMutableTreeNode)node;
+                if (mutableTreeNode.getUserObject() == submission) {
+                    tree.expandPath(new TreePath(mutableTreeNode.getPath()));
+                    break;
+                }
+            }
+        }
+    }
 }
