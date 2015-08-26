@@ -48,7 +48,7 @@ public abstract class File {
      *
      * @see TestGroup
      */
-    protected final TestGroup testRoot;
+    public final TestGroup testRoot;
 
     public File(Path localPath,
                 double pointValue,
