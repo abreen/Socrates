@@ -6,9 +6,8 @@ import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.ceiling.AtMost;
 import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.model.FileReport;
-import io.breen.socrates.model.TestGroupNode;
-import io.breen.socrates.model.TestNode;
 import io.breen.socrates.model.TestResult;
+import io.breen.socrates.model.TestWrapperNode;
 import io.breen.socrates.view.icon.DefaultTestIcon;
 import io.breen.socrates.view.icon.FailedTestIcon;
 import io.breen.socrates.view.icon.PassedTestIcon;
@@ -16,8 +15,8 @@ import io.breen.socrates.view.icon.PassedTestIcon;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -30,8 +29,6 @@ public class TestTree {
     private JScrollPane scrollPane;
     private JTree tree;
 
-    private TreeModelListener modelListener;
-
     private void createUIComponents() {
         tree = new JTree((TreeModel)null) {
             @Override
@@ -39,13 +36,14 @@ public class TestTree {
                                              boolean expanded, boolean leaf, int row,
                                              boolean hasFocus)
             {
-                if (value instanceof TestGroupNode) {
-                    TestGroup group = ((TestGroupNode)value).testGroup;
-                    return testGroupToString(group);
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+                Object userObject = node.getUserObject();
 
-                } else if (value instanceof TestNode) {
-                    Test test = ((TestNode)value).test;
-                    return test.description;
+                if (userObject instanceof TestGroup) {
+                    return testGroupToString((TestGroup)userObject);
+
+                } else if (userObject instanceof Test) {
+                    return ((Test)userObject).description;
                 }
 
                 return super.convertValueToText(
@@ -59,7 +57,11 @@ public class TestTree {
          */
         tree.setSelectionModel(
                 new PredicateTreeSelectionModel(
-                        path -> path.getLastPathComponent() instanceof TestNode
+                        path -> {
+                            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+                                    path.getLastPathComponent();
+                            return node.getUserObject() instanceof Test;
+                        }
                 )
         );
 
@@ -82,17 +84,17 @@ public class TestTree {
                         );
 
                         if (isLeaf) {
-                            TestNode testNode = (TestNode)value;
+                            TestWrapperNode testNode = (TestWrapperNode)value;
                             switch (testNode.getResult()) {
                             case PASSED:
-                                setIcon(new PassedTestIcon());
+                                setIcon(passedIcon);
                                 break;
                             case FAILED:
-                                setIcon(new FailedTestIcon());
+                                setIcon(failedIcon);
                                 break;
                             case NONE:
                             default:
-                                setIcon(new DefaultTestIcon());
+                                setIcon(defaultIcon);
                             }
                         } else {
                             setIcon(null);
@@ -104,29 +106,6 @@ public class TestTree {
         );
 
         tree.setShowsRootHandles(true);
-
-//        modelListener = new TreeModelListener() {
-//            @Override
-//            public void treeNodesChanged(TreeModelEvent e) {
-//                // may happen when a TestNode's result value is changed
-//                TreeNode changedNode = e.getChildren()[0]
-//            }
-//
-//            @Override
-//            public void treeNodesInserted(TreeModelEvent e) {
-//                // should not happen
-//            }
-//
-//            @Override
-//            public void treeNodesRemoved(TreeModelEvent e) {
-//                // should not happen
-//            }
-//
-//            @Override
-//            public void treeStructureChanged(TreeModelEvent e) {
-//                // should not happen
-//            }
-//        };
 
         /*
          * Set up scroll pane.
@@ -144,7 +123,7 @@ public class TestTree {
      * future method calls on this TestTree will affect the specified FileReport.
      */
     public void update(FileReport report) {
-        tree.setModel(report);
+        tree.setModel(report.treeModel);
     }
 
     private static String testGroupToString(TestGroup group) {
@@ -173,11 +152,11 @@ public class TestTree {
         tree.addTreeSelectionListener(listener);
     }
 
-    public TestNode getSelectedTestNode() {
+    public TestWrapperNode getSelectedTestWrapperNode() {
         if (!hasSelection())
             return null;
 
-        return (TestNode)tree.getLastSelectedPathComponent();
+        return (TestWrapperNode)tree.getLastSelectedPathComponent();
     }
 
     public boolean hasSelection() {
@@ -185,38 +164,65 @@ public class TestTree {
     }
 
     /**
-     * Set the result of the currently selected TestNode to TestResult.PASSED. If
+     * Set the result of the currently selected TestWrapperNode to TestResult.PASSED. If
      * there is no selection, this method does nothing.
      */
     public void passTest() {
-        TreePath path = tree.getSelectionPath();
-        if (path == null) return;
+        if (!hasSelection()) return;
 
-        FileReport report = (FileReport)tree.getModel();
-        report.valueForPathChanged(path, TestResult.PASSED);
+        TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
+        test.setResult(TestResult.PASSED);
     }
 
     /**
-     * Set the result of the currently selected TestNode to TestResult.FAILED. If
+     * Set the result of the currently selected TestWrapperNode to TestResult.FAILED. If
      * there is no selection, this method does nothing.
      */
     public void failTest() {
-        TreePath path = tree.getSelectionPath();
-        if (path == null) return;
+        if (!hasSelection()) return;
 
-        FileReport report = (FileReport)tree.getModel();
-        report.valueForPathChanged(path, TestResult.FAILED);
+        TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
+        test.setResult(TestResult.FAILED);
     }
 
     /**
-     * Resets the result of the currently selected TestNode to TestResult.NONE. If
+     * Resets the result of the currently selected TestWrapperNode to TestResult.NONE. If
      * there is no selection, this method does nothing.
      */
     public void resetTest() {
-        TreePath path = tree.getSelectionPath();
-        if (path == null) return;
+        if (!hasSelection()) return;
 
-        FileReport report = (FileReport)tree.getModel();
-        report.valueForPathChanged(path, TestResult.NONE);
+        TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
+        test.setResult(TestResult.NONE);
     }
+
+    public boolean lastTestForFileSelected() {
+        if (!hasSelection()) return false;
+
+        // path to current test
+        TreePath path = tree.getSelectionPath();
+        // TODO
+        return false;
+    }
+
+    public boolean firstTestForFileSelected() {
+        return false;
+    }
+
+    /**
+     * Sets the test tree's current selection to the next test for this file. If the
+     * last test for this file is selected, this method does nothing. If no test is
+     * selected, this method selects the first test.
+     */
+//    public void goToNextTest() {
+//        if (!hasSelection()) {
+//            selectFirstTest();
+//            return;
+//        }
+//
+//        if (lastTestForFileSelected())
+//            return;
+//
+//        tree.setSelectionPath(new TreePath(nextFile.getPath()));
+//    }
 }

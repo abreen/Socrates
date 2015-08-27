@@ -5,7 +5,7 @@ import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.model.FileReport;
-import io.breen.socrates.model.TestNode;
+import io.breen.socrates.model.TestWrapperNode;
 import io.breen.socrates.view.main.FileView;
 import io.breen.socrates.view.main.MainView;
 import io.breen.socrates.view.main.MenuBarManager;
@@ -46,7 +46,7 @@ public class MainController {
         int alt = InputEvent.ALT_DOWN_MASK;
 
         /*
-         * Set up actions and attach them to components.
+         * Set up submission-related actions.
          */
         Action nextSubmission = newMenuItemAction(
                 menuBar.nextSubmission,
@@ -86,6 +86,9 @@ public class MainController {
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | shift)
         );
 
+        /*
+         * Set up file-related actions.
+         */
         Action nextFile = newMenuItemAction(
                 menuBar.nextFile,
                 e -> mainView.submissionTree.goToNextFile()
@@ -156,6 +159,27 @@ public class MainController {
                 }
         );
 
+        /*
+         * Set up theme-related options.
+         */
+        newMenuItemAction(
+                menuBar.defaultTheme,
+                e -> mainView.fileView.changeTheme(FileView.ThemeType.DEFAULT)
+        );
+
+        newMenuItemAction(
+                menuBar.base16Light,
+                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_LIGHT)
+        );
+
+        newMenuItemAction(
+                menuBar.base16Dark,
+                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_DARK)
+        );
+
+        /*
+         * Set up test-related actions.
+         */
         Action passTest = newMenuItemAction(
                 menuBar.passTest,
                 e -> mainView.testTree.passTest()
@@ -196,20 +220,13 @@ public class MainController {
                 }
         );
 
-        newMenuItemAction(
-                menuBar.defaultTheme,
-                e -> mainView.fileView.changeTheme(FileView.ThemeType.DEFAULT)
-        );
-
-        newMenuItemAction(
-                menuBar.base16Light,
-                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_LIGHT)
-        );
-
-        newMenuItemAction(
-                menuBar.base16Dark,
-                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_DARK)
-        );
+        /*
+         * Set up test navigation options.
+         */
+//        Action nextTest = newMenuItemAction(
+//                menuBar.nextTest,
+//                e -> mainView.testTree.goToNextTest()
+//        );
 
         /*
          * Set up event listeners.
@@ -223,7 +240,8 @@ public class MainController {
                         try {
                             mainView.fileView.update(submitted, matchingFile);
                             mainView.fileInfo.update(submitted, matchingFile);
-                            mainView.testTree.update(report);
+
+                            if (report != null) mainView.testTree.update(report);
                         } catch (IOException x) {
                             logger.warning("encountered I/O exception updating view");
                         }
@@ -233,7 +251,7 @@ public class MainController {
 
         mainView.testTree.addTreeSelectionListener(
                 event -> {
-                    TestNode testNode = mainView.testTree.getSelectedTestNode();
+                    TestWrapperNode testNode = mainView.testTree.getSelectedTestWrapperNode();
                     if (testNode != null) {
                         mainView.testControls.update(testNode);
                     }

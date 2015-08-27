@@ -3,7 +3,7 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.test.Automatable;
 import io.breen.socrates.immutable.test.Test;
-import io.breen.socrates.model.TestNode;
+import io.breen.socrates.model.TestWrapperNode;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -85,8 +85,8 @@ public class TestControls {
         properties.setOpaque(false);
     }
 
-    public void update(TestNode testNode) {
-        Test test = testNode.test;
+    public void update(TestWrapperNode testNode) {
+        Test test = (Test)testNode.getUserObject();
         DecimalFormat fmt = new DecimalFormat("#.#");
 
         description.setText(test.description);
