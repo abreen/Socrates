@@ -161,6 +161,9 @@ public class MainController {
                 e -> mainView.testTree.passTest()
         );
         passTest.setEnabled(false);
+        passTest.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, ctrl)
+        );
         mainView.testControls.setPassTestAction(passTest);
 
         Action failTest = newMenuItemAction(
@@ -168,6 +171,9 @@ public class MainController {
                 e -> mainView.testTree.failTest()
         );
         failTest.setEnabled(false);
+        failTest.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ctrl)
+        );
         mainView.testControls.setFailTestAction(failTest);
 
         Action resetTest = newMenuItemAction(
