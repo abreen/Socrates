@@ -22,10 +22,9 @@ public class MenuBarManager {
     public final JMenuItem unGradeSubmission;   // TODO
     public final JMenuItem revealSubmission;
 
-    public final JMenuItem nextFile;            // TODO
-    public final JMenuItem previousFile;        // TODO
+    public final JMenuItem nextFile;
+    public final JMenuItem previousFile;
     public final JMenuItem renameFile;          // TODO
-    public final JMenuItem revealFile;          // TODO
     public final JMenuItem openFile;            // TODO
     public final JMenuItem defaultTheme;
     public final JMenuItem base16Light;
@@ -102,18 +101,6 @@ public class MenuBarManager {
 
         renameFile = new JMenuItem("Rename File...");
 
-        revealFile = new JMenuItem();
-        switch (Globals.operatingSystem) {
-        case OSX:
-            revealFile.setText("Reveal in Finder");
-            break;
-        case WINDOWS:
-            revealFile.setText("Reveal in Explorer");
-            break;
-        default:
-            revealFile.setText("Reveal in File System");
-        }
-
         openFile = new JMenuItem();
         switch (Globals.operatingSystem) {
         case OSX:
@@ -137,7 +124,6 @@ public class MenuBarManager {
         fileMenu.addSeparator();
         fileMenu.add(renameFile);
         fileMenu.addSeparator();
-        fileMenu.add(revealFile);
         fileMenu.add(openFile);
         fileMenu.addSeparator();
         fileMenu.add(defaultTheme);

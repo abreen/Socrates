@@ -36,6 +36,7 @@ public class MainController {
         // ctrl will end up being Command on OS X
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         int shift = InputEvent.SHIFT_DOWN_MASK;
+        int alt = InputEvent.ALT_DOWN_MASK;
 
         /*
          * Set up actions and attach them to components.
@@ -78,14 +79,56 @@ public class MainController {
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | shift)
         );
 
+        Action nextFile = newMenuItemAction(
+                menuBar.nextFile,
+                e -> mainView.submissionTree.goToNextFile()
+        );
+        nextFile.setEnabled(true);
+        nextFile.putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | alt)
+        );
+
+        Action previousFile = newMenuItemAction(
+                menuBar.previousFile,
+                e -> mainView.submissionTree.goToPreviousFile()
+        );
+        previousFile.setEnabled(false);
+        previousFile.putValue(
+                Action.ACCELERATOR_KEY,
+                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | alt)
+        );
+
+        Action openFile = newMenuItemAction(
+                menuBar.openFile,
+                e -> {
+                    SubmittedFile f = mainView.submissionTree.getSelectedSubmittedFile();
+                    Path path = f.fullPath;
+                    try {
+                        Desktop.getDesktop().open(path.toFile());
+                    } catch (IOException x) {
+                        logger.warning("got I/O exception revealing file: " + x);
+                    }
+                }
+        );
+        openFile.setEnabled(false);
+
+        /*
+         * TreeSelectionListener for updating the disabled state of the submission
+         * and file navigation actions.
+         */
         mainView.submissionTree.addTreeSelectionListener(
                 e -> {
                     if (!mainView.submissionTree.hasSelection()) {
-                        nextSubmission.setEnabled(true);
-                        previousSubmission.setEnabled(false);
                         revealSubmission.setEnabled(false);
+                        openFile.setEnabled(false);
+
+                        nextSubmission.setEnabled(true);
+                        nextFile.setEnabled(true);
+                        previousSubmission.setEnabled(false);
                     } else {
                         revealSubmission.setEnabled(true);
+                        openFile.setEnabled(true);
 
                         if (mainView.submissionTree.lastSubmissionSelected())
                             nextSubmission.setEnabled(false);
@@ -96,6 +139,16 @@ public class MainController {
                             previousSubmission.setEnabled(false);
                         else
                             previousSubmission.setEnabled(true);
+
+                        if (mainView.submissionTree.lastFileInSubmissionSelected())
+                            nextFile.setEnabled(false);
+                        else
+                            nextFile.setEnabled(true);
+
+                        if (mainView.submissionTree.firstFileInSubmissionSelected())
+                            previousFile.setEnabled(false);
+                        else
+                            previousFile.setEnabled(true);
                     }
                 }
         );

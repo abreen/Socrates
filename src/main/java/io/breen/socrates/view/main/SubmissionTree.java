@@ -298,4 +298,102 @@ public class SubmissionTree {
 
         tree.setSelectionPath(new TreePath(file.getPath()));
     }
+
+    /**
+     * Returns true if the currently selected file is the first file in the currently
+     * selected submission. This method returns false if there is no selection.
+     */
+    public boolean firstFileInSubmissionSelected() {
+        if (!hasSelection()) return false;
+
+        // get path to the submitted file
+        TreePath file = tree.getSelectionPath();
+        // get path to submission
+        TreePath submission = file.getParentPath();
+
+        DefaultMutableTreeNode submissionNode = (DefaultMutableTreeNode)
+                submission.getLastPathComponent();
+
+        TreeNode firstChild = submissionNode.getFirstChild();
+
+        return file.getLastPathComponent() == firstChild;
+    }
+
+    /**
+     * Returns true if the currently selected file is the last file in the currently
+     * selected submission. This method returns false if there is no selection.
+     */
+    public boolean lastFileInSubmissionSelected() {
+        if (!hasSelection()) return false;
+
+        // get path to the submitted file
+        TreePath file = tree.getSelectionPath();
+        // get path to submission
+        TreePath submission = file.getParentPath();
+
+        DefaultMutableTreeNode submissionNode = (DefaultMutableTreeNode)
+                submission.getLastPathComponent();
+
+        TreeNode lastChild = submissionNode.getLastChild();
+
+        return file.getLastPathComponent() == lastChild;
+    }
+
+    /**
+     * Sets the submission tree's current selection to the next file in the current
+     * submission. If the last file in the current submission is currently selected,
+     * this method does nothing.
+     * If there is no current selection, this method selects the first file in the
+     * first submission, or does nothing if there are no files.
+     */
+    public void goToNextFile() {
+        if (!hasSelection()) {
+            selectFirstSubmission();
+            return;
+        }
+
+        if (lastFileInSubmissionSelected())
+            return;
+
+        // get path to currently selected file
+        TreePath file = tree.getSelectionPath();
+        Object fileNode = file.getLastPathComponent();
+
+        // get path to submission of that file
+        TreePath submission = file.getParentPath();
+
+        DefaultMutableTreeNode submissionNode = (DefaultMutableTreeNode)submission
+                .getLastPathComponent();
+
+        DefaultMutableTreeNode nextFile = (DefaultMutableTreeNode)
+                submissionNode.getChildAfter((TreeNode)fileNode);
+
+        tree.setSelectionPath(new TreePath(nextFile.getPath()));
+    }
+
+    /**
+     * Sets the submission tree's current selection to the previous file in the current
+     * submission. If the first file in the current submission is currently selected,
+     * this method does nothing.
+     * If there is no current selection, this method does nothing.
+     */
+    public void goToPreviousFile() {
+        if (!hasSelection() || firstFileInSubmissionSelected())
+            return;
+
+        // get path to currently selected file
+        TreePath file = tree.getSelectionPath();
+        Object fileNode = file.getLastPathComponent();
+
+        // get path to submission of that file
+        TreePath submission = file.getParentPath();
+
+        DefaultMutableTreeNode submissionNode = (DefaultMutableTreeNode)submission
+                .getLastPathComponent();
+
+        DefaultMutableTreeNode prevFile = (DefaultMutableTreeNode)
+                submissionNode.getChildBefore((TreeNode)fileNode);
+
+        tree.setSelectionPath(new TreePath(prevFile.getPath()));
+    }
 }
