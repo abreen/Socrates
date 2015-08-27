@@ -25,13 +25,13 @@ public class MenuBarManager {
     public final JMenuItem nextFile;
     public final JMenuItem previousFile;
     public final JMenuItem renameFile;          // TODO
-    public final JMenuItem openFile;            // TODO
+    public final JMenuItem openFile;
     public final JMenuItem defaultTheme;
     public final JMenuItem base16Light;
     public final JMenuItem base16Dark;
 
-    public final JMenuItem passTest;            // TODO
-    public final JMenuItem failTest;            // TODO
+    public final JMenuItem passTest;
+    public final JMenuItem failTest;
     public final JMenuItem resetTest;           // TODO
     public final JMenuItem nextTest;            // TODO
     public final JMenuItem nextTestInGroup;     // TODO

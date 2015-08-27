@@ -79,6 +79,10 @@ public class FileInfo {
         }
     }
 
+    /**
+     * Update the FileInfoView to show information about the current file. If the
+     * second parameter is null, the file type property will be reset (e.g., "Unknown").
+     */
     public void update(SubmittedFile file, File matchingFile) throws IOException {
         fileName.setText(file.localPath.toString());
 

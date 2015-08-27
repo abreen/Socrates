@@ -49,8 +49,8 @@ public class TestControls {
     private JPanel rootPanel;
     private JPanel innerPanel;
     private JPanel buttonPanel;
-    private JButton failsButton;
-    private JButton passesButton;
+    private JButton failButton;
+    private JButton passButton;
     private JTextArea notes;
     private PropertiesList properties;
     private JTextArea description;
@@ -107,5 +107,13 @@ public class TestControls {
         );
 
         notes.setDocument(testNode.getNotesDocument());
+    }
+
+    public void setPassTestAction(Action a) {
+        passButton.setAction(a);
+    }
+
+    public void setFailTestAction(Action a) {
+        failButton.setAction(a);
     }
 }

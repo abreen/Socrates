@@ -4,6 +4,7 @@ import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.model.FileReport;
 import io.breen.socrates.model.TestNode;
 import io.breen.socrates.view.main.FileView;
 import io.breen.socrates.view.main.MainView;
@@ -16,7 +17,9 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -26,10 +29,14 @@ public class MainController {
 
     private Criteria criteria;
     private List<Submission> submissions;
+    private Map<SubmittedFile, FileReport> reports;
+
     private MainView mainView;
     private MenuBarManager menuBar;
 
     public MainController() {
+        reports = new HashMap<>();
+
         mainView = new MainView();
         menuBar = new MenuBarManager(mainView);
 
@@ -132,26 +139,34 @@ public class MainController {
 
                         if (mainView.submissionTree.lastSubmissionSelected())
                             nextSubmission.setEnabled(false);
-                        else
-                            nextSubmission.setEnabled(true);
+                        else nextSubmission.setEnabled(true);
 
                         if (mainView.submissionTree.firstSubmissionSelected())
                             previousSubmission.setEnabled(false);
-                        else
-                            previousSubmission.setEnabled(true);
+                        else previousSubmission.setEnabled(true);
 
                         if (mainView.submissionTree.lastFileInSubmissionSelected())
                             nextFile.setEnabled(false);
-                        else
-                            nextFile.setEnabled(true);
+                        else nextFile.setEnabled(true);
 
                         if (mainView.submissionTree.firstFileInSubmissionSelected())
                             previousFile.setEnabled(false);
-                        else
-                            previousFile.setEnabled(true);
+                        else previousFile.setEnabled(true);
                     }
                 }
         );
+
+        Action passTest = newMenuItemAction(
+                menuBar.passTest,
+                e -> mainView.testTree.passTest()
+        );
+        mainView.testControls.setPassTestAction(passTest);
+
+        Action failTest = newMenuItemAction(
+                menuBar.failTest,
+                e -> mainView.testTree.failTest()
+        );
+        mainView.testControls.setFailTestAction(failTest);
 
         newMenuItemAction(
                 menuBar.defaultTheme,
@@ -175,11 +190,12 @@ public class MainController {
                 event -> {
                     SubmittedFile submitted = mainView.submissionTree.getSelectedSubmittedFile();
                     if (submitted != null) {
-                        File matchingFile = criteria.files.get(submitted.localPath);
+                        FileReport report = reports.get(submitted);
+                        File matchingFile = report != null ? report.matchingFile : null;
                         try {
                             mainView.fileView.update(submitted, matchingFile);
                             mainView.fileInfo.update(submitted, matchingFile);
-                            mainView.testTree.update(submitted, matchingFile);
+                            mainView.testTree.update(report);
                         } catch (IOException x) {
                             logger.warning("encountered I/O exception updating view");
                         }
@@ -195,11 +211,25 @@ public class MainController {
                     }
                 }
         );
+
+//        currentFileReport.addTreeModelListener(
+//                new TreeModelListener() {
+//        );
     }
 
     public void start(Criteria criteria, List<Submission> submissions) {
         this.criteria = criteria;
         this.submissions = submissions;
+
+        for (Submission submission : submissions) {
+            for (SubmittedFile submitted : submission.files) {
+                File matchingFile = criteria.files.get(submitted.localPath);
+                if (matchingFile == null)
+                    continue;
+
+                reports.put(submitted, new FileReport(submitted, matchingFile));
+            }
+        }
 
         mainView.setTitle("Socrates — " + criteria.assignmentName);
 

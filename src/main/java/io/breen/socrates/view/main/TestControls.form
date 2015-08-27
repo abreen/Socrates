@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="io.breen.socrates.view.main.TestControls">
   <grid id="27dc6" binding="rootPanel" custom-create="true" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="500" height="400"/>
+      <xy x="20" y="20" width="500" height="443"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -51,18 +51,18 @@
             </properties>
             <border type="none"/>
             <children>
-              <component id="281a1" class="javax.swing.JButton" binding="passesButton">
+              <component id="281a1" class="javax.swing.JButton" binding="passButton">
                 <constraints/>
                 <properties>
                   <focusable value="false"/>
-                  <text value="Passes"/>
+                  <text value="Pass Test"/>
                 </properties>
               </component>
-              <component id="8b53b" class="javax.swing.JButton" binding="failsButton">
+              <component id="8b53b" class="javax.swing.JButton" binding="failButton">
                 <constraints/>
                 <properties>
                   <focusable value="false"/>
-                  <text value="Fails"/>
+                  <text value="Fail Test"/>
                 </properties>
               </component>
             </children>
