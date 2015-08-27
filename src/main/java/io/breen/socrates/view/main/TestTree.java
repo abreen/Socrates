@@ -174,7 +174,14 @@ public class TestTree {
     }
 
     public TestNode getSelectedTestNode() {
+        if (!hasSelection())
+            return null;
+
         return (TestNode)tree.getLastSelectedPathComponent();
+    }
+
+    public boolean hasSelection() {
+        return tree.getSelectionPath() != null;
     }
 
     /**

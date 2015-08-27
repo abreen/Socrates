@@ -176,6 +176,20 @@ public class MainController {
         );
         resetTest.setEnabled(false);
 
+        mainView.testTree.addTreeSelectionListener(
+                e -> {
+                    if (mainView.testTree.hasSelection()) {
+                        passTest.setEnabled(true);
+                        failTest.setEnabled(true);
+                        resetTest.setEnabled(true);
+                    } else {
+                        passTest.setEnabled(false);
+                        failTest.setEnabled(false);
+                        resetTest.setEnabled(false);
+                    }
+                }
+        );
+
         newMenuItemAction(
                 menuBar.defaultTheme,
                 e -> mainView.fileView.changeTheme(FileView.ThemeType.DEFAULT)
