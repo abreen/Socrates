@@ -23,7 +23,7 @@ public class Submission {
      */
     public final String studentName;
 
-    final Path submissionDir;
+    public final Path submissionDir;
 
     public final List<SubmittedFile> files;
 

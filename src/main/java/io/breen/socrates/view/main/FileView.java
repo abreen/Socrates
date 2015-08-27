@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class FileView {
 
-    private enum ThemeType {
+    public enum ThemeType {
         DEFAULT,
         BASE16_LIGHT,
         BASE16_DARK
