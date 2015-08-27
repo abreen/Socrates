@@ -32,7 +32,7 @@ public class MenuBarManager {
 
     public final JMenuItem passTest;
     public final JMenuItem failTest;
-    public final JMenuItem resetTest;           // TODO
+    public final JMenuItem resetTest;
     public final JMenuItem nextTest;            // TODO
     public final JMenuItem nextTestInGroup;     // TODO
     public final JMenuItem previousTest;        // TODO

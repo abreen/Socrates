@@ -200,4 +200,16 @@ public class TestTree {
         FileReport report = (FileReport)tree.getModel();
         report.valueForPathChanged(path, TestResult.FAILED);
     }
+
+    /**
+     * Resets the result of the currently selected TestNode to TestResult.NONE. If
+     * there is no selection, this method does nothing.
+     */
+    public void resetTest() {
+        TreePath path = tree.getSelectionPath();
+        if (path == null) return;
+
+        FileReport report = (FileReport)tree.getModel();
+        report.valueForPathChanged(path, TestResult.NONE);
+    }
 }

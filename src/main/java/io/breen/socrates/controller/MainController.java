@@ -160,13 +160,21 @@ public class MainController {
                 menuBar.passTest,
                 e -> mainView.testTree.passTest()
         );
+        passTest.setEnabled(false);
         mainView.testControls.setPassTestAction(passTest);
 
         Action failTest = newMenuItemAction(
                 menuBar.failTest,
                 e -> mainView.testTree.failTest()
         );
+        failTest.setEnabled(false);
         mainView.testControls.setFailTestAction(failTest);
+
+        Action resetTest = newMenuItemAction(
+                menuBar.resetTest,
+                e -> mainView.testTree.resetTest()
+        );
+        resetTest.setEnabled(false);
 
         newMenuItemAction(
                 menuBar.defaultTheme,
@@ -211,10 +219,6 @@ public class MainController {
                     }
                 }
         );
-
-//        currentFileReport.addTreeModelListener(
-//                new TreeModelListener() {
-//        );
     }
 
     public void start(Criteria criteria, List<Submission> submissions) {
