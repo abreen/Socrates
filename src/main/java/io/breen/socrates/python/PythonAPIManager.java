@@ -32,9 +32,9 @@ public final class PythonAPIManager {
      */
     private static String[] moduleSource = {
             "def pass_test():",
-            "\treturn '" + ScriptTest.PASSED_OUTPUT + "'",
+            "\tprint('" + ScriptTest.PASSED_OUTPUT + "')",
             "def fail_test():",
-            "\treturn '" + ScriptTest.FAILED_OUTPUT + "'"
+            "\tprint('" + ScriptTest.FAILED_OUTPUT + "')"
     };
 
     static {
