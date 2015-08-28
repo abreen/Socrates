@@ -56,6 +56,8 @@ public class TestControls {
     private JTextArea description;
     private JScrollPane notesScrollPane;
 
+    private TestWrapperNode currentNode;
+
     private void createUIComponents() {
         rootPanel = new JPanel();
 
@@ -107,6 +109,12 @@ public class TestControls {
         );
 
         notes.setDocument(testNode.getNotesDocument());
+
+        currentNode = testNode;
+    }
+
+    public void refresh() {
+        update(currentNode);
     }
 
     public void setPassTestAction(Action a) {

@@ -172,6 +172,8 @@ public class TestTree {
 
         TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
         test.setResult(TestResult.PASSED);
+
+        testResultChanged(tree.getSelectionPath());
     }
 
     /**
@@ -183,6 +185,8 @@ public class TestTree {
 
         TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
         test.setResult(TestResult.FAILED);
+
+        testResultChanged(tree.getSelectionPath());
     }
 
     /**
@@ -194,6 +198,8 @@ public class TestTree {
 
         TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
         test.setResult(TestResult.NONE);
+
+        testResultChanged(tree.getSelectionPath());
     }
 
     public boolean lastTestForFileSelected() {
@@ -225,4 +231,19 @@ public class TestTree {
 //
 //        tree.setSelectionPath(new TreePath(nextFile.getPath()));
 //    }
+
+    /**
+     * Important note: we indicate that a test result changed by using the
+     * DefaultTreeModel's valueForPathChanged() method. This method takes the path to
+     * the node that changed and the *user object* that is supposed to have changed.
+     * Since we store the test result *outside* of the user object, and leave the
+     * user object to store the reference to a Test or TestGroup object, we must pass
+     * the user object in here, even though it really has not changed. This is the
+     * simplest way I can think of to force the TreeModel to send a TreeNodesChanged
+     * event to its listeners.
+     */
+    private void testResultChanged(TreePath testPath) {
+        TestWrapperNode node = (TestWrapperNode)testPath.getLastPathComponent();
+        tree.getModel().valueForPathChanged(testPath, node.getUserObject());
+    }
 }

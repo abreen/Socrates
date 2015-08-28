@@ -11,6 +11,9 @@ import io.breen.socrates.view.main.MainView;
 import io.breen.socrates.view.main.MenuBarManager;
 
 import javax.swing.*;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -49,8 +52,7 @@ public class MainController {
          * Set up submission-related actions.
          */
         Action nextSubmission = newMenuItemAction(
-                menuBar.nextSubmission,
-                e -> mainView.submissionTree.goToNextSubmission()
+                menuBar.nextSubmission, e -> mainView.submissionTree.goToNextSubmission()
         );
         nextSubmission.setEnabled(true);
         nextSubmission.putValue(
@@ -69,8 +71,7 @@ public class MainController {
         );
 
         Action revealSubmission = newMenuItemAction(
-                menuBar.revealSubmission,
-                e -> {
+                menuBar.revealSubmission, e -> {
                     Submission s = mainView.submissionTree.getSelectedSubmission();
                     Path path = s.submissionDir;
                     try {
@@ -90,8 +91,7 @@ public class MainController {
          * Set up file-related actions.
          */
         Action nextFile = newMenuItemAction(
-                menuBar.nextFile,
-                e -> mainView.submissionTree.goToNextFile()
+                menuBar.nextFile, e -> mainView.submissionTree.goToNextFile()
         );
         nextFile.setEnabled(true);
         nextFile.putValue(
@@ -100,8 +100,7 @@ public class MainController {
         );
 
         Action previousFile = newMenuItemAction(
-                menuBar.previousFile,
-                e -> mainView.submissionTree.goToPreviousFile()
+                menuBar.previousFile, e -> mainView.submissionTree.goToPreviousFile()
         );
         previousFile.setEnabled(false);
         previousFile.putValue(
@@ -110,8 +109,7 @@ public class MainController {
         );
 
         Action openFile = newMenuItemAction(
-                menuBar.openFile,
-                e -> {
+                menuBar.openFile, e -> {
                     SubmittedFile f = mainView.submissionTree.getSelectedSubmittedFile();
                     Path path = f.fullPath;
                     try {
@@ -181,8 +179,7 @@ public class MainController {
          * Set up test-related actions.
          */
         Action passTest = newMenuItemAction(
-                menuBar.passTest,
-                e -> mainView.testTree.passTest()
+                menuBar.passTest, e -> mainView.testTree.passTest()
         );
         passTest.setEnabled(false);
         passTest.putValue(
@@ -191,8 +188,7 @@ public class MainController {
         mainView.testControls.setPassTestAction(passTest);
 
         Action failTest = newMenuItemAction(
-                menuBar.failTest,
-                e -> mainView.testTree.failTest()
+                menuBar.failTest, e -> mainView.testTree.failTest()
         );
         failTest.setEnabled(false);
         failTest.putValue(
@@ -201,8 +197,7 @@ public class MainController {
         mainView.testControls.setFailTestAction(failTest);
 
         Action resetTest = newMenuItemAction(
-                menuBar.resetTest,
-                e -> mainView.testTree.resetTest()
+                menuBar.resetTest, e -> mainView.testTree.resetTest()
         );
         resetTest.setEnabled(false);
 
@@ -223,17 +218,18 @@ public class MainController {
         /*
          * Set up test navigation options.
          */
-//        Action nextTest = newMenuItemAction(
-//                menuBar.nextTest,
-//                e -> mainView.testTree.goToNextTest()
-//        );
+        //        Action nextTest = newMenuItemAction(
+        //                menuBar.nextTest,
+        //                e -> mainView.testTree.goToNextTest()
+        //        );
 
         /*
          * Set up event listeners.
          */
         mainView.submissionTree.addTreeSelectionListener(
                 event -> {
-                    SubmittedFile submitted = mainView.submissionTree.getSelectedSubmittedFile();
+                    SubmittedFile submitted = mainView.submissionTree
+                            .getSelectedSubmittedFile();
                     if (submitted != null) {
                         FileReport report = reports.get(submitted);
                         File matchingFile = report != null ? report.matchingFile : null;
@@ -251,7 +247,8 @@ public class MainController {
 
         mainView.testTree.addTreeSelectionListener(
                 event -> {
-                    TestWrapperNode testNode = mainView.testTree.getSelectedTestWrapperNode();
+                    TestWrapperNode testNode = mainView.testTree
+                            .getSelectedTestWrapperNode();
                     if (testNode != null) {
                         mainView.testControls.update(testNode);
                     }
@@ -266,9 +263,8 @@ public class MainController {
         for (Submission submission : submissions) {
             for (SubmittedFile submitted : submission.files) {
                 File matchingFile = criteria.files.get(submitted.localPath);
-                if (matchingFile == null)
-                    continue;
-
+                if (matchingFile == null) continue;
+                
                 reports.put(submitted, new FileReport(submitted, matchingFile));
             }
         }
@@ -283,7 +279,9 @@ public class MainController {
         logger.info("started MainView");
     }
 
-    private static Action newMenuItemAction(JMenuItem item, Consumer<ActionEvent> lambda) {
+    private static Action newMenuItemAction(JMenuItem item,
+                                            Consumer<ActionEvent> lambda)
+    {
         Action a = new AbstractAction(item.getText()) {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -293,5 +291,33 @@ public class MainController {
 
         item.setAction(a);
         return a;
+    }
+
+    private static void addTreeChangedListener(TreeModel model,
+                                               Consumer<TreeModelEvent> lambda)
+    {
+        TreeModelListener listener = new TreeModelListener() {
+            @Override
+            public void treeNodesChanged(TreeModelEvent e) {
+                lambda.accept(e);
+            }
+
+            @Override
+            public void treeNodesInserted(TreeModelEvent e) {
+                // should not happen for test tree
+            }
+
+            @Override
+            public void treeNodesRemoved(TreeModelEvent e) {
+                // should not happen for test tree
+            }
+
+            @Override
+            public void treeStructureChanged(TreeModelEvent e) {
+                // should not happen for test tree
+            }
+        };
+
+        model.addTreeModelListener(listener);
     }
 }
