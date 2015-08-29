@@ -15,8 +15,6 @@ import static org.junit.Assert.assertEquals;
 
 public class CriteriaTest {
 
-    private Path[] createdFiles;
-
     private enum InputFile {
         NONEXISTENT(Paths.get("nonexistent." + Criteria.CRITERIA_FILE_EXTENSIONS[0])),
         EMPTY_FILE(Paths.get("empty." + Criteria.CRITERIA_FILE_EXTENSIONS[0])),
@@ -111,8 +109,8 @@ public class CriteriaTest {
     @Test
     public void basicShouldWork() throws Exception {
         Criteria c = Criteria.loadFromPath(InputFile.BASIC.p);
-        assertEquals(c.assignmentName, TEST_ASSIGNMENT_NAME);
-        assertEquals(c.files.size(), 0);
+        assertEquals(TEST_ASSIGNMENT_NAME, c.assignmentName);
+        assertEquals(0, c.files.size());
     }
 
     @Test(expected = InvalidCriteriaException.class)
