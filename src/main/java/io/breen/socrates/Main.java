@@ -86,17 +86,6 @@ public class Main {
         } else if (cmd.hasOption("properties")) {
             logger.severe("specified .properties file does not exist");
             System.exit(2);
-        } else {
-            // create a new .properties file
-            logger.info("creating new socrates.properties file at " + propPath);
-            String comment = "automatically created by Socrates";
-            try {
-                Globals.properties.store(
-                        Files.newBufferedWriter(propPath), comment
-                );
-            } catch (IOException e) {
-                logger.warning("could not create a new .properties file");
-            }
         }
 
         /*
