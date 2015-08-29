@@ -15,12 +15,15 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.text.Document;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.text.DecimalFormat;
 
 public class TestControls implements Observer<TestResult> {
 
     private static final String NO_TEST_SELECTED_DESC = "(no test selected)";
+    private static final Document EMPTY_DOCUMENT = new PlainDocument();
 
     static final Icon ICON_NORESULT = new NoResultTestIcon();
     static final Icon ICON_PASSED = new PassedTestIcon();
@@ -118,9 +121,16 @@ public class TestControls implements Observer<TestResult> {
                 currentNode.resetObserver();
 
             currentNode = null;
+
             description.setText(NO_TEST_SELECTED_DESC);
+
             icon.setIcon(LARGE_ICON_DEFAULT);
+
             properties.resetAll();
+
+            notes.setEnabled(false);
+            notes.setDocument(EMPTY_DOCUMENT);
+
             return;
         }
 
@@ -148,6 +158,7 @@ public class TestControls implements Observer<TestResult> {
                 test instanceof Automatable ? "Yes" : "No"
         );
 
+        notes.setEnabled(true);
         notes.setDocument(testNode.getNotesDocument());
 
         currentNode = testNode;
