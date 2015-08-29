@@ -112,15 +112,20 @@ public class TestTree {
 
                         if (value instanceof TestWrapperNode) {
                             TestWrapperNode testNode = (TestWrapperNode)value;
+
                             TestIcon i = TestControls.newIcon(testNode);
                             i.setIconHeight(16);
                             i.setIconWidth(16);
-                            setIcon(i);
 
                             if (!selected) {
-                                if (testNode.isConstrained()) setForeground(Color.GRAY);
-                                else setForeground(Color.BLACK);
+                                if (testNode.isConstrained()) {
+                                    setForeground(UIManager.getColor("textInactiveText"));
+                                } else {
+                                    setForeground(Color.BLACK);
+                                }
                             }
+
+                            setIcon(i);
 
                         } else {
                             setIcon(null);

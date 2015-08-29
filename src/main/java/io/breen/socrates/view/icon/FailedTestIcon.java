@@ -13,7 +13,7 @@ public class FailedTestIcon extends TestIcon {
         int strokeWidth = width / 4 - 1;
         BasicStroke stroke = new BasicStroke(strokeWidth);
 
-        g2d.setColor(new Color(189, 12, 13, opacity));
+        g2d.setColor(new Color(189, 12, 13));
         g2d.setStroke(stroke);
 
         g2d.drawLine(x + 4, y + 4, x + width - 4, y + height - 4);

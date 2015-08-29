@@ -15,7 +15,7 @@ public class RunningTestIcon extends TestIcon {
 
         BasicStroke stroke = new BasicStroke();
 
-        g2d.setColor(new Color(37, 123, 210, opacity));
+        g2d.setColor(new Color(37, 123, 210));
         g2d.setStroke(stroke);
 
         g2d.fillOval(x + padding, y + padding, dotWidth, dotWidth);

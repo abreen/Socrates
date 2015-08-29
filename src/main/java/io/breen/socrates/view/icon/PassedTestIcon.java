@@ -18,7 +18,7 @@ public class PassedTestIcon extends TestIcon {
 
         BasicStroke stroke = new BasicStroke(strokeWidth);
 
-        g2d.setColor(new Color(49, 141, 34, opacity));
+        g2d.setColor(new Color(49, 141, 34));
         g2d.setStroke(stroke);
 
         g2d.drawLine(
