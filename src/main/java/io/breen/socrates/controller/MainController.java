@@ -112,6 +112,22 @@ public class MainController {
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl)
         );
 
+        Action clearNotes = newMenuItemAction(
+                menuBar.clearNotes, e -> mainView.testControls.clearNotes()
+        );
+        clearNotes.setEnabled(false);
+        clearNotes.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, ctrl)
+        );
+
+        Action focusOnNotes = newMenuItemAction(
+                menuBar.focusOnNotes, e -> mainView.testControls.focusOnNotes()
+        );
+        focusOnNotes.setEnabled(false);
+        focusOnNotes.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, ctrl)
+        );
+
         /*
          * TreeSelectionListener for updating the disabled state of the test state
          * and navigation options.
@@ -120,13 +136,15 @@ public class MainController {
                 e -> {
                     TestWrapperNode testNode = mainView.testTree
                             .getSelectedTestWrapperNode();
-                    if (testNode != null) {
-                        mainView.testControls.update(testNode);
-                    }
+
+                    mainView.testControls.update(testNode);
 
                     if (!mainView.testTree.hasSelection()) {
                         nextTest.setEnabled(true);
                         previousTest.setEnabled(false);
+
+                        clearNotes.setEnabled(false);
+                        focusOnNotes.setEnabled(false);
                     } else {
                         if (mainView.testTree.lastTestForFileSelected())
                             nextTest.setEnabled(false);
@@ -135,6 +153,9 @@ public class MainController {
                         if (mainView.testTree.firstTestForFileSelected())
                             previousTest.setEnabled(false);
                         else previousTest.setEnabled(true);
+
+                        clearNotes.setEnabled(true);
+                        focusOnNotes.setEnabled(true);
                     }
                 }
         );

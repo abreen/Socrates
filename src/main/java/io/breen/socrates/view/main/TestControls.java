@@ -18,6 +18,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import java.awt.*;
@@ -134,6 +135,10 @@ public class TestControls implements Observer<TestWrapperNode> {
             notes.setEnabled(false);
             notes.setDocument(EMPTY_DOCUMENT);
 
+            resetButton.getAction().setEnabled(false);
+            passButton.getAction().setEnabled(false);
+            failButton.getAction().setEnabled(false);
+
             return;
         }
 
@@ -218,7 +223,7 @@ public class TestControls implements Observer<TestWrapperNode> {
     private void updateConstrained(boolean constrained) {
         if (constrained) {
             resetButton.getAction().setEnabled(false);
-            if (currentNode.getResult() != TestResult.NONE)
+            if (currentNode.getResult() == TestResult.FAILED)
                 passButton.getAction().setEnabled(true);
             else
                 passButton.getAction().setEnabled(false);
@@ -228,6 +233,22 @@ public class TestControls implements Observer<TestWrapperNode> {
             passButton.getAction().setEnabled(true);
             failButton.getAction().setEnabled(true);
         }
+    }
+
+    /**
+     * Clears the notes Document of the currently selected test node.
+     */
+    public void clearNotes() {
+        if (currentNode == null)
+            return;
+
+        try {
+            currentNode.notes.remove(0, currentNode.notes.getLength());
+        } catch (BadLocationException ignored) {}
+    }
+
+    public void focusOnNotes() {
+        notes.requestFocusInWindow();
     }
 
     @Override

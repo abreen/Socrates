@@ -35,8 +35,8 @@ public class MenuBarManager {
     public final JMenuItem resetTest;
     public final JMenuItem nextTest;
     public final JMenuItem previousTest;
-    public final JMenuItem clearNotes;          // TODO
-    public final JMenuItem focusOnNotes;        // TODO
+    public final JMenuItem clearNotes;
+    public final JMenuItem focusOnNotes;
 
 
     public MenuBarManager(MainView view) {

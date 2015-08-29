@@ -16,6 +16,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
 import java.util.Enumeration;
 
@@ -61,6 +63,37 @@ public class TestTree {
                             return node.getUserObject() instanceof Test;
                         }
                 )
+        );
+
+        tree.addMouseListener(
+                new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        int row = tree.getRowForLocation(e.getX(), e.getY());
+                        if (row == -1)
+                            tree.clearSelection();
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+
+                    }
+                }
         );
 
         tree.setCellRenderer(
