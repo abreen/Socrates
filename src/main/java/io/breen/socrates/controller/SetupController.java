@@ -128,10 +128,13 @@ public class SetupController {
             view.setVisible(true);
         } else if (submissions == null) {
             // we can skip the "Choose a criteria file" step
+            HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
             view.showSubmissionsCard();
             view.setVisible(true);
         } else {
             // we can skip the setup entirely
+            HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
+            HookManager.runHook(Hook.BEFORE_GRADING);
             main.start(criteria, submissions);
         }
     }
