@@ -36,7 +36,7 @@ public class LateSubmissionTest extends Test implements Automatable {
             throw new CannotBeAutomatedException();
 
         LocalDateTime ldt = target.receipt.getLatestDate();
-        return ldt.isAfter(cutoff);
+        return ldt.isBefore(cutoff);
     }
 
     @Override
