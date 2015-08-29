@@ -140,7 +140,7 @@ public class TestControls implements Observer<TestWrapperNode> {
 
         updateIcon();
 
-        updateConstrained();
+        updateButtons();
 
         properties.set(
                 TestProperty.TEST_TYPE.index, test.getTestTypeName()
@@ -218,7 +218,7 @@ public class TestControls implements Observer<TestWrapperNode> {
         icon.setIcon(i);
     }
 
-    private void updateConstrained() {
+    private void updateButtons() {
         if (currentNode == null) {
             setEnabledForAllButtons(false);
         } else if (currentNode.isConstrained()) {
@@ -254,7 +254,7 @@ public class TestControls implements Observer<TestWrapperNode> {
         if (event instanceof ResultChangedEvent) {
             updateIcon();
         } else if (event instanceof ConstraintChangedEvent) {
-            updateConstrained();
+            updateButtons();
         } else if (event instanceof StageChangedEvent) {
             updateIcon();
             AutomationStage stage = ((StageChangedEvent)event).newStage;
