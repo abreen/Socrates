@@ -116,8 +116,8 @@ public class TestTree {
      * future method calls on this TestTree will affect the specified FileReport.
      */
     public void update(FileReport report) {
-        tree.setModel(report == null ? null : report.treeModel);
         tree.clearSelection();
+        tree.setModel(report == null ? null : report.treeModel);
     }
 
     private static String testGroupToString(TestGroup group) {
