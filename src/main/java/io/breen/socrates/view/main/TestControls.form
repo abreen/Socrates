@@ -94,7 +94,7 @@
                   <wrapStyleWord value="true"/>
                 </properties>
               </component>
-              <component id="150fb" class="javax.swing.JLabel" binding="icon" custom-create="true">
+              <component id="150fb" class="javax.swing.JLabel" binding="icon">
                 <constraints border-constraint="West"/>
                 <properties>
                   <iconTextGap value="0"/>

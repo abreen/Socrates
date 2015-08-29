@@ -4,12 +4,6 @@ import java.awt.*;
 
 public class RunningTestIcon extends TestIcon {
 
-    public RunningTestIcon() {}
-
-    public RunningTestIcon(int width, int height) {
-        super(width, height);
-    }
-
     public void paintIcon(Component c, Graphics g, int x, int y) {
         Graphics2D g2d = (Graphics2D)g.create();
         g2d.setRenderingHint(
@@ -21,7 +15,7 @@ public class RunningTestIcon extends TestIcon {
 
         BasicStroke stroke = new BasicStroke();
 
-        g2d.setColor(new Color(37, 123, 210));
+        g2d.setColor(new Color(37, 123, 210, opacity));
         g2d.setStroke(stroke);
 
         g2d.fillOval(x + padding, y + padding, dotWidth, dotWidth);

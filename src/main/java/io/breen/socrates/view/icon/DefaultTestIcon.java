@@ -4,12 +4,6 @@ import java.awt.*;
 
 public class DefaultTestIcon extends TestIcon {
 
-    public DefaultTestIcon() {}
-
-    public DefaultTestIcon(int width, int height) {
-        super(width, height);
-    }
-
     public void paintIcon(Component c, Graphics g, int x, int y) {
         Graphics2D g2d = (Graphics2D)g.create();
         g2d.setRenderingHint(
@@ -18,7 +12,7 @@ public class DefaultTestIcon extends TestIcon {
 
         BasicStroke stroke = new BasicStroke();
 
-        g2d.setColor(new Color(186, 186, 186));
+        g2d.setColor(new Color(186, 186, 186, opacity));
         g2d.setStroke(stroke);
         g2d.fillOval(x + 4, y + 4, width - 6, height - 6);
 

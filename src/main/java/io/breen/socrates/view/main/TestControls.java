@@ -73,6 +73,7 @@ public class TestControls implements Observer<TestWrapperNode> {
     private TestWrapperNode currentNode;
 
     public TestControls() {
+        updateIcon();
         description.setText(NO_TEST_SELECTED_DESC);
     }
 
@@ -85,8 +86,6 @@ public class TestControls implements Observer<TestWrapperNode> {
         if (Globals.operatingSystem == Globals.OS.OSX) {
             rootPanel.setBorder(UIManager.getBorder("InsetBorder.aquaVariant"));
         }
-
-        icon = new JLabel(new DefaultTestIcon(ICON_WIDTH, ICON_HEIGHT));
 
         /*
          * Set up the notes text area and scroll pane. If we are running on OS X, we
