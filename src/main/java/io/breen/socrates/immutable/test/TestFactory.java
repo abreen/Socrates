@@ -2,6 +2,7 @@ package io.breen.socrates.immutable.test;
 
 import io.breen.socrates.constructor.SocratesConstructor;
 import io.breen.socrates.immutable.criteria.Resource;
+import io.breen.socrates.immutable.test.implementation.any.TakesAwhileTest;
 import io.breen.socrates.immutable.test.implementation.any.script.ScriptTest;
 
 import java.util.Map;
@@ -31,7 +32,11 @@ public class TestFactory {
                 throw new InvalidTestException(type, "cannot find required script: " + scriptName);
 
             return new ScriptTest(deduction, description, script);
-        } case ALWAYS_PASSING_PLAIN: {
+        }
+        case TAKES_AWHILE: {
+            return new TakesAwhileTest(0);
+        }
+        case ALWAYS_PASSING_PLAIN: {
             return new io.breen.socrates.immutable.test.implementation.plain.AlwaysPassingTest(0);
         }
         case REVIEW_PLAIN:

@@ -21,6 +21,7 @@ public enum TestType {
      * Test types that can work for any file type
      */
     SCRIPT(null, "script"),
+    TAKES_AWHILE(null, "takesawhile"),
 
     /*
      * Test types for plain text files
@@ -52,6 +53,8 @@ public enum TestType {
     public static TestType fromTypeAndString(FileType type, String testType) {
         if (testType.equals("script"))
             return SCRIPT;
+        if (testType.equals("takesawhile"))
+            return TAKES_AWHILE;
 
         for (TestType t : TestType.values())
             if (t.forFileType == type && t.type.equals(testType))
