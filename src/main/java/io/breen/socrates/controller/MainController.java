@@ -86,6 +86,7 @@ public class MainController {
                             // cannot change result while test is running
                             return;
                         case FINISHED_NORMAL:
+                        case NONE:
                             if (userWantsToOverride())
                                 mainView.testTree.passTest();
                             return;
@@ -115,6 +116,7 @@ public class MainController {
                             // cannot change result while test is running
                             return;
                         case FINISHED_NORMAL:
+                        case NONE:
                             if (userWantsToOverride())
                                 mainView.testTree.failTest();
                             return;
