@@ -270,7 +270,11 @@ public class TestTree {
         DefaultMutableTreeNode nextSibling = node.getNextSibling();
 
         if (nextSibling != null) {
-            tree.setSelectionPath(new TreePath(nextSibling.getPath()));
+            if (nextSibling instanceof TestWrapperNode) {
+                tree.setSelectionPath(new TreePath(nextSibling.getPath()));
+            } else {
+                tree.setSelectionPath(new TreePath(nextSibling.getFirstLeaf().getPath()));
+            }
             return;
         }
 
@@ -301,7 +305,11 @@ public class TestTree {
         DefaultMutableTreeNode previousSibling = node.getPreviousSibling();
 
         if (previousSibling != null) {
-            tree.setSelectionPath(new TreePath(previousSibling.getPath()));
+            if (previousSibling instanceof TestWrapperNode) {
+                tree.setSelectionPath(new TreePath(previousSibling.getPath()));
+            } else {
+                tree.setSelectionPath(new TreePath(previousSibling.getLastLeaf().getPath()));
+            }
             return;
         }
 
