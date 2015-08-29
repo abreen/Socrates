@@ -8,6 +8,7 @@ import io.breen.socrates.util.ObservableChangedEvent;
 import io.breen.socrates.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.util.Deque;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -23,6 +24,12 @@ import java.util.List;
  * ceiling was reached.
  */
 public class ConstraintUpdater implements Observer<TestWrapperNode> {
+
+    public final DefaultTreeModel treeModel;
+
+    public ConstraintUpdater(DefaultTreeModel treeModel) {
+        this.treeModel = treeModel;
+    }
 
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> eventObj) {
         if (!(eventObj instanceof TestWrapperNode.ResultChangedEvent)) return;
@@ -48,8 +55,8 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
         }
     }
 
-    private static void updateRelevantSubtrees(TestGroupWrapperNode parent,
-                                               int deltaFailed, double deltaPoints)
+    private void updateRelevantSubtrees(TestGroupWrapperNode parent, int deltaFailed,
+                                        double deltaPoints)
     {
         Deque<TestGroupWrapperNode> parents = new LinkedList<>();
 
@@ -160,10 +167,8 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
                 }
             }
 
-            if (checkAfter.isEmpty())
-                break;
-            else
-                needsCheck = checkAfter;
+            if (checkAfter.isEmpty()) break;
+            else needsCheck = checkAfter;
         }
     }
 
@@ -177,7 +182,7 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
                 (newResult == TestResult.PASSED || newResult == TestResult.NONE));
     }
 
-    private static void constrainTree(TestGroupWrapperNode root) {
+    private void constrainTree(TestGroupWrapperNode root) {
         Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
         while (dfs.hasMoreElements()) {
             DefaultMutableTreeNode dfsNode = dfs.nextElement();
@@ -185,10 +190,11 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
 
             TestWrapperNode testNode = (TestWrapperNode)dfsNode;
             testNode.setConstrained(true);
+            treeModel.nodeChanged(testNode);
         }
     }
 
-    private static void unconstrainTree(TestGroupWrapperNode root) {
+    private void unconstrainTree(TestGroupWrapperNode root) {
         Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
         while (dfs.hasMoreElements()) {
             DefaultMutableTreeNode dfsNode = dfs.nextElement();
@@ -196,6 +202,7 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
 
             TestWrapperNode testNode = (TestWrapperNode)dfsNode;
             testNode.setConstrained(false);
+            treeModel.nodeChanged(testNode);
         }
     }
 }

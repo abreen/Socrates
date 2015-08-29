@@ -130,7 +130,7 @@ public class TestTree {
             tree.setModel(null);
         } else {
             DefaultTreeModel treeModel = report.treeModel;
-            updater = new ConstraintUpdater();
+            updater = new ConstraintUpdater(treeModel);
 
             Enumeration<DefaultMutableTreeNode> dfs = getRoot(treeModel).depthFirstEnumeration();
             while (dfs.hasMoreElements()) {
