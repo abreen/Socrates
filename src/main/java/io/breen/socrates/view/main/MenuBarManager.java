@@ -34,9 +34,7 @@ public class MenuBarManager {
     public final JMenuItem failTest;
     public final JMenuItem resetTest;
     public final JMenuItem nextTest;
-    public final JMenuItem nextTestInGroup;     // TODO
     public final JMenuItem previousTest;
-    public final JMenuItem previousTestInGroup; // TODO
     public final JMenuItem clearNotes;          // TODO
     public final JMenuItem focusOnNotes;        // TODO
 
@@ -142,9 +140,7 @@ public class MenuBarManager {
         resetTest = new JMenuItem("Reset Test");
 
         nextTest = new JMenuItem("Next Test");
-        nextTestInGroup = new JMenuItem("Next Test in Group");
         previousTest = new JMenuItem("Previous Test");
-        previousTestInGroup = new JMenuItem("Previous Test in Group");
 
         clearNotes = new JMenuItem("Clear Notes");
         focusOnNotes = new JMenuItem("Focus on Notes");
@@ -154,9 +150,7 @@ public class MenuBarManager {
         testMenu.add(resetTest);
         testMenu.addSeparator();
         testMenu.add(nextTest);
-        testMenu.add(nextTestInGroup);
         testMenu.add(previousTest);
-        testMenu.add(previousTestInGroup);
         testMenu.addSeparator();
         testMenu.add(clearNotes);
         testMenu.add(focusOnNotes);
