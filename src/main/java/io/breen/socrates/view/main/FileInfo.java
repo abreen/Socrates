@@ -16,10 +16,6 @@ import java.time.format.DateTimeFormatter;
 
 public class FileInfo {
 
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-            "EEE L/d h:mm:ss a"
-    );
-
     private enum FileProperty {
         FILE_TYPE(0, "File type", "—"),
         FILE_SIZE(1, "Size", "—"),
@@ -53,7 +49,9 @@ public class FileInfo {
             return defaults;
         }
     }
-
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+            "EEE L/d h:mm:ss a"
+    );
     private JPanel rootPanel;
     private JLabel fileName;
     private JPanel innerPanel;
@@ -68,6 +66,11 @@ public class FileInfo {
         innerPanel.add(properties, BorderLayout.CENTER);
     }
 
+    private static LocalDateTime getModified(Path path) throws IOException {
+        FileTime modified = Files.getLastModifiedTime(path);
+        return LocalDateTime.ofInstant(modified.toInstant(), Globals.getZoneId());
+    }
+
     private void createUIComponents() {
         rootPanel = new JPanel();
 
@@ -80,8 +83,8 @@ public class FileInfo {
     }
 
     /**
-     * Update the FileInfoView to show information about the current file. If the
-     * second parameter is null, the file type property will be reset (e.g., "Unknown").
+     * Update the FileInfoView to show information about the current file. If the second parameter
+     * is null, the file type property will be reset (e.g., "Unknown").
      */
     public void update(SubmittedFile file, File matchingFile) throws IOException {
         fileName.setText(file.localPath.toString());
@@ -93,29 +96,20 @@ public class FileInfo {
         }
 
         properties.set(
-                FileProperty.FILE_SIZE.index,
-                FileUtils.byteCountToDisplaySize(file.size)
+                FileProperty.FILE_SIZE.index, FileUtils.byteCountToDisplaySize(file.size)
         );
 
         properties.set(
-                FileProperty.HAS_RECEIPT.index,
-                file.receipt == null ? "No" : "Yes"
+                FileProperty.HAS_RECEIPT.index, file.receipt == null ? "No" : "Yes"
         );
 
         properties.set(
                 FileProperty.SUBMITTED_DATE.index,
-                file.receipt == null ? "Unknown" : file.receipt.getLatestDate()
-                                                               .format(formatter)
+                file.receipt == null ? "Unknown" : file.receipt.getLatestDate().format(formatter)
         );
 
         properties.set(
-                FileProperty.MODIFIED_DATE.index,
-                getModified(file.fullPath).format(formatter)
+                FileProperty.MODIFIED_DATE.index, getModified(file.fullPath).format(formatter)
         );
-    }
-
-    private static LocalDateTime getModified(Path path) throws IOException {
-        FileTime modified = Files.getLastModifiedTime(path);
-        return LocalDateTime.ofInstant(modified.toInstant(), Globals.getZoneId());
     }
 }

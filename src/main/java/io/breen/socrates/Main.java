@@ -8,17 +8,10 @@ import io.breen.socrates.immutable.submission.ReceiptFormatException;
 import io.breen.socrates.immutable.submission.Submission;
 import org.apache.commons.cli.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class Main {

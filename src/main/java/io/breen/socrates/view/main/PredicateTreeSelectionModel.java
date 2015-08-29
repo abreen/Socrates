@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.function.Predicate;
 
 /**
- * A simple TreeSelectionModel based on DefaultTreeSelectionModel that only allows
- * selection of a TreePath if the path satisfies a property given by a predicate.
+ * A simple TreeSelectionModel based on DefaultTreeSelectionModel that only allows selection of a
+ * TreePath if the path satisfies a property given by a predicate.
  */
 public class PredicateTreeSelectionModel extends DefaultTreeSelectionModel {
 
@@ -26,8 +26,7 @@ public class PredicateTreeSelectionModel extends DefaultTreeSelectionModel {
     public void setSelectionPaths(TreePath[] paths) {
         TreePath[] filteredPaths = Arrays.copyOf(paths, paths.length);
         for (int i = 0; i < filteredPaths.length; i++)
-            if (!predicate.test(filteredPaths[i]))
-                filteredPaths[i] = null;
+            if (!predicate.test(filteredPaths[i])) filteredPaths[i] = null;
 
         super.setSelectionPaths(filteredPaths);
     }
@@ -41,8 +40,7 @@ public class PredicateTreeSelectionModel extends DefaultTreeSelectionModel {
     public void addSelectionPaths(TreePath[] paths) {
         TreePath[] filteredPaths = Arrays.copyOf(paths, paths.length);
         for (int i = 0; i < filteredPaths.length; i++)
-            if (!predicate.test(filteredPaths[i]))
-                filteredPaths[i] = null;
+            if (!predicate.test(filteredPaths[i])) filteredPaths[i] = null;
 
         super.addSelectionPaths(filteredPaths);
     }

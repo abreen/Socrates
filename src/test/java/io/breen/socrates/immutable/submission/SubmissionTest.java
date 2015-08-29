@@ -3,9 +3,7 @@ package io.breen.socrates.immutable.submission;
 import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.file.implementation.PlainFile;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -17,10 +15,6 @@ import static org.junit.Assert.*;
 
 public class SubmissionTest {
 
-    private Criteria criteria;
-    private Path submissionDir;
-    private Path[] children;
-
     private enum SubDir {
         ALPHA(0), BETA(1), GAMMA(2), DELTA(3), EPSILON(4);
 
@@ -30,6 +24,9 @@ public class SubmissionTest {
             this.i = i;
         }
     }
+    private Criteria criteria;
+    private Path submissionDir;
+    private Path[] children;
 
     @Before
     public void setUp() throws Exception {
@@ -62,12 +59,8 @@ public class SubmissionTest {
             Files.createFile(receipt1);
             Files.createFile(receipt2);
 
-            Files.newBufferedWriter(receipt1)
-                 .append("2015-08-14T22:46:00")
-                 .close();
-            Files.newBufferedWriter(receipt2)
-                 .append("2015-08-14T20:12:00")
-                 .close();
+            Files.newBufferedWriter(receipt1).append("2015-08-14T22:46:00").close();
+            Files.newBufferedWriter(receipt2).append("2015-08-14T20:12:00").close();
         }
 
         {
@@ -80,12 +73,8 @@ public class SubmissionTest {
             Files.createFile(receipt1);
             Files.createFile(receipt2);
 
-            Files.newBufferedWriter(receipt1)
-                 .append("2015-08-14T22:46:00")
-                 .close();
-            Files.newBufferedWriter(receipt2)
-                 .append("foo")
-                 .close();
+            Files.newBufferedWriter(receipt1).append("2015-08-14T22:46:00").close();
+            Files.newBufferedWriter(receipt2).append("foo").close();
         }
 
         {
@@ -97,9 +86,7 @@ public class SubmissionTest {
             // delta: directory with no files, but with an invalid receipt
             Path badReceipt = children[SubDir.DELTA.i].resolve("ps0pr1.txt.receipt");
             Files.createFile(badReceipt);
-            Files.newBufferedWriter(badReceipt)
-                 .append("boo")
-                 .close();
+            Files.newBufferedWriter(badReceipt).append("boo").close();
         }
 
         // epsilon: directory with no files

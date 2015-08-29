@@ -5,9 +5,7 @@ import io.breen.socrates.immutable.criteria.Resource;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
-import io.breen.socrates.immutable.test.Automatable;
-import io.breen.socrates.immutable.test.CannotBeAutomatedException;
-import io.breen.socrates.immutable.test.Test;
+import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.python.PythonProcessBuilder;
 
 import java.io.BufferedReader;
@@ -67,8 +65,7 @@ public class ScriptTest extends Test implements Automatable {
             BufferedReader reader = Files.newBufferedReader(output);
             String lastLine = reader.lines().reduce((prev, current) -> current).get();
 
-            if (lastLine == null)
-                throw new ScriptTestInvalidResult(this, null);
+            if (lastLine == null) throw new ScriptTestInvalidResult(this, null);
 
             switch (lastLine) {
             case PASSED_OUTPUT:

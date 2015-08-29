@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Class containing default style values for the base16 light theme by
- * Chris Kempson (http://chriskempson.github.io/base16/#default).
+ * Class containing default style values for the base16 light theme by Chris Kempson
+ * (http://chriskempson.github.io/base16/#default).
  */
 public class Base16LightTheme extends DefaultTheme {
 

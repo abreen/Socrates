@@ -42,6 +42,28 @@ public class SetupView extends JFrame {
         );
     }
 
+    private static void disableCancelButton(Container container) {
+        for (int i = 0; i < container.getComponentCount(); i++) {
+            Component c = container.getComponent(i);
+            if (c instanceof JButton) {
+                JButton b = (JButton)c;
+                if (b.getText().equals("Cancel")) {
+                    b.setEnabled(false);
+                    return;
+                }
+            } else if (c instanceof Container) {
+                disableCancelButton((Container)c);
+            }
+        }
+    }
+
+    private static String[] concat(String[] a, String[] b) {
+        String[] newArray = new String[a.length + b.length];
+        System.arraycopy(a, 0, newArray, 0, a.length);
+        System.arraycopy(b, 0, newArray, a.length, b.length);
+        return newArray;
+    }
+
     public Path chooseCriteriaFile() {
         JFileChooser fc = new JFileChooser();
 
@@ -50,8 +72,7 @@ public class SetupView extends JFrame {
         fc.setAcceptAllFileFilterUsed(false);
 
         String[] any = concat(
-                Criteria.CRITERIA_FILE_EXTENSIONS,
-                Criteria.CRITERIA_PACKAGE_EXTENSIONS
+                Criteria.CRITERIA_FILE_EXTENSIONS, Criteria.CRITERIA_PACKAGE_EXTENSIONS
         );
         fc.addChoosableFileFilter(new FileNameExtensionFilter("Any criteria type", any));
 
@@ -109,27 +130,5 @@ public class SetupView extends JFrame {
 
     public void addSubmissionsButtonActionListener(ActionListener l) {
         selectButton.addActionListener(l);
-    }
-
-    private static void disableCancelButton(Container container) {
-        for (int i = 0; i < container.getComponentCount(); i++) {
-            Component c = container.getComponent(i);
-            if (c instanceof JButton) {
-                JButton b = (JButton)c;
-                if (b.getText().equals("Cancel")) {
-                    b.setEnabled(false);
-                    return;
-                }
-            } else if (c instanceof Container) {
-                disableCancelButton((Container)c);
-            }
-        }
-    }
-
-    private static String[] concat(String[] a, String[] b) {
-        String[] newArray = new String[a.length + b.length];
-        System.arraycopy(a, 0, newArray, 0, a.length);
-        System.arraycopy(b, 0, newArray, a.length, b.length);
-        return newArray;
     }
 }

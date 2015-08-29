@@ -3,9 +3,7 @@ package io.breen.socrates.immutable.test.implementation.any;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
-import io.breen.socrates.immutable.test.Automatable;
-import io.breen.socrates.immutable.test.CannotBeAutomatedException;
-import io.breen.socrates.immutable.test.Test;
+import io.breen.socrates.immutable.test.*;
 
 /**
  * A test that takes awhile.

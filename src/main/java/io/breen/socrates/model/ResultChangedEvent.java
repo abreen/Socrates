@@ -10,8 +10,7 @@ public class ResultChangedEvent extends ObservableChangedEvent<TestWrapperNode> 
     public final TestResult oldResult;
     public final TestResult newResult;
 
-    public ResultChangedEvent(TestWrapperNode source, TestResult oldResult,
-                              TestResult newResult)
+    public ResultChangedEvent(TestWrapperNode source, TestResult oldResult, TestResult newResult)
     {
         super(source);
         this.oldResult = oldResult;

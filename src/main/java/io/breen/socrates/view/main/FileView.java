@@ -43,9 +43,8 @@ public class FileView {
     }
 
     /**
-     * Update the FileView and show the contents of the current file to the user.
-     * If the second parameter is null, the content type of the file will be set to
-     * plain text.
+     * Update the FileView and show the contents of the current file to the user. If the second
+     * parameter is null, the content type of the file will be set to plain text.
      */
     public void update(SubmittedFile submittedFile, File matchingFile) throws IOException
     {

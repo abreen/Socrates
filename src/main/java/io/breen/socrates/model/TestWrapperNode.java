@@ -11,15 +11,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This class "wraps" an immutable Test (a leaf node in the immutable tree that starts in
- * a File object) and contains data relevant to the outcome of the wrapped test on a
- * particular submission.
+ * This class "wraps" an immutable Test (a leaf node in the immutable tree that starts in a File
+ * object) and contains data relevant to the outcome of the wrapped test on a particular
+ * submission.
  *
  * @see io.breen.socrates.model.TestGroupWrapperNode
  */
-public class TestWrapperNode extends DefaultMutableTreeNode
-        implements Observable<TestWrapperNode>
-{
+public class TestWrapperNode extends DefaultMutableTreeNode implements Observable<TestWrapperNode> {
 
     public final Document notes;
     protected final List<Observer<TestWrapperNode>> observers;

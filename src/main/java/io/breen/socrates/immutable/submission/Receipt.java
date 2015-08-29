@@ -7,16 +7,13 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
- * Class representing a receipt file designed to store information about the submission
- * date and time of a file. This class assumes receipt files are plain text files with
- * newline-separated dates in ISO 8601 format (without offsets). For the precise
- * expected format, see DateTimeFormatter.ISO_LOCAL_DATE_TIME.
+ * Class representing a receipt file designed to store information about the submission date and
+ * time of a file. This class assumes receipt files are plain text files with newline-separated
+ * dates in ISO 8601 format (without offsets). For the precise expected format, see
+ * DateTimeFormatter.ISO_LOCAL_DATE_TIME.
  *
  * @see DateTimeFormatter
  */
@@ -29,22 +26,11 @@ public final class Receipt {
         this.dates.addAll(dates);
     }
 
-    public String toString() {
-        return "Receipt(" +
-                "dates=" + dates +
-                ")";
-    }
-
-    public LocalDateTime getLatestDate() {
-        return dates.peek();
-    }
-
     /**
      * @throws IOException
      * @throws ReceiptFormatException
      */
-    public static Receipt fromReceiptFile(Path path)
-            throws IOException, ReceiptFormatException
+    public static Receipt fromReceiptFile(Path path) throws IOException, ReceiptFormatException
     {
         List<LocalDateTime> list = new LinkedList<>();
         BufferedReader reader = Files.newBufferedReader(path);
@@ -63,10 +49,19 @@ public final class Receipt {
             list.add(ldt);
         }
 
-        if (list.isEmpty())
-            throw new ReceiptFormatException("receipt file is empty");
+        if (list.isEmpty()) throw new ReceiptFormatException("receipt file is empty");
 
         reader.close();
         return new Receipt(list);
+    }
+
+    public String toString() {
+        return "Receipt(" +
+                "dates=" + dates +
+                ")";
+    }
+
+    public LocalDateTime getLatestDate() {
+        return dates.peek();
     }
 }

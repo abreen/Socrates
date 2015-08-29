@@ -3,29 +3,24 @@ package io.breen.socrates.immutable.hooks;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.criteria.Resource;
 import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.hooks.triggers.FileHook;
-import io.breen.socrates.immutable.hooks.triggers.Hook;
-import io.breen.socrates.immutable.hooks.triggers.TestHook;
+import io.breen.socrates.immutable.hooks.triggers.*;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.python.PythonProcessBuilder;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * Static singleton class managing all hooks-related responsibility, such as registering
- * tasks to hooks or running hooks.
+ * Static singleton class managing all hooks-related responsibility, such as registering tasks to
+ * hooks or running hooks.
  */
 public final class HookManager {
 
-    private static Logger logger = Logger.getLogger(HookManager.class.getName());
     private static final Map<Hook, List<Resource>> tasks;
     private static final Map<FileHook, Map<File, List<Resource>>> fileTasks;
     private static final Map<TestHook, Map<Test, List<Resource>>> testTasks;
+    private static Logger logger = Logger.getLogger(HookManager.class.getName());
 
     static {
         tasks = new HashMap<>();
@@ -109,13 +104,11 @@ public final class HookManager {
         try {
             Path path = script.getPath();
             PythonProcessBuilder builder = new PythonProcessBuilder(path);
-            if (workingDir != null)
-                builder.setDirectory(workingDir);
+            if (workingDir != null) builder.setDirectory(workingDir);
 
             Process process = builder.start();
             int exitCode = process.waitFor();
-            if (exitCode != Globals.NORMAL_EXIT_CODE)
-                throw new HookAbnormalExit(script, exitCode);
+            if (exitCode != Globals.NORMAL_EXIT_CODE) throw new HookAbnormalExit(script, exitCode);
 
         } catch (Exception e) {
             logger.severe("running script " + script + " failed: " + e);

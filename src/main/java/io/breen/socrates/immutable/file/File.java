@@ -5,56 +5,49 @@ import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.ceiling.AtMost;
 import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.immutable.test.implementation.any.LateSubmissionTest;
-import io.breen.socrates.util.Either;
-import io.breen.socrates.util.Left;
-import io.breen.socrates.util.Right;
+import io.breen.socrates.util.*;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * Class representing an expected file specified by the criteria. Instances of
- * non-abstract subclasses of this class are immutable, and are created when a
- * Criteria object is created.
+ * Class representing an expected file specified by the criteria. Instances of non-abstract
+ * subclasses of this class are immutable, and are created when a Criteria object is created.
  *
  * @see io.breen.socrates.immutable.criteria.Criteria
  */
 public abstract class File {
 
     /**
-     * The relative path from the root of any student's submission directory specifying
-     * where the expected file can be found.
+     * The relative path from the root of any student's submission directory specifying where the
+     * expected file can be found.
      */
     public final Path localPath;
 
     /**
-     * The number of points that this file contributes to the total value of the
-     * assignment being graded.
+     * The number of points that this file contributes to the total value of the assignment being
+     * graded.
      */
     public final double pointValue;
 
     /**
-     * The content type value for this file. This may not be a MIME type; it should
-     * be whatever is specified in the JSyntaxPane libraries in order for syntax
-     * highlighting to work.
+     * The content type value for this file. This may not be a MIME type; it should be whatever is
+     * specified in the JSyntaxPane libraries in order for syntax highlighting to work.
      */
     public final String contentType;
 
     /**
-     * This file's "test tree" root. The root is a TestGroup object whose maxValue
-     * field is equal to this file's point value. (This is to prevent tests deducting
-     * more points than are allocated to this file.)
+     * This file's "test tree" root. The root is a TestGroup object whose maxValue field is equal to
+     * this file's point value. (This is to prevent tests deducting more points than are allocated
+     * to this file.)
      *
      * @see TestGroup
      */
     public final TestGroup testRoot;
 
-    public File(Path localPath,
-                double pointValue,
-                String contentType,
-                Map<LocalDateTime, Double> dueDates,
-                List<Either<Test, TestGroup>> tests)
+    public File(Path localPath, double pointValue, String contentType,
+                Map<LocalDateTime, Double> dueDates, List<Either<Test, TestGroup>> tests)
     {
         this.localPath = localPath;
         this.contentType = contentType;
@@ -62,29 +55,13 @@ public abstract class File {
         this.testRoot = createTestRoot(pointValue, dueDates, tests);
     }
 
-    public String toString() {
-        return this.getClass().toString() + "(" +
-                "localPath=" + localPath + ", " +
-                "pointValue=" + pointValue + ", " +
-                "testRoot=" + testRoot +
-                ")";
-    }
-
     /**
-     * Returns the human-readable, user-friendly string representing the type of the
-     * file. This is used by the GUI.
+     * This method creates this file's test "root". The root is a test group that limits the maximum
+     * total value of the descendant tests to the total value of the file. This method may also
+     * create a test group of LateSubmissionTest objects, if the criteria file specifies due dates
+     * for this file. (That test group would be a child of the root.)
      */
-    public abstract String getFileTypeName();
-
-    /**
-     * This method creates this file's test "root". The root is a test group that limits
-     * the maximum total value of the descendant tests to the total value of the file.
-     * This method may also create a test group of LateSubmissionTest objects, if the
-     * criteria file specifies due dates for this file. (That test group would be a
-     * child of the root.)
-     */
-    private static TestGroup createTestRoot(double fileValue,
-                                            Map<LocalDateTime, Double> dueDates,
+    private static TestGroup createTestRoot(double fileValue, Map<LocalDateTime, Double> dueDates,
                                             List<Either<Test, TestGroup>> tests)
     {
         if (dueDates != null) {
@@ -118,4 +95,18 @@ public abstract class File {
 
         return new TestGroup(tests, Ceiling.getAny(), new AtMost<>(fileValue));
     }
+
+    public String toString() {
+        return this.getClass().toString() + "(" +
+                "localPath=" + localPath + ", " +
+                "pointValue=" + pointValue + ", " +
+                "testRoot=" + testRoot +
+                ")";
+    }
+
+    /**
+     * Returns the human-readable, user-friendly string representing the type of the file. This is
+     * used by the GUI.
+     */
+    public abstract String getFileTypeName();
 }

@@ -27,12 +27,33 @@ public class TestTree {
 
     private ConstraintUpdater updater;
 
+    private static String testGroupToString(TestGroup group) {
+        Ceiling<Integer> maxNum = group.maxNum;
+        Ceiling<Double> maxValue = group.maxValue;
+
+        DecimalFormat fmt = new DecimalFormat("#.#");
+
+        if (maxNum == Ceiling.ANY && maxValue == Ceiling.ANY) {
+            return "fail any";
+        } else if (maxNum != Ceiling.ANY && maxValue == Ceiling.ANY) {
+            int max = ((AtMost<Integer>)maxNum).getValue();
+            return "fail ≤ " + max;
+        } else if (maxNum == Ceiling.ANY && maxValue != Ceiling.ANY) {
+            double max = ((AtMost<Double>)maxValue).getValue();
+            return "take ≤ " + fmt.format(max) + " points";
+        } else {
+            int maxN = ((AtMost<Integer>)maxNum).getValue();
+            double maxV = ((AtMost<Double>)maxValue).getValue();
+
+            return "fail ≤ " + maxN + " and take ≤ " + fmt.format(maxV) + " points";
+        }
+    }
+
     private void createUIComponents() {
         tree = new JTree((TreeModel)null) {
             @Override
-            public String convertValueToText(Object value, boolean selected,
-                                             boolean expanded, boolean leaf, int row,
-                                             boolean hasFocus)
+            public String convertValueToText(Object value, boolean selected, boolean expanded,
+                                             boolean leaf, int row, boolean hasFocus)
             {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
                 Object userObject = node.getUserObject();
@@ -96,12 +117,10 @@ public class TestTree {
         tree.setCellRenderer(
                 new DefaultTreeCellRenderer() {
                     @Override
-                    public Component getTreeCellRendererComponent(JTree tree,
-                                                                  Object value,
+                    public Component getTreeCellRendererComponent(JTree tree, Object value,
                                                                   boolean selected,
-                                                                  boolean expanded,
-                                                                  boolean isLeaf, int row,
-                                                                  boolean focused)
+                                                                  boolean expanded, boolean isLeaf,
+                                                                  int row, boolean focused)
                     {
                         super.getTreeCellRendererComponent(
                                 tree, value, selected, expanded, isLeaf, row, focused
@@ -146,9 +165,9 @@ public class TestTree {
     }
 
     /**
-     * Replace the TestTree's model with the specified FileReport. This causes the JTree's
-     * contents to be replaced by the state of the specified FileReport. All future method
-     * calls on this TestTree will affect the specified FileReport.
+     * Replace the TestTree's model with the specified FileReport. This causes the JTree's contents
+     * to be replaced by the state of the specified FileReport. All future method calls on this
+     * TestTree will affect the specified FileReport.
      */
     public void update(FileReport report) {
         if (report == null) {
@@ -158,38 +177,14 @@ public class TestTree {
             DefaultTreeModel treeModel = report.treeModel;
             updater = new ConstraintUpdater(treeModel);
 
-            Enumeration<DefaultMutableTreeNode> dfs = getRoot(treeModel)
-                    .depthFirstEnumeration();
+            Enumeration<DefaultMutableTreeNode> dfs = getRoot(treeModel).depthFirstEnumeration();
             while (dfs.hasMoreElements()) {
                 DefaultMutableTreeNode node = dfs.nextElement();
-                if (node instanceof TestWrapperNode)
-                    ((TestWrapperNode)node).addObserver(updater);
+                if (node instanceof TestWrapperNode) ((TestWrapperNode)node).addObserver(updater);
             }
 
             tree.setModel(treeModel);
             expandFirstTest();
-        }
-    }
-
-    private static String testGroupToString(TestGroup group) {
-        Ceiling<Integer> maxNum = group.maxNum;
-        Ceiling<Double> maxValue = group.maxValue;
-
-        DecimalFormat fmt = new DecimalFormat("#.#");
-
-        if (maxNum == Ceiling.ANY && maxValue == Ceiling.ANY) {
-            return "fail any";
-        } else if (maxNum != Ceiling.ANY && maxValue == Ceiling.ANY) {
-            int max = ((AtMost<Integer>)maxNum).getValue();
-            return "fail ≤ " + max;
-        } else if (maxNum == Ceiling.ANY && maxValue != Ceiling.ANY) {
-            double max = ((AtMost<Double>)maxValue).getValue();
-            return "take ≤ " + fmt.format(max) + " points";
-        } else {
-            int maxN = ((AtMost<Integer>)maxNum).getValue();
-            double maxV = ((AtMost<Double>)maxValue).getValue();
-
-            return "fail ≤ " + maxN + " and take ≤ " + fmt.format(maxV) + " points";
         }
     }
 
@@ -208,8 +203,8 @@ public class TestTree {
     }
 
     /**
-     * Set the result of the currently selected TestWrapperNode to TestResult.PASSED. If
-     * there is no selection, this method does nothing.
+     * Set the result of the currently selected TestWrapperNode to TestResult.PASSED. If there is no
+     * selection, this method does nothing.
      */
     public void passTest() {
         if (!hasSelection()) return;
@@ -221,8 +216,8 @@ public class TestTree {
     }
 
     /**
-     * Set the result of the currently selected TestWrapperNode to TestResult.FAILED. If
-     * there is no selection, this method does nothing.
+     * Set the result of the currently selected TestWrapperNode to TestResult.FAILED. If there is no
+     * selection, this method does nothing.
      */
     public void failTest() {
         if (!hasSelection()) return;
@@ -234,8 +229,8 @@ public class TestTree {
     }
 
     /**
-     * Resets the result of the currently selected TestWrapperNode to TestResult.NONE. If
-     * there is no selection, this method does nothing.
+     * Resets the result of the currently selected TestWrapperNode to TestResult.NONE. If there is
+     * no selection, this method does nothing.
      */
     public void resetTest() {
         if (!hasSelection()) return;
@@ -248,8 +243,8 @@ public class TestTree {
     }
 
     /**
-     * Returns true if the currently selected test is the last test for this file, or
-     * false otherwise. This method returns false if there is no selection.
+     * Returns true if the currently selected test is the last test for this file, or false
+     * otherwise. This method returns false if there is no selection.
      */
     public boolean lastTestForFileSelected() {
         if (!hasSelection()) return false;
@@ -257,8 +252,8 @@ public class TestTree {
     }
 
     /**
-     * Returns true if the currently selected test is the first test for this file, or
-     * false otherwise. This method returns false if there is no selection.
+     * Returns true if the currently selected test is the first test for this file, or false
+     * otherwise. This method returns false if there is no selection.
      */
     public boolean firstTestForFileSelected() {
         if (!hasSelection()) return false;
@@ -281,9 +276,9 @@ public class TestTree {
     }
 
     /**
-     * Sets the test tree's current selection to the next test for this file. If the last
-     * test for this file is selected, this method clears the selection. If no test is
-     * selected, this method selects the first test.
+     * Sets the test tree's current selection to the next test for this file. If the last test for
+     * this file is selected, this method clears the selection. If no test is selected, this method
+     * selects the first test.
      */
     public void goToNextTest() {
         if (!hasSelection()) {
@@ -291,14 +286,12 @@ public class TestTree {
             return;
         }
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree
-                .getLastSelectedPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
 
         DefaultMutableTreeNode next = node.getNextLeaf();
 
-        while (next != null &&
-                (!(next instanceof TestWrapperNode) ||
-                        ((TestWrapperNode)next).isConstrained())) {
+        while (next != null && (!(next instanceof TestWrapperNode) || ((TestWrapperNode)next)
+                .isConstrained())) {
             next = next.getNextLeaf();
         }
 
@@ -310,21 +303,19 @@ public class TestTree {
     }
 
     /**
-     * Sets the test tree's current selection to the previous test for this file. If the
-     * first test for this file is selected, this method does nothing. If no test is
-     * selected, this method does nothing.
+     * Sets the test tree's current selection to the previous test for this file. If the first test
+     * for this file is selected, this method does nothing. If no test is selected, this method does
+     * nothing.
      */
     public void goToPreviousTest() {
         if (!hasSelection() || firstTestForFileSelected()) return;
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree
-                .getLastSelectedPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
 
         DefaultMutableTreeNode prev = node.getPreviousLeaf();
 
-        while (prev != null &&
-                (!(prev instanceof TestWrapperNode) ||
-                        ((TestWrapperNode)prev).isConstrained())) {
+        while (prev != null && (!(prev instanceof TestWrapperNode) || ((TestWrapperNode)prev)
+                .isConstrained())) {
             prev = prev.getPreviousLeaf();
         }
 

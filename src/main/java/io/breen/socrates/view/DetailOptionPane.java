@@ -11,14 +11,7 @@ public class DetailOptionPane extends JOptionPane {
     {
         String[] opts = {"OK", "Details..."};
         int opt = JOptionPane.showOptionDialog(
-                parent,
-                message,
-                title,
-                JOptionPane.DEFAULT_OPTION,
-                messageType,
-                null,
-                opts,
-                opts[0]
+                parent, message, title, JOptionPane.DEFAULT_OPTION, messageType, null, opts, opts[0]
         );
 
         if (opt == 1) {

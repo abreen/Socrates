@@ -9,19 +9,15 @@ import io.breen.socrates.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import java.util.Deque;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
- * Instances of this class can be added as observers to a tree of TestWrapperNodes, and
- * will update the constraints of the other nodes in the tree when test results change.
+ * Instances of this class can be added as observers to a tree of TestWrapperNodes, and will update
+ * the constraints of the other nodes in the tree when test results change.
  *
- * If a TestWrapperNode is marked as "constrained", this means that one or more
- * TestGroupWrapperNode ancestors of that node specified a ceiling (for the maximum number
- * of tests allowed to fail or the maximum point value allowed to be taken) and that
- * ceiling was reached.
+ * If a TestWrapperNode is marked as "constrained", this means that one or more TestGroupWrapperNode
+ * ancestors of that node specified a ceiling (for the maximum number of tests allowed to fail or
+ * the maximum point value allowed to be taken) and that ceiling was reached.
  */
 public class ConstraintUpdater implements Observer<TestWrapperNode> {
 
@@ -31,11 +27,20 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
         this.treeModel = treeModel;
     }
 
+    private static TestGroupWrapperNode getParent(DefaultMutableTreeNode node) {
+        return (TestGroupWrapperNode)node.getParent();
+    }
+
+    private static boolean mustUpdateTree(TestResult oldResult, TestResult newResult) {
+        return ((oldResult == TestResult.PASSED || oldResult == TestResult.NONE) && newResult ==
+                TestResult.FAILED) || (oldResult == TestResult.FAILED && (newResult == TestResult
+                .PASSED || newResult == TestResult.NONE));
+    }
+
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> eventObj) {
         if (!(eventObj instanceof ResultChangedEvent)) return;
 
-        ResultChangedEvent event = (ResultChangedEvent)
-                eventObj;
+        ResultChangedEvent event = (ResultChangedEvent)eventObj;
 
         if (!mustUpdateTree(event.oldResult, event.newResult)) return;
 
@@ -170,16 +175,6 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
             if (checkAfter.isEmpty()) break;
             else needsCheck = checkAfter;
         }
-    }
-
-    private static TestGroupWrapperNode getParent(DefaultMutableTreeNode node) {
-        return (TestGroupWrapperNode)node.getParent();
-    }
-
-    private static boolean mustUpdateTree(TestResult oldResult, TestResult newResult) {
-        return ((oldResult == TestResult.PASSED || oldResult == TestResult.NONE) &&
-                newResult == TestResult.FAILED) || (oldResult == TestResult.FAILED &&
-                (newResult == TestResult.PASSED || newResult == TestResult.NONE));
     }
 
     private void constrainTree(TestGroupWrapperNode root) {

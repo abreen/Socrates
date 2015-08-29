@@ -1,21 +1,15 @@
 package io.breen.socrates.python;
 
 import io.breen.socrates.Globals;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 public class PythonProcessBuilderTest {
-
-    private static final String SIMPLE_OUTPUT_STRING = "Hello, world!";
 
     private enum PythonModule {
         SIMPLE(Paths.get("simple.py")),
@@ -28,6 +22,7 @@ public class PythonProcessBuilderTest {
             this.p = p;
         }
     }
+    private static final String SIMPLE_OUTPUT_STRING = "Hello, world!";
 
     @Before
     public void setUp() throws Exception {

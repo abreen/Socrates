@@ -13,10 +13,7 @@ import io.breen.socrates.view.setup.SetupView;
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class SetupController {
@@ -43,8 +40,8 @@ public class SetupController {
                                 MissingResourceException x) {
                             DetailOptionPane.showMessageDialog(
                                     view,
-                                    "There was an error opening the criteria file you "
-                                            + "selected.",
+                                    "There was an error opening the criteria file you " +
+                                            "selected.",
                                     "Error Opening Criteria",
                                     JOptionPane.ERROR_MESSAGE,
                                     x.toString()
@@ -56,10 +53,8 @@ public class SetupController {
                         logger.info("criteria was successfully loaded");
                         HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
 
-                        if (submissions == null)
-                            view.showSubmissionsCard();
-                        else
-                            transferToMain();
+                        if (submissions == null) view.showSubmissionsCard();
+                        else transferToMain();
                     }
                 }
         );
@@ -100,11 +95,7 @@ public class SetupController {
                                     "Opening Submissions";
 
                             DetailOptionPane.showMessageDialog(
-                                    view,
-                                    msg,
-                                    title,
-                                    JOptionPane.INFORMATION_MESSAGE,
-                                    sb.toString()
+                                    view, msg, title, JOptionPane.INFORMATION_MESSAGE, sb.toString()
                             );
                         }
 

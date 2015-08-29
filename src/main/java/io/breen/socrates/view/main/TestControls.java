@@ -9,22 +9,12 @@ import io.breen.socrates.util.Observer;
 import io.breen.socrates.view.icon.*;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.PlainDocument;
+import javax.swing.border.*;
+import javax.swing.text.*;
 import java.awt.*;
 import java.text.DecimalFormat;
 
 public class TestControls implements Observer<TestWrapperNode> {
-
-    private static final String NO_TEST_SELECTED_DESC = "(no test selected)";
-    private static final Document EMPTY_DOCUMENT = new PlainDocument();
-
-    private static final int ICON_WIDTH = 24;
-    private static final int ICON_HEIGHT = 24;
 
     private enum TestProperty {
         TEST_TYPE(0, "Test type", "—"),
@@ -57,7 +47,10 @@ public class TestControls implements Observer<TestWrapperNode> {
             return defaults;
         }
     }
-
+    private static final String NO_TEST_SELECTED_DESC = "(no test selected)";
+    private static final Document EMPTY_DOCUMENT = new PlainDocument();
+    private static final int ICON_WIDTH = 24;
+    private static final int ICON_HEIGHT = 24;
     private JPanel rootPanel;
     private JPanel innerPanel;
     private JPanel buttonPanel;
@@ -75,6 +68,25 @@ public class TestControls implements Observer<TestWrapperNode> {
     public TestControls() {
         updateIcon();
         description.setText(NO_TEST_SELECTED_DESC);
+    }
+
+    public static TestIcon newIcon(TestWrapperNode node) {
+        if (node == null) return new DefaultTestIcon();
+
+        if (node.getAutomationStage() == AutomationStage.STARTED) return new RunningTestIcon();
+
+        switch (node.getResult()) {
+        case NONE:
+            if (node.getAutomationStage() == AutomationStage.FINISHED_ERROR)
+                return new ErrorTestIcon();
+            else return new NoResultTestIcon();
+        case PASSED:
+            return new PassedTestIcon();
+        case FAILED:
+            return new FailedTestIcon();
+        default:
+            return new DefaultTestIcon();
+        }
     }
 
     private void createUIComponents() {
@@ -108,8 +120,7 @@ public class TestControls implements Observer<TestWrapperNode> {
 
     public void update(TestWrapperNode testNode) {
         if (testNode == null) {
-            if (currentNode != null)
-                currentNode.removeObserver(this);
+            if (currentNode != null) currentNode.removeObserver(this);
 
             currentNode = null;
 
@@ -160,8 +171,8 @@ public class TestControls implements Observer<TestWrapperNode> {
     }
 
     /**
-     * Sets the Action for the "Pass" button. The button's text will not be changed
-     * to the Action's text --- the old text will be retained.
+     * Sets the Action for the "Pass" button. The button's text will not be changed to the Action's
+     * text --- the old text will be retained.
      */
     public void setPassTestAction(Action a) {
         String textBefore = passButton.getText();
@@ -170,8 +181,8 @@ public class TestControls implements Observer<TestWrapperNode> {
     }
 
     /**
-     * Sets the Action for the "Fail" button. The button's text will not be changed
-     * to the Action's text --- the old text will be retained.
+     * Sets the Action for the "Fail" button. The button's text will not be changed to the Action's
+     * text --- the old text will be retained.
      */
     public void setFailTestAction(Action a) {
         String textBefore = failButton.getText();
@@ -180,35 +191,13 @@ public class TestControls implements Observer<TestWrapperNode> {
     }
 
     /**
-     * Sets the Action for the "Reset" button. The button's text will not be changed
-     * to the Action's text --- the old text will be retained.
+     * Sets the Action for the "Reset" button. The button's text will not be changed to the Action's
+     * text --- the old text will be retained.
      */
     public void setResetTestAction(Action a) {
         String textBefore = resetButton.getText();
         resetButton.setAction(a);
         resetButton.setText(textBefore);
-    }
-
-    public static TestIcon newIcon(TestWrapperNode node) {
-        if (node == null)
-            return new DefaultTestIcon();
-
-        if (node.getAutomationStage() == AutomationStage.STARTED)
-            return new RunningTestIcon();
-
-        switch (node.getResult()) {
-        case NONE:
-            if (node.getAutomationStage() == AutomationStage.FINISHED_ERROR)
-                return new ErrorTestIcon();
-            else
-                return new NoResultTestIcon();
-        case PASSED:
-            return new PassedTestIcon();
-        case FAILED:
-            return new FailedTestIcon();
-        default:
-            return new DefaultTestIcon();
-        }
     }
 
     private void updateIcon() {
@@ -225,8 +214,7 @@ public class TestControls implements Observer<TestWrapperNode> {
             resetButton.getAction().setEnabled(true);
             if (currentNode.getResult() == TestResult.FAILED)
                 passButton.getAction().setEnabled(true);
-            else
-                passButton.getAction().setEnabled(false);
+            else passButton.getAction().setEnabled(false);
             failButton.getAction().setEnabled(false);
         } else {
             setEnabledForAllButtons(true);
@@ -237,8 +225,7 @@ public class TestControls implements Observer<TestWrapperNode> {
      * Clears the notes Document of the currently selected test node.
      */
     public void clearNotes() {
-        if (currentNode == null)
-            return;
+        if (currentNode == null) return;
 
         try {
             currentNode.notes.remove(0, currentNode.notes.getLength());

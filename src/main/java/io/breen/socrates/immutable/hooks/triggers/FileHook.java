@@ -1,9 +1,8 @@
 package io.breen.socrates.immutable.hooks.triggers;
 
 /**
- * Values representing points in the grading process (hooks) having to do with a
- * particular file, to which scripts may be attached, causing the scripts to run
- * at those points in time.
+ * Values representing points in the grading process (hooks) having to do with a particular file, to
+ * which scripts may be attached, causing the scripts to run at those points in time.
  */
 public enum FileHook {
 
@@ -23,16 +22,15 @@ public enum FileHook {
         this.type = type;
     }
 
+    public static FileHook fromString(String type) {
+        for (FileHook h : FileHook.values())
+            if (h.type.equals(type)) return h;
+
+        return null;
+    }
+
     @Override
     public String toString() {
         return type;
-    }
-
-    public static FileHook fromString(String type) {
-        for (FileHook h : FileHook.values())
-            if (h.type.equals(type))
-                return h;
-
-        return null;
     }
 }

@@ -67,6 +67,6 @@ public class DefaultTheme {
 
     protected static String toHex(Color c) {
         String hex = Integer.toHexString(c.getRGB());
-        return "#"+ hex.substring(2);
+        return "#" + hex.substring(2);
     }
 }

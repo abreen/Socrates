@@ -3,41 +3,31 @@ package io.breen.socrates;
 import org.apache.commons.lang.SystemUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.ZoneId;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
- * The single location for a small number (as little as possible!) of runtime-set
- * variables that are needed anywhere.
+ * The single location for a small number (as little as possible!) of runtime-set variables that are
+ * needed anywhere.
  */
 public class Globals {
-
-    public static final int NORMAL_EXIT_CODE = 0;
-
-    private static final Pattern PYTHON3_VERSION_PATTERN = Pattern.compile("Python 3.*");
-
-    private static Logger logger = Logger.getLogger(Globals.class.getName());
-
-    public static Properties properties;
 
     public enum OS {
         WINDOWS, OSX, LINUX, OTHER
     }
-
+    public static final int NORMAL_EXIT_CODE = 0;
+    private static final Pattern PYTHON3_VERSION_PATTERN = Pattern.compile("Python 3.*");
+    public static Properties properties;
     public static OS operatingSystem;
-
     /**
-     * A working path to the Python 3 interpreter, usable by (for example) ProcessBuilder
-     * to run Python 3 programs.
+     * A working path to the Python 3 interpreter, usable by (for example) ProcessBuilder to run
+     * Python 3 programs.
      */
     public static Path python3Command;
+    private static Logger logger = Logger.getLogger(Globals.class.getName());
 
     static {
         if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_MAC_OSX) {
@@ -110,8 +100,7 @@ public class Globals {
         if (versionString == null)
             // file was empty
             return false;
-        else
-            return PYTHON3_VERSION_PATTERN.matcher(versionString).matches();
+        else return PYTHON3_VERSION_PATTERN.matcher(versionString).matches();
     }
 
     public static ZoneId getZoneId() {

@@ -5,10 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Class containing default style values for the base16 dark theme by
- * Chris Kempson (http://chriskempson.github.io/base16/#default).
+ * Class containing default style values for the base16 dark theme by Chris Kempson
+ * (http://chriskempson.github.io/base16/#default).
  */
 public class Base16DarkTheme extends Base16LightTheme {
+
     public static final Map<String, String> map;
     public static final Color backgroundColor;
     public static final Color foregroundColor;

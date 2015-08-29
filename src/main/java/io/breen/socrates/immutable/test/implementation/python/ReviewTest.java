@@ -10,7 +10,8 @@ public class ReviewTest extends Test {
 
     @Override
     public String toString() {
-        return "PythonFile:ReviewTest(deduction=" + deduction + ", description=" + description + ")";
+        return "PythonFile:ReviewTest(deduction=" + deduction + ", description=" + description +
+                ")";
     }
 
     @Override

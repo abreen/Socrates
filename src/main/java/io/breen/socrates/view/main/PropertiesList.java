@@ -3,15 +3,13 @@ package io.breen.socrates.view.main;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 
 /**
- * A custom Swing component that displays "properties" --- a list of key-value pairs,
- * both strings. The keys are right-aligned on the left, and the values are left-aligned
- * on the right. Key-value pairs can be added after the component is created. Any
- * pair can be "reset" to default values.
+ * A custom Swing component that displays "properties" --- a list of key-value pairs, both strings.
+ * The keys are right-aligned on the left, and the values are left-aligned on the right. Key-value
+ * pairs can be added after the component is created. Any pair can be "reset" to default values.
  */
 public class PropertiesList extends JPanel {
 

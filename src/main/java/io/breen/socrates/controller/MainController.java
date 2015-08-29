@@ -4,30 +4,20 @@ import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
-import io.breen.socrates.immutable.test.Automatable;
-import io.breen.socrates.immutable.test.CannotBeAutomatedException;
-import io.breen.socrates.immutable.test.Test;
-import io.breen.socrates.model.AutomationStage;
-import io.breen.socrates.model.FileReport;
-import io.breen.socrates.model.TestResult;
-import io.breen.socrates.model.TestWrapperNode;
-import io.breen.socrates.view.main.FileView;
-import io.breen.socrates.view.main.MainView;
-import io.breen.socrates.view.main.MenuBarManager;
+import io.breen.socrates.immutable.test.*;
+import io.breen.socrates.model.*;
+import io.breen.socrates.view.main.*;
 
 import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -57,8 +47,7 @@ public class MainController {
          * Set up theme-related options.
          */
         newMenuItemAction(
-                menuBar.defaultTheme,
-                e -> mainView.fileView.changeTheme(FileView.ThemeType.DEFAULT)
+                menuBar.defaultTheme, e -> mainView.fileView.changeTheme(FileView.ThemeType.DEFAULT)
         );
 
         newMenuItemAction(
@@ -87,8 +76,7 @@ public class MainController {
                             return;
                         case FINISHED_NORMAL:
                         case NONE:
-                            if (userWantsToOverride())
-                                mainView.testTree.passTest();
+                            if (userWantsToOverride()) mainView.testTree.passTest();
                             return;
                         case FINISHED_ERROR:
                             mainView.testTree.passTest();
@@ -117,8 +105,7 @@ public class MainController {
                             return;
                         case FINISHED_NORMAL:
                         case NONE:
-                            if (userWantsToOverride())
-                                mainView.testTree.failTest();
+                            if (userWantsToOverride()) mainView.testTree.failTest();
                             return;
                         case FINISHED_ERROR:
                             mainView.testTree.failTest();
@@ -181,8 +168,7 @@ public class MainController {
          */
         mainView.testTree.addTreeSelectionListener(
                 e -> {
-                    TestWrapperNode testNode = mainView.testTree
-                            .getSelectedTestWrapperNode();
+                    TestWrapperNode testNode = mainView.testTree.getSelectedTestWrapperNode();
 
                     mainView.testControls.update(testNode);
 
@@ -216,8 +202,7 @@ public class MainController {
 
                         if (file == null) return;
 
-                        Submission submission = mainView.submissionTree
-                                .getSelectedSubmission();
+                        Submission submission = mainView.submissionTree.getSelectedSubmission();
 
                         (new Thread(
                                 () -> {
@@ -257,18 +242,15 @@ public class MainController {
         );
         nextSubmission.setEnabled(true);
         nextSubmission.putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | shift)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | shift)
         );
 
         Action previousSubmission = newMenuItemAction(
-                menuBar.previousSubmission,
-                e -> mainView.submissionTree.goToPreviousSubmission()
+                menuBar.previousSubmission, e -> mainView.submissionTree.goToPreviousSubmission()
         );
         previousSubmission.setEnabled(false);
         previousSubmission.putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | shift)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | shift)
         );
 
         Action revealSubmission = newMenuItemAction(
@@ -284,8 +266,7 @@ public class MainController {
         );
         revealSubmission.setEnabled(false);
         revealSubmission.putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | shift)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | shift)
         );
 
         /*
@@ -296,8 +277,7 @@ public class MainController {
         );
         nextFile.setEnabled(true);
         nextFile.putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | alt)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | alt)
         );
 
         Action previousFile = newMenuItemAction(
@@ -305,8 +285,7 @@ public class MainController {
         );
         previousFile.setEnabled(false);
         previousFile.putValue(
-                Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | alt)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | alt)
         );
 
         Action openFile = newMenuItemAction(
@@ -329,8 +308,7 @@ public class MainController {
                 event -> {
                     FileReport report = null;
                     File matchingFile = null;
-                    SubmittedFile submitted = mainView.submissionTree
-                            .getSelectedSubmittedFile();
+                    SubmittedFile submitted = mainView.submissionTree.getSelectedSubmittedFile();
 
                     if (submitted != null) {
                         report = reports.get(submitted);
@@ -389,29 +367,6 @@ public class MainController {
         );
     }
 
-    public void start(Criteria criteria, List<Submission> submissions) {
-        this.criteria = criteria;
-        this.submissions = submissions;
-
-        for (Submission submission : submissions) {
-            for (SubmittedFile submitted : submission.files) {
-                File matchingFile = criteria.files.get(submitted.localPath);
-                if (matchingFile == null) continue;
-
-                reports.put(submitted, new FileReport(submitted, matchingFile));
-            }
-        }
-
-        mainView.setTitle("Socrates — " + criteria.assignmentName);
-
-        mainView.submissionTree.addUngraded(submissions);
-        mainView.submissionTree.expandFirstSubmission();
-
-        mainView.setVisible(true);
-
-        logger.info("started MainView");
-    }
-
     private static Action newMenuItemAction(JMenuItem item, Consumer<ActionEvent> lambda)
     {
         Action a = new AbstractAction(item.getText()) {
@@ -425,8 +380,7 @@ public class MainController {
         return a;
     }
 
-    private static void addTreeChangedListener(TreeModel model,
-                                               Consumer<TreeModelEvent> lambda)
+    private static void addTreeChangedListener(TreeModel model, Consumer<TreeModelEvent> lambda)
     {
         TreeModelListener listener = new TreeModelListener() {
             @Override
@@ -451,6 +405,29 @@ public class MainController {
         };
 
         model.addTreeModelListener(listener);
+    }
+
+    public void start(Criteria criteria, List<Submission> submissions) {
+        this.criteria = criteria;
+        this.submissions = submissions;
+
+        for (Submission submission : submissions) {
+            for (SubmittedFile submitted : submission.files) {
+                File matchingFile = criteria.files.get(submitted.localPath);
+                if (matchingFile == null) continue;
+
+                reports.put(submitted, new FileReport(submitted, matchingFile));
+            }
+        }
+
+        mainView.setTitle("Socrates — " + criteria.assignmentName);
+
+        mainView.submissionTree.addUngraded(submissions);
+        mainView.submissionTree.expandFirstSubmission();
+
+        mainView.setVisible(true);
+
+        logger.info("started MainView");
     }
 
     private boolean userWantsToOverride() {

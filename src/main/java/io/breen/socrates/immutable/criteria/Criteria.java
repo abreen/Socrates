@@ -7,58 +7,44 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.*;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * An immutable class representing a criteria file (or package) containing specifications
- * of parts of the assignment and the tests that should be run. Instances of this class
- * created from criteria packages may also contain other resources that are needed to
- * execute the tests specified in a criteria file (e.g., hooks, scripts, or static
- * files).
+ * An immutable class representing a criteria file (or package) containing specifications of parts
+ * of the assignment and the tests that should be run. Instances of this class created from criteria
+ * packages may also contain other resources that are needed to execute the tests specified in a
+ * criteria file (e.g., hooks, scripts, or static files).
  */
 public final class Criteria {
 
     public static final String[] CRITERIA_FILE_EXTENSIONS = {"scf", "yml"};
     public static final String[] CRITERIA_PACKAGE_EXTENSIONS = {"scp", "zip"};
-
+    private static Logger logger = Logger.getLogger(Criteria.class.getName());
     /**
      * Human-readable assignment name (e.g., "Problem Set 1"). Cannot be null.
      */
     public final String assignmentName;
 
+    /*
+     * Other resources provided by a criteria package
+     */
     /**
-     * File objects created from the criteria file. These will all be instances of
-     * subclasses of File, since File is abstract. Each File's localPath Path is used
-     * as the key in this map.
+     * File objects created from the criteria file. These will all be instances of subclasses of
+     * File, since File is abstract. Each File's localPath Path is used as the key in this map.
      *
      * @see File
      */
     public final Map<Path, File> files;
-
-    /*
-     * Other resources provided by a criteria package
-     */
-
     public final Map<String, Resource> staticResources;
-
     public final Map<String, Resource> scriptResources;
-
     public final Map<String, Resource> hookResources;
 
-    public Criteria(String name,
-                    List<File> files,
-                    Map<String, Resource> staticResources,
-                    Map<String, Resource> scriptResources,
-                    Map<String, Resource> hookResources)
+    public Criteria(String name, List<File> files, Map<String, Resource> staticResources,
+                    Map<String, Resource> scriptResources, Map<String, Resource> hookResources)
     {
         if (name == null) throw new IllegalArgumentException("'name' cannot be null");
         if (files == null) throw new IllegalArgumentException("'files' cannot be null");
@@ -85,15 +71,6 @@ public final class Criteria {
 
     public Criteria(String name, List<File> files) {
         this(name, files, new HashMap<>(), new HashMap<>(), new HashMap<>());
-    }
-
-    public String toString() {
-        return "Criteria\n" +
-                "\tassignment_name=" + assignmentName + "\n" +
-                "\tstaticResources=" + staticResources + "\n" +
-                "\tscriptResources=" + scriptResources + "\n" +
-                "\thookResources=" + hookResources + "\n" +
-                "\tfiles=" + files + ")";
     }
 
     /**
@@ -136,7 +113,13 @@ public final class Criteria {
                 }
             }
 
-            Yaml y = new Yaml(new SocratesConstructor(staticResources, scriptResources, hookResources));
+            Yaml y = new Yaml(
+                    new SocratesConstructor(
+                            staticResources,
+                            scriptResources,
+                            hookResources
+                    )
+            );
             Criteria c = (Criteria)y.load(criteriaFile);
             checkCriteriaObject(c);
             return c;
@@ -181,5 +164,12 @@ public final class Criteria {
         return c;
     }
 
-    private static Logger logger = Logger.getLogger(Criteria.class.getName());
+    public String toString() {
+        return "Criteria\n" +
+                "\tassignment_name=" + assignmentName + "\n" +
+                "\tstaticResources=" + staticResources + "\n" +
+                "\tscriptResources=" + scriptResources + "\n" +
+                "\thookResources=" + hookResources + "\n" +
+                "\tfiles=" + files + ")";
+    }
 }

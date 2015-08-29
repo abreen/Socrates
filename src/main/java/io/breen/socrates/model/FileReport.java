@@ -4,22 +4,19 @@ import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.util.Either;
-import io.breen.socrates.util.Left;
-import io.breen.socrates.util.Right;
+import io.breen.socrates.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 /**
- * A mutable data structure containing outcomes of tests for a given submitted file.
- * The outcomes are stored in a tree of TestWrapperNode objects, each of which
- * individually represents either a Test or a TestGroup from the criteria.
+ * A mutable data structure containing outcomes of tests for a given submitted file. The outcomes
+ * are stored in a tree of TestWrapperNode objects, each of which individually represents either a
+ * Test or a TestGroup from the criteria.
  *
- * This object adds the tree of TestWrapperNode objects to a DefaultTreeModel.
- * When the GUI needs to display a tree containing the current state of the tests
- * for the file, it can simply set its model reference to the one contained by the
- * FileReport.
+ * This object adds the tree of TestWrapperNode objects to a DefaultTreeModel. When the GUI needs to
+ * display a tree containing the current state of the tests for the file, it can simply set its
+ * model reference to the one contained by the FileReport.
  */
 public class FileReport {
 

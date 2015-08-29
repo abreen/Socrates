@@ -7,8 +7,8 @@ import java.nio.file.Path;
 import java.util.logging.Logger;
 
 /**
- * Class representing immutable objects storing information about a single file
- * found on the file system that represents one part of a student's submission.
+ * Class representing immutable objects storing information about a single file found on the file
+ * system that represents one part of a student's submission.
  */
 public class SubmittedFile {
 
@@ -20,9 +20,8 @@ public class SubmittedFile {
     public final Path fullPath;
 
     /**
-     * This file's location relative to the submission directory. This path should
-     * match the path specified in a criteria file, if this SubmittedFile is indeed
-     * relevant to grading.
+     * This file's location relative to the submission directory. This path should match the path
+     * specified in a criteria file, if this SubmittedFile is indeed relevant to grading.
      */
     public final Path localPath;
 
@@ -32,8 +31,8 @@ public class SubmittedFile {
     public final long size;
 
     /**
-     * This file's receipt, storing the submission timestamps. If there was no receipt
-     * for this file, this is null.
+     * This file's receipt, storing the submission timestamps. If there was no receipt for this
+     * file, this is null.
      */
     public final Receipt receipt;
 
