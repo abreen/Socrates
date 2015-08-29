@@ -13,10 +13,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.text.DecimalFormat;
 
@@ -167,7 +164,7 @@ public class TestTree {
         TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
         test.setResult(TestResult.PASSED);
 
-        testResultChanged(tree.getSelectionPath());
+        getModel().nodeChanged(test);
     }
 
     /**
@@ -180,7 +177,7 @@ public class TestTree {
         TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
         test.setResult(TestResult.FAILED);
 
-        testResultChanged(tree.getSelectionPath());
+        getModel().nodeChanged(test);
     }
 
     /**
@@ -193,7 +190,7 @@ public class TestTree {
         TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
         test.setResult(TestResult.NONE);
 
-        testResultChanged(tree.getSelectionPath());
+        getModel().nodeChanged(test);
     }
 
     /**
@@ -292,27 +289,18 @@ public class TestTree {
             if (parent == null) return;
         }
 
-        DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode)parent.getChildBefore(node);
+        DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode)parent.getChildBefore(
+                node
+        );
         tree.setSelectionPath(new TreePath(newRoot.getLastLeaf().getPath()));
-    }
-
-    /**
-     * Important note: we indicate that a test result changed by using the
-     * DefaultTreeModel's valueForPathChanged() method. This method takes the path to
-     * the node that changed and the *user object* that is supposed to have changed.
-     * Since we store the test result *outside* of the user object, and leave the
-     * user object to store the reference to a Test or TestGroup object, we must pass
-     * the user object in here, even though it really has not changed. This is the
-     * simplest way I can think of to force the TreeModel to send a TreeNodesChanged
-     * event to its listeners.
-     */
-    private void testResultChanged(TreePath testPath) {
-        TestWrapperNode node = (TestWrapperNode)testPath.getLastPathComponent();
-        tree.getModel().valueForPathChanged(testPath, node.getUserObject());
     }
 
     private DefaultMutableTreeNode getRoot() {
         TreeModel model = tree.getModel();
         return (DefaultMutableTreeNode)(model == null ? null : model.getRoot());
+    }
+
+    private DefaultTreeModel getModel() {
+        return (DefaultTreeModel)tree.getModel();
     }
 }
