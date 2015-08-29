@@ -20,7 +20,7 @@ import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.text.DecimalFormat;
 
-public class TestControls implements Observer<TestResult> {
+public class TestControls implements Observer<TestWrapperNode> {
 
     private static final String NO_TEST_SELECTED_DESC = "(no test selected)";
     private static final Document EMPTY_DOCUMENT = new PlainDocument();
@@ -118,7 +118,7 @@ public class TestControls implements Observer<TestResult> {
     public void update(TestWrapperNode testNode) {
         if (testNode == null) {
             if (currentNode != null)
-                currentNode.resetObserver();
+                currentNode.removeObserver(this);
 
             currentNode = null;
 
@@ -134,7 +134,7 @@ public class TestControls implements Observer<TestResult> {
             return;
         }
 
-        testNode.setObserver(this);
+        testNode.addObserver(this);
 
         Test test = (Test)testNode.getUserObject();
         DecimalFormat fmt = new DecimalFormat("#.#");
@@ -144,8 +144,7 @@ public class TestControls implements Observer<TestResult> {
         changeIcon(testNode.getResult());
 
         properties.set(
-                TestProperty.TEST_TYPE.index,
-                test.getTestTypeName()
+                TestProperty.TEST_TYPE.index, test.getTestTypeName()
         );
 
         properties.set(
@@ -212,7 +211,7 @@ public class TestControls implements Observer<TestResult> {
         icon.setIcon(resultIcon);
     }
 
-    public void objectChanged(TestResult object) {
-        changeIcon(object);
+    public void objectChanged(TestWrapperNode object) {
+        changeIcon(object.getResult());
     }
 }
