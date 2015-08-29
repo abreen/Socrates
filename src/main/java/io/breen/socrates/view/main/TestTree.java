@@ -8,9 +8,6 @@ import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.model.FileReport;
 import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.TestWrapperNode;
-import io.breen.socrates.view.icon.FailedTestIcon;
-import io.breen.socrates.view.icon.NoResultTestIcon;
-import io.breen.socrates.view.icon.PassedTestIcon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -65,10 +62,6 @@ public class TestTree {
                 )
         );
 
-        Icon defaultIcon = new NoResultTestIcon();
-        Icon passedIcon = new PassedTestIcon();
-        Icon failedIcon = new FailedTestIcon();
-
         tree.setCellRenderer(
                 new DefaultTreeCellRenderer() {
                     @Override
@@ -87,14 +80,14 @@ public class TestTree {
                             TestWrapperNode testNode = (TestWrapperNode)value;
                             switch (testNode.getResult()) {
                             case PASSED:
-                                setIcon(passedIcon);
+                                setIcon(TestControls.ICON_PASSED);
                                 break;
                             case FAILED:
-                                setIcon(failedIcon);
+                                setIcon(TestControls.ICON_FAILED);
                                 break;
                             case NONE:
                             default:
-                                setIcon(defaultIcon);
+                                setIcon(TestControls.ICON_NORESULT);
                             }
                         } else {
                             setIcon(null);

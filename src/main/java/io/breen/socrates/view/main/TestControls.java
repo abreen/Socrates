@@ -3,7 +3,9 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.test.Automatable;
 import io.breen.socrates.immutable.test.Test;
+import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.TestWrapperNode;
+import io.breen.socrates.util.Observer;
 import io.breen.socrates.view.icon.DefaultTestIcon;
 import io.breen.socrates.view.icon.FailedTestIcon;
 import io.breen.socrates.view.icon.NoResultTestIcon;
@@ -16,13 +18,13 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.text.DecimalFormat;
 
-public class TestControls {
+public class TestControls implements Observer<TestResult> {
 
     private static final String NO_TEST_SELECTED_DESC = "(no test selected)";
 
-    private static final Icon ICON_NORESULT = new NoResultTestIcon();
-    private static final Icon ICON_PASSED = new PassedTestIcon();
-    private static final Icon ICON_FAILED = new FailedTestIcon();
+    static final Icon ICON_NORESULT = new NoResultTestIcon();
+    static final Icon ICON_PASSED = new PassedTestIcon();
+    static final Icon ICON_FAILED = new FailedTestIcon();
 
     private static final Icon LARGE_ICON_DEFAULT = new DefaultTestIcon(24, 24);
     private static final Icon LARGE_ICON_NORESULT = new NoResultTestIcon(24, 24);
@@ -111,6 +113,9 @@ public class TestControls {
 
     public void update(TestWrapperNode testNode) {
         if (testNode == null) {
+            if (currentNode != null)
+                currentNode.resetObserver();
+
             currentNode = null;
             description.setText(NO_TEST_SELECTED_DESC);
             icon.setIcon(LARGE_ICON_DEFAULT);
@@ -118,26 +123,14 @@ public class TestControls {
             return;
         }
 
+        testNode.setObserver(this);
+
         Test test = (Test)testNode.getUserObject();
         DecimalFormat fmt = new DecimalFormat("#.#");
 
         description.setText(test.description);
 
-        Icon resultIcon;
-        switch (testNode.getResult()) {
-        case NONE:
-            resultIcon = LARGE_ICON_NORESULT;
-            break;
-        case PASSED:
-            resultIcon = LARGE_ICON_PASSED;
-            break;
-        case FAILED:
-            resultIcon = LARGE_ICON_FAILED;
-            break;
-        default:
-            resultIcon = LARGE_ICON_DEFAULT;
-        }
-        icon.setIcon(resultIcon);
+        changeIcon(testNode.getResult());
 
         properties.set(
                 TestProperty.TEST_TYPE.index,
@@ -159,15 +152,33 @@ public class TestControls {
         currentNode = testNode;
     }
 
-    public void refresh() {
-        update(currentNode);
-    }
-
     public void setPassTestAction(Action a) {
         passButton.setAction(a);
     }
 
     public void setFailTestAction(Action a) {
         failButton.setAction(a);
+    }
+
+    private void changeIcon(TestResult result) {
+        Icon resultIcon;
+        switch (result) {
+        case NONE:
+            resultIcon = LARGE_ICON_NORESULT;
+            break;
+        case PASSED:
+            resultIcon = LARGE_ICON_PASSED;
+            break;
+        case FAILED:
+            resultIcon = LARGE_ICON_FAILED;
+            break;
+        default:
+            resultIcon = LARGE_ICON_DEFAULT;
+        }
+        icon.setIcon(resultIcon);
+    }
+
+    public void objectChanged(TestResult object) {
+        changeIcon(object);
     }
 }
