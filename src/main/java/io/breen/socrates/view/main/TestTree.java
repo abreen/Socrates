@@ -5,6 +5,7 @@ import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.ceiling.AtMost;
 import io.breen.socrates.immutable.test.ceiling.Ceiling;
+import io.breen.socrates.model.ConstraintUpdater;
 import io.breen.socrates.model.FileReport;
 import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.TestWrapperNode;
@@ -16,12 +17,15 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.Enumeration;
 
 public class TestTree {
 
     private JPanel rootPanel;
     private JScrollPane scrollPane;
     private JTree tree;
+
+    private ConstraintUpdater updater;
 
     private void createUIComponents() {
         tree = new JTree((TreeModel)null) {
@@ -73,7 +77,7 @@ public class TestTree {
                                 tree, value, selected, expanded, isLeaf, row, focused
                         );
 
-                        if (isLeaf) {
+                        if (value instanceof TestWrapperNode) {
                             TestWrapperNode testNode = (TestWrapperNode)value;
                             switch (testNode.getResult()) {
                             case PASSED:
@@ -86,6 +90,14 @@ public class TestTree {
                             default:
                                 setIcon(TestControls.ICON_NORESULT);
                             }
+
+                            if (!selected) {
+                                if (testNode.isConstrained())
+                                    setForeground(Color.GRAY);
+                                else
+                                    setForeground(Color.BLACK);
+                            }
+
                         } else {
                             setIcon(null);
                         }
@@ -113,8 +125,22 @@ public class TestTree {
      * future method calls on this TestTree will affect the specified FileReport.
      */
     public void update(FileReport report) {
-        tree.clearSelection();
-        tree.setModel(report == null ? null : report.treeModel);
+        if (report == null) {
+            updater = null;
+            tree.setModel(null);
+        } else {
+            DefaultTreeModel treeModel = report.treeModel;
+            updater = new ConstraintUpdater();
+
+            Enumeration<DefaultMutableTreeNode> dfs = getRoot(treeModel).depthFirstEnumeration();
+            while (dfs.hasMoreElements()) {
+                DefaultMutableTreeNode node = dfs.nextElement();
+                if (node instanceof TestWrapperNode)
+                    ((TestWrapperNode)node).addObserver(updater);
+            }
+
+            tree.setModel(treeModel);
+        }
     }
 
     private static String testGroupToString(TestGroup group) {
@@ -298,6 +324,10 @@ public class TestTree {
     private DefaultMutableTreeNode getRoot() {
         TreeModel model = tree.getModel();
         return (DefaultMutableTreeNode)(model == null ? null : model.getRoot());
+    }
+
+    private DefaultMutableTreeNode getRoot(TreeModel model) {
+        return (DefaultMutableTreeNode)model.getRoot();
     }
 
     private DefaultTreeModel getModel() {

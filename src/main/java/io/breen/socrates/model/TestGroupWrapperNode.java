@@ -29,4 +29,12 @@ public class TestGroupWrapperNode extends DefaultMutableTreeNode {
     public void updatedPointsTaken(double delta) {
         pointsTaken += delta;
     }
+
+    public int getNumFailed() {
+        return numFailed;
+    }
+
+    public double getPointsTaken() {
+        return pointsTaken;
+    }
 }

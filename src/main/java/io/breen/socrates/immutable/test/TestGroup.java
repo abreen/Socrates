@@ -42,9 +42,6 @@ public class TestGroup {
             int num = AtMost.getValue(maxNum);
 
             if (num < 0) throw new IllegalArgumentException("maxNum cannot be negative");
-            if (num > members.size()) throw new IllegalArgumentException(
-                    "maxNum cannot be greater than the number of tests"
-            );
         }
 
         if (maxValue != Ceiling.ANY && AtMost.getValue(maxValue) < 0)

@@ -1,10 +1,17 @@
 package io.breen.socrates.model;
 
 import io.breen.socrates.immutable.test.Test;
+import io.breen.socrates.immutable.test.TestGroup;
+import io.breen.socrates.immutable.test.ceiling.AtMost;
+import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.util.ObservableChangedEvent;
 import io.breen.socrates.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.Deque;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Instances of this class can be added as observers to a tree of TestWrapperNodes, and
@@ -32,21 +39,131 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
         switch (result) {
         case FAILED:
             // test was just failed from being none or passed
-            updatePathToRoot(parent, 1, test.deduction);
+            updateRelevantSubtrees(parent, 1, test.deduction);
+            break;
         case PASSED:
         case NONE:
             // test was just passed or reset from being failed
-            updatePathToRoot(parent, -1, -test.deduction);
+            updateRelevantSubtrees(parent, -1, -test.deduction);
         }
     }
 
-    private static void updatePathToRoot(TestGroupWrapperNode parent, int deltaFailed,
-                                         double deltaPoints)
+    private static void updateRelevantSubtrees(TestGroupWrapperNode parent,
+                                               int deltaFailed, double deltaPoints)
     {
+        Deque<TestGroupWrapperNode> parents = new LinkedList<>();
+
         while (parent != null) {
-            parent.updateNumFailed(deltaFailed);
-            parent.updatedPointsTaken(deltaPoints);
+            parents.addFirst(parent);
             parent = getParent(parent);
+        }
+
+        /*
+         * Starting from the root of this tree, visit each TestGroupWrapperNode root
+         * of a subtree that was just modified. As soon as we find a root of a subtree
+         * that should be constrained due to a new change, we constrain the entire subtree
+         * and stop. If we find a root of a subtree that becomes un-constrained due to a
+         * new change, we un-constrain the entire subtree and add that subtree to list
+         * of trees we must check for constraints that may need to be applied that are
+         * not relevant to this change.
+         */
+        List<TestGroupWrapperNode> needsCheck = new LinkedList<>();
+
+        for (TestGroupWrapperNode root : parents) {
+            TestGroup group = (TestGroup)root.getUserObject();
+            Ceiling<Integer> maxNum = group.maxNum;
+            Ceiling<Double> maxValue = group.maxValue;
+            boolean subtreeShouldBeConstrained = false;
+            boolean subtreeShouldBeUnConstrained = false;
+
+            if (maxNum != Ceiling.ANY) {
+                int maxN = ((AtMost<Integer>)maxNum).getValue();
+                boolean alreadyConstrained = root.getNumFailed() >= maxN;
+                if (alreadyConstrained && root.getNumFailed() + deltaFailed < maxN) {
+                    // this subtree must be un-constrained due to a new change in number
+                    subtreeShouldBeUnConstrained = true;
+                } else if (root.getNumFailed() + deltaFailed >= maxN) {
+                    // this subtree must be constrained due to a new change in number
+                    subtreeShouldBeConstrained = true;
+                }
+            }
+
+            if (maxValue != Ceiling.ANY) {
+                double maxV = ((AtMost<Double>)maxValue).getValue();
+                boolean alreadyConstrained = root.getPointsTaken() >= maxV;
+                if (alreadyConstrained && root.getPointsTaken() + deltaPoints < maxV) {
+                    // this subtree must be un-constrained due to a new change in points
+                    subtreeShouldBeUnConstrained |= true;
+                } else if (root.getPointsTaken() + deltaPoints >= maxV) {
+                    // this subtree must be constrained due to a new change in points
+                    subtreeShouldBeConstrained |= true;
+                }
+            }
+
+            root.updateNumFailed(deltaFailed);
+            root.updatedPointsTaken(deltaPoints);
+
+            if (subtreeShouldBeConstrained) {
+                constrainTree(root);
+                break;
+            } else if (subtreeShouldBeUnConstrained) {
+                unconstrainTree(root);
+
+                Enumeration<DefaultMutableTreeNode> children = root.children();
+                while (children.hasMoreElements()) {
+                    DefaultMutableTreeNode child = children.nextElement();
+                    if (child instanceof TestGroupWrapperNode && !parents.contains(child))
+                        needsCheck.add((TestGroupWrapperNode)child);
+                }
+            }
+        }
+
+        /*
+         * We now must check trees that have just become un-constrained due to a change.
+         * These trees' leaves were marked un-constrained because an ancestor in the
+         * tree became un-constrained. However, an old constraint on these roots may
+         * still be in effect. If they are, we will re-constrain the leaves of these
+         * trees.
+         */
+        while (true) {
+            List<TestGroupWrapperNode> checkAfter = new LinkedList<>();
+
+            for (TestGroupWrapperNode root : needsCheck) {
+                TestGroup group = (TestGroup)root.getUserObject();
+                Ceiling<Integer> maxNum = group.maxNum;
+                Ceiling<Double> maxValue = group.maxValue;
+                boolean needsReConstraining = false;
+
+                if (maxNum != Ceiling.ANY) {
+                    int maxN = ((AtMost<Integer>)maxNum).getValue();
+                    if (root.getNumFailed() >= maxN) {
+                        needsReConstraining = true;
+                    }
+                }
+
+                if (maxValue != Ceiling.ANY) {
+                    double maxV = ((AtMost<Double>)maxValue).getValue();
+                    if (root.getPointsTaken() >= maxV) {
+                        needsReConstraining = true;
+                    }
+                }
+
+                if (needsReConstraining) {
+                    constrainTree(root);
+                } else {
+                    Enumeration<DefaultMutableTreeNode> children = root.children();
+                    while (children.hasMoreElements()) {
+                        DefaultMutableTreeNode child = children.nextElement();
+                        if (child instanceof TestGroupWrapperNode)
+                            checkAfter.add((TestGroupWrapperNode)child);
+                    }
+                }
+            }
+
+            if (checkAfter.isEmpty())
+                break;
+            else
+                needsCheck = checkAfter;
         }
     }
 
@@ -58,5 +175,27 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
         return ((oldResult == TestResult.PASSED || oldResult == TestResult.NONE) &&
                 newResult == TestResult.FAILED) || (oldResult == TestResult.FAILED &&
                 (newResult == TestResult.PASSED || newResult == TestResult.NONE));
+    }
+
+    private static void constrainTree(TestGroupWrapperNode root) {
+        Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        while (dfs.hasMoreElements()) {
+            DefaultMutableTreeNode dfsNode = dfs.nextElement();
+            if (dfsNode instanceof TestGroupWrapperNode) continue;
+
+            TestWrapperNode testNode = (TestWrapperNode)dfsNode;
+            testNode.setConstrained(true);
+        }
+    }
+
+    private static void unconstrainTree(TestGroupWrapperNode root) {
+        Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        while (dfs.hasMoreElements()) {
+            DefaultMutableTreeNode dfsNode = dfs.nextElement();
+            if (dfsNode instanceof TestGroupWrapperNode) continue;
+
+            TestWrapperNode testNode = (TestWrapperNode)dfsNode;
+            testNode.setConstrained(false);
+        }
     }
 }
