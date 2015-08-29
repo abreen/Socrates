@@ -80,9 +80,16 @@ public class MainController {
                     Test test = (Test)node.getUserObject();
 
                     if (test instanceof Automatable) {
-                        if (node.getAutomationStage() == AutomationStage.STARTED) return;
-                        if (node.getAutomationStage() == AutomationStage
-                                .FINISHED_NORMAL && userWantsToOverride()) {
+                        AutomationStage stage = node.getAutomationStage();
+                        switch (stage) {
+                        case STARTED:
+                            // cannot change result while test is running
+                            return;
+                        case FINISHED_NORMAL:
+                            if (userWantsToOverride())
+                                mainView.testTree.passTest();
+                            return;
+                        case FINISHED_ERROR:
                             mainView.testTree.passTest();
                         }
                     } else {
@@ -102,9 +109,16 @@ public class MainController {
                     Test test = (Test)node.getUserObject();
 
                     if (test instanceof Automatable) {
-                        if (node.getAutomationStage() == AutomationStage.STARTED) return;
-                        if (node.getAutomationStage() == AutomationStage
-                                .FINISHED_NORMAL && userWantsToOverride()) {
+                        AutomationStage stage = node.getAutomationStage();
+                        switch (stage) {
+                        case STARTED:
+                            // cannot change result while test is running
+                            return;
+                        case FINISHED_NORMAL:
+                            if (userWantsToOverride())
+                                mainView.testTree.failTest();
+                            return;
+                        case FINISHED_ERROR:
                             mainView.testTree.failTest();
                         }
                     } else {
