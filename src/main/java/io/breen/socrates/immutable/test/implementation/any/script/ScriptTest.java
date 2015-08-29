@@ -37,6 +37,11 @@ public class ScriptTest extends Test implements Automatable {
                 ")";
     }
 
+    @Override
+    public String getTestTypeName() {
+        return "script-based test";
+    }
+
     /**
      * @throws CannotBeAutomatedException
      * @throws ScriptTestRuntimeException

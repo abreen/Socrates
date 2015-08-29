@@ -32,4 +32,10 @@ public abstract class Test {
     public String toString() {
         return "Test(deduction=" + deduction + ")";
     }
+
+    /**
+     * Returns the human-readable, user-friendly string representing the type of the
+     * test. This is used by the GUI.
+     */
+    public abstract String getTestTypeName();
 }

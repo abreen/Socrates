@@ -12,4 +12,9 @@ public class ReviewTest extends Test {
     public String toString() {
         return "PythonFile:ReviewTest(deduction=" + deduction + ", description=" + description + ")";
     }
+
+    @Override
+    public String getTestTypeName() {
+        return "review test";
+    }
 }

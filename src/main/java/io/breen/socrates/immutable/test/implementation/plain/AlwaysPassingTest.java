@@ -21,4 +21,9 @@ public class AlwaysPassingTest extends Test implements Automatable<PlainFile> {
     public String toString() {
         return "PlainFile:AlwaysPassing" + super.toString();
     }
+
+    @Override
+    public String getTestTypeName() {
+        return "always passing";
+    }
 }

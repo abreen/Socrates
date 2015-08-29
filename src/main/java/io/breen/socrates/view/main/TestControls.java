@@ -145,7 +145,7 @@ public class TestControls implements Observer<TestResult> {
 
         properties.set(
                 TestProperty.TEST_TYPE.index,
-                test.getClass().getSimpleName()
+                test.getTestTypeName()
         );
 
         properties.set(

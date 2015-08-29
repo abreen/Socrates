@@ -43,4 +43,9 @@ public class LateSubmissionTest extends Test implements Automatable {
     public String toString() {
         return "LateSubmissionTest(deduction=" + deduction + ", cutoff=" + cutoff + ")";
     }
+
+    @Override
+    public String getTestTypeName() {
+        return "late submission check";
+    }
 }
