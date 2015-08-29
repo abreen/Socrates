@@ -58,8 +58,8 @@ public class TestTree {
         tree.setSelectionModel(
                 new PredicateTreeSelectionModel(
                         path -> {
-                            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                                    path.getLastPathComponent();
+                            DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                                    .getLastPathComponent();
                             return node.getUserObject() instanceof Test;
                         }
                 )
@@ -70,8 +70,7 @@ public class TestTree {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         int row = tree.getRowForLocation(e.getX(), e.getY());
-                        if (row == -1)
-                            tree.clearSelection();
+                        if (row == -1) tree.clearSelection();
                     }
 
                     @Override
@@ -125,10 +124,8 @@ public class TestTree {
                             }
 
                             if (!selected) {
-                                if (testNode.isConstrained())
-                                    setForeground(Color.GRAY);
-                                else
-                                    setForeground(Color.BLACK);
+                                if (testNode.isConstrained()) setForeground(Color.GRAY);
+                                else setForeground(Color.BLACK);
                             }
 
                         } else {
@@ -153,9 +150,9 @@ public class TestTree {
     }
 
     /**
-     * Replace the TestTree's model with the specified FileReport. This causes the
-     * JTree's contents to be replaced by the state of the specified FileReport. All
-     * future method calls on this TestTree will affect the specified FileReport.
+     * Replace the TestTree's model with the specified FileReport. This causes the JTree's
+     * contents to be replaced by the state of the specified FileReport. All future method
+     * calls on this TestTree will affect the specified FileReport.
      */
     public void update(FileReport report) {
         if (report == null) {
@@ -165,7 +162,8 @@ public class TestTree {
             DefaultTreeModel treeModel = report.treeModel;
             updater = new ConstraintUpdater(treeModel);
 
-            Enumeration<DefaultMutableTreeNode> dfs = getRoot(treeModel).depthFirstEnumeration();
+            Enumeration<DefaultMutableTreeNode> dfs = getRoot(treeModel)
+                    .depthFirstEnumeration();
             while (dfs.hasMoreElements()) {
                 DefaultMutableTreeNode node = dfs.nextElement();
                 if (node instanceof TestWrapperNode)
@@ -173,6 +171,7 @@ public class TestTree {
             }
 
             tree.setModel(treeModel);
+            expandFirstTest();
         }
     }
 
@@ -203,8 +202,7 @@ public class TestTree {
     }
 
     public TestWrapperNode getSelectedTestWrapperNode() {
-        if (!hasSelection())
-            return null;
+        if (!hasSelection()) return null;
 
         return (TestWrapperNode)tree.getLastSelectedPathComponent();
     }
@@ -286,8 +284,8 @@ public class TestTree {
     }
 
     /**
-     * Sets the test tree's current selection to the next test for this file. If the
-     * last test for this file is selected, this method does nothing. If no test is
+     * Sets the test tree's current selection to the next test for this file. If the last
+     * test for this file is selected, this method clears the selection. If no test is
      * selected, this method selects the first test.
      */
     public void goToNextTest() {
@@ -296,33 +294,22 @@ public class TestTree {
             return;
         }
 
-        if (lastTestForFileSelected())
-            return;
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree
+                .getLastSelectedPathComponent();
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-        DefaultMutableTreeNode nextSibling = node.getNextSibling();
+        DefaultMutableTreeNode next = node.getNextLeaf();
 
-        if (nextSibling != null) {
-            if (nextSibling instanceof TestWrapperNode) {
-                tree.setSelectionPath(new TreePath(nextSibling.getPath()));
-            } else {
-                tree.setSelectionPath(new TreePath(nextSibling.getFirstLeaf().getPath()));
-            }
-            return;
+        while (next != null &&
+                (!(next instanceof TestWrapperNode) ||
+                        ((TestWrapperNode)next).isConstrained())) {
+            next = next.getNextLeaf();
         }
 
-        // current selection is last test in this group
-        DefaultMutableTreeNode parent = (DefaultMutableTreeNode)node.getParent();
-
-        while (parent.getLastChild() == node) {
-            node = parent;
-            parent = (DefaultMutableTreeNode)parent.getParent();
-
-            if (parent == null) return;
+        if (next != null) {
+            tree.setSelectionPath(new TreePath(next.getPath()));
+        } else {
+            tree.clearSelection();
         }
-
-        DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode)parent.getChildAfter(node);
-        tree.setSelectionPath(new TreePath(newRoot.getFirstLeaf().getPath()));
     }
 
     /**
@@ -331,35 +318,29 @@ public class TestTree {
      * selected, this method does nothing.
      */
     public void goToPreviousTest() {
-        if (!hasSelection() || firstTestForFileSelected())
-            return;
+        if (!hasSelection() || firstTestForFileSelected()) return;
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-        DefaultMutableTreeNode previousSibling = node.getPreviousSibling();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree
+                .getLastSelectedPathComponent();
 
-        if (previousSibling != null) {
-            if (previousSibling instanceof TestWrapperNode) {
-                tree.setSelectionPath(new TreePath(previousSibling.getPath()));
-            } else {
-                tree.setSelectionPath(new TreePath(previousSibling.getLastLeaf().getPath()));
-            }
-            return;
+        DefaultMutableTreeNode prev = node.getPreviousLeaf();
+
+        while (prev != null &&
+                (!(prev instanceof TestWrapperNode) ||
+                        ((TestWrapperNode)prev).isConstrained())) {
+            prev = prev.getPreviousLeaf();
         }
 
-        // current selection is first test in this group
-        DefaultMutableTreeNode parent = (DefaultMutableTreeNode)node.getParent();
-
-        while (parent.getFirstChild() == node) {
-            node = parent;
-            parent = (DefaultMutableTreeNode)parent.getParent();
-
-            if (parent == null) return;
+        if (prev != null) {
+            tree.setSelectionPath(new TreePath(prev.getPath()));
+        } else {
+            tree.clearSelection();
         }
+    }
 
-        DefaultMutableTreeNode newRoot = (DefaultMutableTreeNode)parent.getChildBefore(
-                node
-        );
-        tree.setSelectionPath(new TreePath(newRoot.getLastLeaf().getPath()));
+    public void expandFirstTest() {
+        DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode)getRoot().getFirstChild();
+        tree.expandPath(new TreePath(firstChild.getPath()));
     }
 
     private DefaultMutableTreeNode getRoot() {

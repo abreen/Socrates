@@ -128,32 +128,9 @@ public class SubmissionTree {
         }
     }
 
-    public void setActiveSubmittedFile(SubmittedFile submittedFile) {
-        Enumeration ungraded = ungradedRoot.depthFirstEnumeration();
-        while (ungraded.hasMoreElements()) {
-            Object node = ungraded.nextElement();
-            if (node instanceof DefaultMutableTreeNode) {
-                DefaultMutableTreeNode mutableTreeNode = (DefaultMutableTreeNode)node;
-                if (mutableTreeNode.getUserObject() == submittedFile) {
-                    tree.setSelectionPath(new TreePath(mutableTreeNode.getPath()));
-                    break;
-                }
-            }
-        }
-    }
-
-    public void expandSubmission(Submission submission) {
-        Enumeration ungraded = ungradedRoot.breadthFirstEnumeration();
-        while (ungraded.hasMoreElements()) {
-            Object node = ungraded.nextElement();
-            if (node instanceof DefaultMutableTreeNode) {
-                DefaultMutableTreeNode mutableTreeNode = (DefaultMutableTreeNode)node;
-                if (mutableTreeNode.getUserObject() == submission) {
-                    tree.expandPath(new TreePath(mutableTreeNode.getPath()));
-                    break;
-                }
-            }
-        }
+    public void expandFirstSubmission() {
+        DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode)ungradedRoot.getFirstChild();
+        tree.expandPath(new TreePath(firstChild.getPath()));
     }
 
     public boolean hasSelection() {

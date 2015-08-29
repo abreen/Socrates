@@ -146,13 +146,12 @@ public class MainController {
                         clearNotes.setEnabled(false);
                         focusOnNotes.setEnabled(false);
                     } else {
-                        if (mainView.testTree.lastTestForFileSelected())
-                            nextTest.setEnabled(false);
-                        else nextTest.setEnabled(true);
+                        nextTest.setEnabled(true);
 
                         if (mainView.testTree.firstTestForFileSelected())
                             previousTest.setEnabled(false);
-                        else previousTest.setEnabled(true);
+                        else
+                            previousTest.setEnabled(true);
 
                         clearNotes.setEnabled(true);
                         focusOnNotes.setEnabled(true);
@@ -320,7 +319,7 @@ public class MainController {
         mainView.setTitle("Socrates — " + criteria.assignmentName);
 
         mainView.submissionTree.addUngraded(submissions);
-        mainView.submissionTree.expandSubmission(submissions.get(0));
+        mainView.submissionTree.expandFirstSubmission();
 
         mainView.setVisible(true);
 
