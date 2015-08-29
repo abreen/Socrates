@@ -211,6 +211,7 @@ public class TestControls implements Observer<TestWrapperNode> {
         icon.setIcon(resultIcon);
     }
 
+    @Override
     public void objectChanged(TestWrapperNode object) {
         changeIcon(object.getResult());
     }

@@ -56,10 +56,12 @@ public class TestWrapperNode extends DefaultMutableTreeNode
         observers.forEach(o -> o.objectChanged(this));
     }
 
+    @Override
     public void addObserver(Observer<TestWrapperNode> observer) {
         observers.add(observer);
     }
 
+    @Override
     public void removeObserver(Observer<TestWrapperNode> observer) {
         observers.remove(observer);
     }
