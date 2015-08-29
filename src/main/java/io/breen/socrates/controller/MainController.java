@@ -49,6 +49,98 @@ public class MainController {
         int alt = InputEvent.ALT_DOWN_MASK;
 
         /*
+         * Set up theme-related options.
+         */
+        newMenuItemAction(
+                menuBar.defaultTheme,
+                e -> mainView.fileView.changeTheme(FileView.ThemeType.DEFAULT)
+        );
+
+        newMenuItemAction(
+                menuBar.base16Light,
+                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_LIGHT)
+        );
+
+        newMenuItemAction(
+                menuBar.base16Dark,
+                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_DARK)
+        );
+
+        /*
+         * Set up test-related actions.
+         */
+        Action passTest = newMenuItemAction(
+                menuBar.passTest, e -> mainView.testTree.passTest()
+        );
+        passTest.setEnabled(false);
+        passTest.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, ctrl)
+        );
+        mainView.testControls.setPassTestAction(passTest);
+
+        Action failTest = newMenuItemAction(
+                menuBar.failTest, e -> mainView.testTree.failTest()
+        );
+        failTest.setEnabled(false);
+        failTest.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ctrl)
+        );
+        mainView.testControls.setFailTestAction(failTest);
+
+        Action resetTest = newMenuItemAction(
+                menuBar.resetTest, e -> mainView.testTree.resetTest()
+        );
+        resetTest.setEnabled(false);
+
+        /*
+         * Set up test navigation options.
+         */
+        Action nextTest = newMenuItemAction(
+                menuBar.nextTest, e -> mainView.testTree.goToNextTest()
+        );
+        nextTest.setEnabled(false);
+        nextTest.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl)
+        );
+
+        Action previousTest = newMenuItemAction(
+                menuBar.previousTest, e -> mainView.testTree.goToPreviousTest()
+        );
+        previousTest.setEnabled(false);
+        previousTest.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl)
+        );
+
+        /*
+         * TreeSelectionListener for updating the disabled state of the test state
+         * and navigation options.
+         */
+        mainView.testTree.addTreeSelectionListener(
+                e -> {
+                    if (!mainView.testTree.hasSelection()) {
+                        passTest.setEnabled(false);
+                        failTest.setEnabled(false);
+                        resetTest.setEnabled(false);
+
+                        nextTest.setEnabled(true);
+                        previousTest.setEnabled(false);
+                    } else {
+                        passTest.setEnabled(true);
+                        failTest.setEnabled(true);
+                        resetTest.setEnabled(true);
+
+                        if (mainView.testTree.lastTestForFileSelected())
+                            nextTest.setEnabled(false);
+                        else nextTest.setEnabled(true);
+
+                        if (mainView.testTree.firstTestForFileSelected())
+                            previousTest.setEnabled(false);
+                        else previousTest.setEnabled(true);
+                    }
+                }
+        );
+
+        /*
          * Set up submission-related actions.
          */
         Action nextSubmission = newMenuItemAction(
@@ -122,11 +214,31 @@ public class MainController {
         openFile.setEnabled(false);
 
         /*
-         * TreeSelectionListener for updating the disabled state of the submission
-         * and file navigation actions.
+         * Set up event listeners.
          */
         mainView.submissionTree.addTreeSelectionListener(
-                e -> {
+                event -> {
+                    FileReport report = null;
+                    File matchingFile = null;
+                    SubmittedFile submitted = mainView.submissionTree
+                            .getSelectedSubmittedFile();
+
+                    if (submitted != null) {
+                        report = reports.get(submitted);
+                        matchingFile = report == null ? null : report.matchingFile;
+                        try {
+                            mainView.fileView.update(submitted, matchingFile);
+                            mainView.fileInfo.update(submitted, matchingFile);
+                            mainView.testTree.update(report);
+                            mainView.testControls.update(null);
+                        } catch (IOException x) {
+                            logger.warning("encountered I/O exception updating view");
+                        }
+                    }
+
+                    /*
+                     * Update enabled state of actions.
+                     */
                     if (!mainView.submissionTree.hasSelection()) {
                         revealSubmission.setEnabled(false);
                         openFile.setEnabled(false);
@@ -134,6 +246,13 @@ public class MainController {
                         nextSubmission.setEnabled(true);
                         nextFile.setEnabled(true);
                         previousSubmission.setEnabled(false);
+
+                        passTest.setEnabled(false);
+                        failTest.setEnabled(false);
+                        resetTest.setEnabled(false);
+
+                        nextTest.setEnabled(false);
+                        previousTest.setEnabled(false);
                     } else {
                         revealSubmission.setEnabled(true);
                         openFile.setEnabled(true);
@@ -153,93 +272,13 @@ public class MainController {
                         if (mainView.submissionTree.firstFileInSubmissionSelected())
                             previousFile.setEnabled(false);
                         else previousFile.setEnabled(true);
-                    }
-                }
-        );
 
-        /*
-         * Set up theme-related options.
-         */
-        newMenuItemAction(
-                menuBar.defaultTheme,
-                e -> mainView.fileView.changeTheme(FileView.ThemeType.DEFAULT)
-        );
-
-        newMenuItemAction(
-                menuBar.base16Light,
-                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_LIGHT)
-        );
-
-        newMenuItemAction(
-                menuBar.base16Dark,
-                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_DARK)
-        );
-
-        /*
-         * Set up test-related actions.
-         */
-        Action passTest = newMenuItemAction(
-                menuBar.passTest, e -> mainView.testTree.passTest()
-        );
-        passTest.setEnabled(false);
-        passTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, ctrl)
-        );
-        mainView.testControls.setPassTestAction(passTest);
-
-        Action failTest = newMenuItemAction(
-                menuBar.failTest, e -> mainView.testTree.failTest()
-        );
-        failTest.setEnabled(false);
-        failTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ctrl)
-        );
-        mainView.testControls.setFailTestAction(failTest);
-
-        Action resetTest = newMenuItemAction(
-                menuBar.resetTest, e -> mainView.testTree.resetTest()
-        );
-        resetTest.setEnabled(false);
-
-        mainView.testTree.addTreeSelectionListener(
-                e -> {
-                    if (mainView.testTree.hasSelection()) {
-                        passTest.setEnabled(true);
-                        failTest.setEnabled(true);
-                        resetTest.setEnabled(true);
-                    } else {
-                        passTest.setEnabled(false);
-                        failTest.setEnabled(false);
-                        resetTest.setEnabled(false);
-                    }
-                }
-        );
-
-        /*
-         * Set up test navigation options.
-         */
-        //        Action nextTest = newMenuItemAction(
-        //                menuBar.nextTest,
-        //                e -> mainView.testTree.goToNextTest()
-        //        );
-
-        /*
-         * Set up event listeners.
-         */
-        mainView.submissionTree.addTreeSelectionListener(
-                event -> {
-                    SubmittedFile submitted = mainView.submissionTree
-                            .getSelectedSubmittedFile();
-                    if (submitted != null) {
-                        FileReport report = reports.get(submitted);
-                        File matchingFile = report != null ? report.matchingFile : null;
-                        try {
-                            mainView.fileView.update(submitted, matchingFile);
-                            mainView.fileInfo.update(submitted, matchingFile);
-
-                            if (report != null) mainView.testTree.update(report);
-                        } catch (IOException x) {
-                            logger.warning("encountered I/O exception updating view");
+                        if (matchingFile != null) {
+                            int n = matchingFile.testRoot.members.size();
+                            if (n > 0)
+                                nextTest.setEnabled(true);
+                        } else {
+                            nextTest.setEnabled(false);
                         }
                     }
                 }
@@ -264,7 +303,7 @@ public class MainController {
             for (SubmittedFile submitted : submission.files) {
                 File matchingFile = criteria.files.get(submitted.localPath);
                 if (matchingFile == null) continue;
-                
+
                 reports.put(submitted, new FileReport(submitted, matchingFile));
             }
         }
@@ -279,8 +318,7 @@ public class MainController {
         logger.info("started MainView");
     }
 
-    private static Action newMenuItemAction(JMenuItem item,
-                                            Consumer<ActionEvent> lambda)
+    private static Action newMenuItemAction(JMenuItem item, Consumer<ActionEvent> lambda)
     {
         Action a = new AbstractAction(item.getText()) {
             @Override

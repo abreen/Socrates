@@ -14,6 +14,8 @@ import java.text.DecimalFormat;
 
 public class TestControls {
 
+    private static final String NO_TEST_SELECTED_DESC = "(no test selected)";
+
     private enum TestProperty {
         TEST_TYPE(0, "Test type", "—"),
         DEDUCTION(1, "Deduction", "—"),
@@ -58,6 +60,10 @@ public class TestControls {
 
     private TestWrapperNode currentNode;
 
+    public TestControls() {
+        description.setText(NO_TEST_SELECTED_DESC);
+    }
+
     private void createUIComponents() {
         rootPanel = new JPanel();
 
@@ -88,6 +94,13 @@ public class TestControls {
     }
 
     public void update(TestWrapperNode testNode) {
+        if (testNode == null) {
+            currentNode = null;
+            description.setText(NO_TEST_SELECTED_DESC);
+            properties.resetAll();
+            return;
+        }
+
         Test test = (Test)testNode.getUserObject();
         DecimalFormat fmt = new DecimalFormat("#.#");
 

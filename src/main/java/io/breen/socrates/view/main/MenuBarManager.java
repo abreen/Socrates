@@ -33,9 +33,9 @@ public class MenuBarManager {
     public final JMenuItem passTest;
     public final JMenuItem failTest;
     public final JMenuItem resetTest;
-    public final JMenuItem nextTest;            // TODO
+    public final JMenuItem nextTest;
     public final JMenuItem nextTestInGroup;     // TODO
-    public final JMenuItem previousTest;        // TODO
+    public final JMenuItem previousTest;
     public final JMenuItem previousTestInGroup; // TODO
     public final JMenuItem clearNotes;          // TODO
     public final JMenuItem focusOnNotes;        // TODO
