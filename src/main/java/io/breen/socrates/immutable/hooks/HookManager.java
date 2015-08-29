@@ -80,35 +80,38 @@ public final class HookManager {
         if (tasksForHook.isEmpty()) return;
 
         logger.info("running hook " + hook);
-        tasksForHook.forEach(HookManager::run);
+        tasksForHook.forEach(h -> run(h, null));
     }
 
-    public static void runHookForFile(FileHook hook, File file) {
+    public static void runHookForFile(FileHook hook, File file, Path directory) {
         Map<File, List<Resource>> mapForHook = fileTasks.get(hook);
 
         if (!mapForHook.containsKey(file)) return;
 
         List<Resource> tasksForFile = mapForHook.get(file);
         logger.info("running hook " + hook + " for file " + file);
-        tasksForFile.forEach(HookManager::run);
+        tasksForFile.forEach(h -> run(h, directory));
     }
 
-    public static void runHookForTest(TestHook hook, Test test) {
+    public static void runHookForTest(TestHook hook, Test test, Path directory) {
         Map<Test, List<Resource>> mapForHook = testTasks.get(hook);
 
         if (!mapForHook.containsKey(test)) return;
 
         List<Resource> tasksForTest = mapForHook.get(test);
         logger.info("running hook " + hook + " for test " + test);
-        tasksForTest.forEach(HookManager::run);
+        tasksForTest.forEach(h -> run(h, directory));
     }
 
-    private static void run(Resource script) {
+    private static void run(Resource script, Path workingDir) {
         logger.info("running script: " + script);
 
         try {
             Path path = script.getPath();
             PythonProcessBuilder builder = new PythonProcessBuilder(path);
+            if (workingDir != null)
+                builder.setDirectory(workingDir);
+
             Process process = builder.start();
             int exitCode = process.waitFor();
             if (exitCode != Globals.NORMAL_EXIT_CODE)
