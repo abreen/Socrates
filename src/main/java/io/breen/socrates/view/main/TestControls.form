@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="io.breen.socrates.view.main.TestControls">
   <grid id="27dc6" binding="rootPanel" custom-create="true" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="500" height="443"/>
+      <xy x="20" y="20" width="570" height="443"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -67,18 +67,35 @@
               </component>
             </children>
           </grid>
-          <component id="29abc" class="javax.swing.JTextArea" binding="description">
+          <grid id="ea63b" layout-manager="BorderLayout" hgap="10" vgap="0">
             <constraints border-constraint="North"/>
             <properties>
-              <editable value="false"/>
-              <font size="14"/>
-              <lineWrap value="true"/>
               <opaque value="false"/>
-              <rows value="3"/>
-              <text value="(no test selected)"/>
-              <wrapStyleWord value="true"/>
             </properties>
-          </component>
+            <border type="none"/>
+            <children>
+              <component id="29abc" class="javax.swing.JTextArea" binding="description">
+                <constraints border-constraint="Center"/>
+                <properties>
+                  <editable value="false"/>
+                  <font size="14"/>
+                  <lineWrap value="true"/>
+                  <opaque value="false"/>
+                  <rows value="3"/>
+                  <text value="(no test selected)"/>
+                  <wrapStyleWord value="true"/>
+                </properties>
+              </component>
+              <component id="150fb" class="javax.swing.JLabel" binding="icon" custom-create="true">
+                <constraints border-constraint="West"/>
+                <properties>
+                  <iconTextGap value="0"/>
+                  <text value=""/>
+                  <verticalAlignment value="1"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
         </children>
       </grid>
     </children>

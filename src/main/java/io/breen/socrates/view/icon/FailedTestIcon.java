@@ -1,12 +1,14 @@
 package io.breen.socrates.view.icon;
 
-import javax.swing.*;
 import java.awt.*;
 
-public class FailedTestIcon implements Icon {
+public class FailedTestIcon extends TestIcon {
 
-    private final int width = 16;
-    private final int height = 16;
+    public FailedTestIcon() {}
+
+    public FailedTestIcon(int width, int height) {
+        super(width, height);
+    }
 
     public void paintIcon(Component c, Graphics g, int x, int y) {
         Graphics2D g2d = (Graphics2D)g.create();
@@ -14,7 +16,8 @@ public class FailedTestIcon implements Icon {
                 RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
         );
 
-        BasicStroke stroke = new BasicStroke(3);
+        int strokeWidth = width / 4 - 1;
+        BasicStroke stroke = new BasicStroke(strokeWidth);
 
         g2d.setColor(new Color(189, 12, 13));
         g2d.setStroke(stroke);
@@ -23,13 +26,5 @@ public class FailedTestIcon implements Icon {
         g2d.drawLine(x + 4, y + height - 4, x + width - 4, y + 4);
 
         g2d.dispose();
-    }
-
-    public int getIconWidth() {
-        return width;
-    }
-
-    public int getIconHeight() {
-        return height;
     }
 }

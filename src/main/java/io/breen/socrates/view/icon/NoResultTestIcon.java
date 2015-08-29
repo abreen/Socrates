@@ -2,11 +2,11 @@ package io.breen.socrates.view.icon;
 
 import java.awt.*;
 
-public class DefaultTestIcon extends TestIcon {
+public class NoResultTestIcon extends TestIcon {
 
-    public DefaultTestIcon() {}
+    public NoResultTestIcon() {}
 
-    public DefaultTestIcon(int width, int height) {
+    public NoResultTestIcon(int width, int height) {
         super(width, height);
     }
 
@@ -18,7 +18,7 @@ public class DefaultTestIcon extends TestIcon {
 
         BasicStroke stroke = new BasicStroke();
 
-        g2d.setColor(new Color(186, 186, 186));
+        g2d.setColor(new Color(140, 140, 140));
         g2d.setStroke(stroke);
         g2d.fillOval(x + 4, y + 4, width - 6, height - 6);
 

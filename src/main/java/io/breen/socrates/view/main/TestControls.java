@@ -4,6 +4,10 @@ import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.test.Automatable;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.model.TestWrapperNode;
+import io.breen.socrates.view.icon.DefaultTestIcon;
+import io.breen.socrates.view.icon.FailedTestIcon;
+import io.breen.socrates.view.icon.NoResultTestIcon;
+import io.breen.socrates.view.icon.PassedTestIcon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -15,6 +19,15 @@ import java.text.DecimalFormat;
 public class TestControls {
 
     private static final String NO_TEST_SELECTED_DESC = "(no test selected)";
+
+    private static final Icon ICON_NORESULT = new NoResultTestIcon();
+    private static final Icon ICON_PASSED = new PassedTestIcon();
+    private static final Icon ICON_FAILED = new FailedTestIcon();
+
+    private static final Icon LARGE_ICON_DEFAULT = new DefaultTestIcon(24, 24);
+    private static final Icon LARGE_ICON_NORESULT = new NoResultTestIcon(24, 24);
+    private static final Icon LARGE_ICON_PASSED = new PassedTestIcon(24, 24);
+    private static final Icon LARGE_ICON_FAILED = new FailedTestIcon(24, 24);
 
     private enum TestProperty {
         TEST_TYPE(0, "Test type", "—"),
@@ -57,6 +70,7 @@ public class TestControls {
     private PropertiesList properties;
     private JTextArea description;
     private JScrollPane notesScrollPane;
+    private JLabel icon;
 
     private TestWrapperNode currentNode;
 
@@ -73,6 +87,8 @@ public class TestControls {
         if (Globals.operatingSystem == Globals.OS.OSX) {
             rootPanel.setBorder(UIManager.getBorder("InsetBorder.aquaVariant"));
         }
+
+        icon = new JLabel(LARGE_ICON_DEFAULT);
 
         /*
          * Set up the notes text area and scroll pane. If we are running on OS X, we
@@ -97,6 +113,7 @@ public class TestControls {
         if (testNode == null) {
             currentNode = null;
             description.setText(NO_TEST_SELECTED_DESC);
+            icon.setIcon(LARGE_ICON_DEFAULT);
             properties.resetAll();
             return;
         }
@@ -105,6 +122,22 @@ public class TestControls {
         DecimalFormat fmt = new DecimalFormat("#.#");
 
         description.setText(test.description);
+
+        Icon resultIcon;
+        switch (testNode.getResult()) {
+        case NONE:
+            resultIcon = LARGE_ICON_NORESULT;
+            break;
+        case PASSED:
+            resultIcon = LARGE_ICON_PASSED;
+            break;
+        case FAILED:
+            resultIcon = LARGE_ICON_FAILED;
+            break;
+        default:
+            resultIcon = LARGE_ICON_DEFAULT;
+        }
+        icon.setIcon(resultIcon);
 
         properties.set(
                 TestProperty.TEST_TYPE.index,
