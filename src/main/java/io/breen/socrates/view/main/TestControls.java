@@ -73,6 +73,7 @@ public class TestControls implements Observer<TestResult> {
     private JTextArea description;
     private JScrollPane notesScrollPane;
     private JLabel icon;
+    private JButton resetButton;
 
     private TestWrapperNode currentNode;
 
@@ -152,12 +153,34 @@ public class TestControls implements Observer<TestResult> {
         currentNode = testNode;
     }
 
+    /**
+     * Sets the Action for the "Pass" button. The button's text will not be changed
+     * to the Action's text --- the old text will be retained.
+     */
     public void setPassTestAction(Action a) {
+        String textBefore = passButton.getText();
         passButton.setAction(a);
+        passButton.setText(textBefore);
     }
 
+    /**
+     * Sets the Action for the "Fail" button. The button's text will not be changed
+     * to the Action's text --- the old text will be retained.
+     */
     public void setFailTestAction(Action a) {
+        String textBefore = failButton.getText();
         failButton.setAction(a);
+        failButton.setText(textBefore);
+    }
+
+    /**
+     * Sets the Action for the "Reset" button. The button's text will not be changed
+     * to the Action's text --- the old text will be retained.
+     */
+    public void setResetTestAction(Action a) {
+        String textBefore = resetButton.getText();
+        resetButton.setAction(a);
+        resetButton.setText(textBefore);
     }
 
     private void changeIcon(TestResult result) {

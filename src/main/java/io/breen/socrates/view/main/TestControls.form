@@ -44,25 +44,31 @@
               </component>
             </children>
           </grid>
-          <grid id="8d54d" binding="buttonPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+          <grid id="8d54d" binding="buttonPanel" layout-manager="FlowLayout" hgap="0" vgap="5" flow-align="1">
             <constraints border-constraint="South"/>
             <properties>
               <opaque value="false"/>
             </properties>
             <border type="none"/>
             <children>
+              <component id="58ce3" class="javax.swing.JButton" binding="resetButton">
+                <constraints/>
+                <properties>
+                  <text value="Reset"/>
+                </properties>
+              </component>
               <component id="281a1" class="javax.swing.JButton" binding="passButton">
                 <constraints/>
                 <properties>
                   <focusable value="false"/>
-                  <text value="Pass Test"/>
+                  <text value="Pass"/>
                 </properties>
               </component>
               <component id="8b53b" class="javax.swing.JButton" binding="failButton">
                 <constraints/>
                 <properties>
                   <focusable value="false"/>
-                  <text value="Fail Test"/>
+                  <text value="Fail"/>
                 </properties>
               </component>
             </children>

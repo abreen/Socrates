@@ -91,6 +91,7 @@ public class MainController {
                 menuBar.resetTest, e -> mainView.testTree.resetTest()
         );
         resetTest.setEnabled(false);
+        mainView.testControls.setResetTestAction(resetTest);
 
         /*
          * Set up test navigation options.
