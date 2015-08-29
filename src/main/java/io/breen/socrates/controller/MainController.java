@@ -75,7 +75,16 @@ public class MainController {
          * Set up test-related actions.
          */
         Action passTest = newMenuItemAction(
-                menuBar.passTest, e -> mainView.testTree.passTest()
+                menuBar.passTest, e -> {
+                    TestWrapperNode node = mainView.testTree.getSelectedTestWrapperNode();
+                    if (node.getUserObject() instanceof Automatable) {
+                        if (userWantsToOverride()) {
+                            mainView.testTree.passTest();
+                        }
+                    } else {
+                        mainView.testTree.passTest();
+                    }
+                }
         );
         passTest.setEnabled(false);
         passTest.putValue(
@@ -84,7 +93,16 @@ public class MainController {
         mainView.testControls.setPassTestAction(passTest);
 
         Action failTest = newMenuItemAction(
-                menuBar.failTest, e -> mainView.testTree.failTest()
+                menuBar.failTest, e -> {
+                    TestWrapperNode node = mainView.testTree.getSelectedTestWrapperNode();
+                    if (node.getUserObject() instanceof Automatable) {
+                        if (userWantsToOverride()) {
+                            mainView.testTree.failTest();
+                        }
+                    } else {
+                        mainView.testTree.failTest();
+                    }
+                }
         );
         failTest.setEnabled(false);
         failTest.putValue(
@@ -403,5 +421,16 @@ public class MainController {
         };
 
         model.addTreeModelListener(listener);
+    }
+
+    private boolean userWantsToOverride() {
+        int rv = JOptionPane.showConfirmDialog(
+                mainView,
+                "This is an automated test. Are you sure you want to\n" +
+                        "override the automated test's result?",
+                "Override Automated Test?",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE
+        );
+        return rv == JOptionPane.YES_OPTION;
     }
 }

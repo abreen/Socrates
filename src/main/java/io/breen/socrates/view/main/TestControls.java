@@ -224,7 +224,7 @@ public class TestControls implements Observer<TestWrapperNode> {
             passButton.getAction().setEnabled(false);
             failButton.getAction().setEnabled(false);
         } else if (currentNode.isConstrained()) {
-            resetButton.getAction().setEnabled(false);
+            resetButton.getAction().setEnabled(true);
             if (currentNode.getResult() == TestResult.FAILED)
                 passButton.getAction().setEnabled(true);
             else
