@@ -32,9 +32,9 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
     }
 
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> eventObj) {
-        if (!(eventObj instanceof TestWrapperNode.ResultChangedEvent)) return;
+        if (!(eventObj instanceof ResultChangedEvent)) return;
 
-        TestWrapperNode.ResultChangedEvent event = (TestWrapperNode.ResultChangedEvent)
+        ResultChangedEvent event = (ResultChangedEvent)
                 eventObj;
 
         if (!mustUpdateTree(event.oldResult, event.newResult)) return;

@@ -125,17 +125,9 @@ public class MainController {
                     }
 
                     if (!mainView.testTree.hasSelection()) {
-                        passTest.setEnabled(false);
-                        failTest.setEnabled(false);
-                        resetTest.setEnabled(false);
-
                         nextTest.setEnabled(true);
                         previousTest.setEnabled(false);
                     } else {
-                        passTest.setEnabled(true);
-                        failTest.setEnabled(true);
-                        resetTest.setEnabled(true);
-
                         if (mainView.testTree.lastTestForFileSelected())
                             nextTest.setEnabled(false);
                         else nextTest.setEnabled(true);

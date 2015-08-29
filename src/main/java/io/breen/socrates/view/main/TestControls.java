@@ -3,6 +3,8 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.test.Automatable;
 import io.breen.socrates.immutable.test.Test;
+import io.breen.socrates.model.ConstraintChangedEvent;
+import io.breen.socrates.model.ResultChangedEvent;
 import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.TestWrapperNode;
 import io.breen.socrates.util.ObservableChangedEvent;
@@ -135,6 +137,8 @@ public class TestControls implements Observer<TestWrapperNode> {
             return;
         }
 
+        currentNode = testNode;
+
         testNode.addObserver(this);
 
         Test test = (Test)testNode.getUserObject();
@@ -142,7 +146,9 @@ public class TestControls implements Observer<TestWrapperNode> {
 
         description.setText(test.description);
 
-        changeIcon(testNode.getResult());
+        updateIcon(testNode.getResult());
+
+        updateConstrained(testNode.isConstrained());
 
         properties.set(
                 TestProperty.TEST_TYPE.index, test.getTestTypeName()
@@ -154,14 +160,11 @@ public class TestControls implements Observer<TestWrapperNode> {
         );
 
         properties.set(
-                TestProperty.IS_AUTOMATED.index,
-                test instanceof Automatable ? "Yes" : "No"
+                TestProperty.IS_AUTOMATED.index, test instanceof Automatable ? "Yes" : "No"
         );
 
         notes.setEnabled(true);
         notes.setDocument(testNode.notes);
-
-        currentNode = testNode;
     }
 
     /**
@@ -194,7 +197,7 @@ public class TestControls implements Observer<TestWrapperNode> {
         resetButton.setText(textBefore);
     }
 
-    private void changeIcon(TestResult result) {
+    private void updateIcon(TestResult result) {
         Icon resultIcon;
         switch (result) {
         case NONE:
@@ -212,9 +215,29 @@ public class TestControls implements Observer<TestWrapperNode> {
         icon.setIcon(resultIcon);
     }
 
+    private void updateConstrained(boolean constrained) {
+        if (constrained) {
+            resetButton.getAction().setEnabled(false);
+            if (currentNode.getResult() != TestResult.NONE)
+                passButton.getAction().setEnabled(true);
+            else
+                passButton.getAction().setEnabled(false);
+            failButton.getAction().setEnabled(false);
+        } else {
+            resetButton.getAction().setEnabled(true);
+            passButton.getAction().setEnabled(true);
+            failButton.getAction().setEnabled(true);
+        }
+    }
+
     @Override
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> event) {
-        if (event instanceof TestWrapperNode.ResultChangedEvent)
-            changeIcon(((TestWrapperNode.ResultChangedEvent)event).newResult);
+        if (event instanceof ResultChangedEvent) {
+            ResultChangedEvent e = (ResultChangedEvent)event;
+            updateIcon(e.newResult);
+        } else if (event instanceof ConstraintChangedEvent) {
+            ConstraintChangedEvent e = (ConstraintChangedEvent)event;
+            updateConstrained(e.isNowConstrained);
+        }
     }
 }

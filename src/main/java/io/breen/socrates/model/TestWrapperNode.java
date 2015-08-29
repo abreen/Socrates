@@ -2,7 +2,6 @@ package io.breen.socrates.model;
 
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.util.Observable;
-import io.breen.socrates.util.ObservableChangedEvent;
 import io.breen.socrates.util.Observer;
 
 import javax.swing.text.Document;
@@ -54,7 +53,9 @@ public class TestWrapperNode extends DefaultMutableTreeNode
     public void setConstrained(boolean constrained) {
         if (constrained == this.constrained) return;
         this.constrained = constrained;
-        observers.forEach(o -> o.objectChanged(new ConstraintChangedEvent(this)));
+        observers.forEach(
+                o -> o.objectChanged(new ConstraintChangedEvent(this, constrained))
+        );
     }
 
     @Override
@@ -65,26 +66,5 @@ public class TestWrapperNode extends DefaultMutableTreeNode
     @Override
     public void removeObserver(Observer<TestWrapperNode> observer) {
         observers.remove(observer);
-    }
-
-    public class ResultChangedEvent extends ObservableChangedEvent<TestWrapperNode> {
-
-        public final TestResult oldResult;
-        public final TestResult newResult;
-
-        public ResultChangedEvent(TestWrapperNode source, TestResult oldResult,
-                                  TestResult newResult)
-        {
-            super(source);
-            this.oldResult = oldResult;
-            this.newResult = newResult;
-        }
-    }
-
-    public class ConstraintChangedEvent extends ObservableChangedEvent<TestWrapperNode> {
-
-        public ConstraintChangedEvent(TestWrapperNode source) {
-            super(source);
-        }
     }
 }
