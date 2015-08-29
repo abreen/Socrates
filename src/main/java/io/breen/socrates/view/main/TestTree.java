@@ -9,6 +9,7 @@ import io.breen.socrates.model.ConstraintUpdater;
 import io.breen.socrates.model.FileReport;
 import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.TestWrapperNode;
+import io.breen.socrates.view.icon.TestIcon;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -111,17 +112,10 @@ public class TestTree {
 
                         if (value instanceof TestWrapperNode) {
                             TestWrapperNode testNode = (TestWrapperNode)value;
-                            switch (testNode.getResult()) {
-                            case PASSED:
-                                setIcon(TestControls.ICON_PASSED);
-                                break;
-                            case FAILED:
-                                setIcon(TestControls.ICON_FAILED);
-                                break;
-                            case NONE:
-                            default:
-                                setIcon(TestControls.ICON_NORESULT);
-                            }
+                            TestIcon i = TestControls.newIcon(testNode);
+                            i.setIconHeight(16);
+                            i.setIconWidth(16);
+                            setIcon(i);
 
                             if (!selected) {
                                 if (testNode.isConstrained()) setForeground(Color.GRAY);
@@ -341,6 +335,10 @@ public class TestTree {
     public void expandFirstTest() {
         DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode)getRoot().getFirstChild();
         tree.expandPath(new TreePath(firstChild.getPath()));
+    }
+
+    public void nodeChanged(TreeNode node) {
+        getModel().nodeChanged(node);
     }
 
     private DefaultMutableTreeNode getRoot() {

@@ -4,8 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public abstract class TestIcon implements Icon {
-    protected final int width;
-    protected final int height;
+    protected int width;
+    protected int height;
 
     public TestIcon(int width, int height) {
         this.width = width;
@@ -24,5 +24,13 @@ public abstract class TestIcon implements Icon {
 
     public int getIconHeight() {
         return height;
+    }
+
+    public void setIconWidth(int width) {
+        this.width = width;
+    }
+
+    public void setIconHeight(int height) {
+        this.height = height;
     }
 }

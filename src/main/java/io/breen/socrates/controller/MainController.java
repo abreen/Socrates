@@ -4,7 +4,12 @@ import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.immutable.test.Automatable;
+import io.breen.socrates.immutable.test.CannotBeAutomatedException;
+import io.breen.socrates.immutable.test.Test;
+import io.breen.socrates.model.AutomationStage;
 import io.breen.socrates.model.FileReport;
+import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.TestWrapperNode;
 import io.breen.socrates.view.main.FileView;
 import io.breen.socrates.view.main.MainView;
@@ -139,22 +144,59 @@ public class MainController {
 
                     mainView.testControls.update(testNode);
 
-                    if (!mainView.testTree.hasSelection()) {
+                    if (testNode == null) {
                         nextTest.setEnabled(true);
                         previousTest.setEnabled(false);
 
                         clearNotes.setEnabled(false);
                         focusOnNotes.setEnabled(false);
+                        return;
                     } else {
                         nextTest.setEnabled(true);
 
                         if (mainView.testTree.firstTestForFileSelected())
                             previousTest.setEnabled(false);
-                        else
-                            previousTest.setEnabled(true);
+                        else previousTest.setEnabled(true);
 
                         clearNotes.setEnabled(true);
                         focusOnNotes.setEnabled(true);
+                    }
+
+                    Test test = (Test)testNode.getUserObject();
+                    if (test instanceof Automatable &&
+                            testNode.getResult() == TestResult.NONE &&
+                            testNode.getAutomationStage() == AutomationStage.NONE &&
+                            !testNode.isConstrained())
+                    {
+                        SubmittedFile submitted = mainView.submissionTree
+                                .getSelectedSubmittedFile();
+                        File file = criteria.files.get(submitted.localPath);
+
+                        if (file == null) return;
+
+                        Submission submission = mainView.submissionTree
+                                .getSelectedSubmission();
+
+                        (new Thread(
+                                () -> {
+                                    Automatable a = (Automatable)test;
+                                    testNode.setAutomationStage(AutomationStage.STARTED);
+                                    try {
+                                        boolean passed = a.shouldPass(file, submitted, submission);
+
+                                        if (passed) testNode.setResult(TestResult.PASSED);
+                                        else testNode.setResult(TestResult.FAILED);
+
+                                        testNode.setAutomationStage(AutomationStage.FINISHED_NORMAL);
+
+                                    } catch (CannotBeAutomatedException x) {
+                                        testNode.setAutomationStage(AutomationStage.FINISHED_ERROR);
+
+                                    } finally {
+                                        mainView.testTree.nodeChanged(testNode);
+                                    }
+                                }
+                        )).start();
                     }
                 }
         );
@@ -265,10 +307,6 @@ public class MainController {
                         nextSubmission.setEnabled(true);
                         nextFile.setEnabled(true);
                         previousSubmission.setEnabled(false);
-
-                        passTest.setEnabled(false);
-                        failTest.setEnabled(false);
-                        resetTest.setEnabled(false);
 
                         nextTest.setEnabled(false);
                         previousTest.setEnabled(false);

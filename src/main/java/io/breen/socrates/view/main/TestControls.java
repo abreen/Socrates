@@ -3,16 +3,10 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.test.Automatable;
 import io.breen.socrates.immutable.test.Test;
-import io.breen.socrates.model.ConstraintChangedEvent;
-import io.breen.socrates.model.ResultChangedEvent;
-import io.breen.socrates.model.TestResult;
-import io.breen.socrates.model.TestWrapperNode;
+import io.breen.socrates.model.*;
 import io.breen.socrates.util.ObservableChangedEvent;
 import io.breen.socrates.util.Observer;
-import io.breen.socrates.view.icon.DefaultTestIcon;
-import io.breen.socrates.view.icon.FailedTestIcon;
-import io.breen.socrates.view.icon.NoResultTestIcon;
-import io.breen.socrates.view.icon.PassedTestIcon;
+import io.breen.socrates.view.icon.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -29,14 +23,8 @@ public class TestControls implements Observer<TestWrapperNode> {
     private static final String NO_TEST_SELECTED_DESC = "(no test selected)";
     private static final Document EMPTY_DOCUMENT = new PlainDocument();
 
-    static final Icon ICON_NORESULT = new NoResultTestIcon();
-    static final Icon ICON_PASSED = new PassedTestIcon();
-    static final Icon ICON_FAILED = new FailedTestIcon();
-
-    private static final Icon LARGE_ICON_DEFAULT = new DefaultTestIcon(24, 24);
-    private static final Icon LARGE_ICON_NORESULT = new NoResultTestIcon(24, 24);
-    private static final Icon LARGE_ICON_PASSED = new PassedTestIcon(24, 24);
-    private static final Icon LARGE_ICON_FAILED = new FailedTestIcon(24, 24);
+    private static final int ICON_WIDTH = 24;
+    private static final int ICON_HEIGHT = 24;
 
     private enum TestProperty {
         TEST_TYPE(0, "Test type", "—"),
@@ -98,7 +86,7 @@ public class TestControls implements Observer<TestWrapperNode> {
             rootPanel.setBorder(UIManager.getBorder("InsetBorder.aquaVariant"));
         }
 
-        icon = new JLabel(LARGE_ICON_DEFAULT);
+        icon = new JLabel(new DefaultTestIcon(ICON_WIDTH, ICON_HEIGHT));
 
         /*
          * Set up the notes text area and scroll pane. If we are running on OS X, we
@@ -128,7 +116,7 @@ public class TestControls implements Observer<TestWrapperNode> {
 
             description.setText(NO_TEST_SELECTED_DESC);
 
-            icon.setIcon(LARGE_ICON_DEFAULT);
+            updateIcon();
 
             properties.resetAll();
 
@@ -151,9 +139,9 @@ public class TestControls implements Observer<TestWrapperNode> {
 
         description.setText(test.description);
 
-        updateIcon(testNode.getResult());
+        updateIcon();
 
-        updateConstrained(testNode.isConstrained());
+        updateConstrained();
 
         properties.set(
                 TestProperty.TEST_TYPE.index, test.getTestTypeName()
@@ -202,26 +190,41 @@ public class TestControls implements Observer<TestWrapperNode> {
         resetButton.setText(textBefore);
     }
 
-    private void updateIcon(TestResult result) {
-        Icon resultIcon;
-        switch (result) {
+    public static TestIcon newIcon(TestWrapperNode node) {
+        if (node == null)
+            return new DefaultTestIcon();
+
+        if (node.getAutomationStage() == AutomationStage.STARTED)
+            return new RunningTestIcon();
+
+        switch (node.getResult()) {
         case NONE:
-            resultIcon = LARGE_ICON_NORESULT;
-            break;
+            if (node.getAutomationStage() == AutomationStage.FINISHED_ERROR)
+                return new ErrorTestIcon();
+            else
+                return new NoResultTestIcon();
         case PASSED:
-            resultIcon = LARGE_ICON_PASSED;
-            break;
+            return new PassedTestIcon();
         case FAILED:
-            resultIcon = LARGE_ICON_FAILED;
-            break;
+            return new FailedTestIcon();
         default:
-            resultIcon = LARGE_ICON_DEFAULT;
+            return new DefaultTestIcon();
         }
-        icon.setIcon(resultIcon);
     }
 
-    private void updateConstrained(boolean constrained) {
-        if (constrained) {
+    private void updateIcon() {
+        TestIcon i = newIcon(currentNode);
+        i.setIconHeight(24);
+        i.setIconWidth(24);
+        icon.setIcon(i);
+    }
+
+    private void updateConstrained() {
+        if (currentNode == null) {
+            resetButton.getAction().setEnabled(false);
+            passButton.getAction().setEnabled(false);
+            failButton.getAction().setEnabled(false);
+        } else if (currentNode.isConstrained()) {
             resetButton.getAction().setEnabled(false);
             if (currentNode.getResult() == TestResult.FAILED)
                 passButton.getAction().setEnabled(true);
@@ -254,11 +257,11 @@ public class TestControls implements Observer<TestWrapperNode> {
     @Override
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> event) {
         if (event instanceof ResultChangedEvent) {
-            ResultChangedEvent e = (ResultChangedEvent)event;
-            updateIcon(e.newResult);
+            updateIcon();
         } else if (event instanceof ConstraintChangedEvent) {
-            ConstraintChangedEvent e = (ConstraintChangedEvent)event;
-            updateConstrained(e.isNowConstrained);
+            updateConstrained();
+        } else if (event instanceof StageChangedEvent) {
+            updateIcon();
         }
     }
 }

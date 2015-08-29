@@ -25,6 +25,7 @@ public class TestWrapperNode extends DefaultMutableTreeNode
     protected final List<Observer<TestWrapperNode>> observers;
     protected TestResult result;
     protected boolean constrained;
+    protected AutomationStage stage;
 
     public TestWrapperNode(Test test) {
         super(test);
@@ -32,6 +33,7 @@ public class TestWrapperNode extends DefaultMutableTreeNode
         observers = new LinkedList<>();
         result = TestResult.NONE;
         constrained = false;
+        stage = AutomationStage.NONE;       // only used if the test is automatable
     }
 
     public TestResult getResult() {
@@ -56,6 +58,18 @@ public class TestWrapperNode extends DefaultMutableTreeNode
         observers.forEach(
                 o -> o.objectChanged(new ConstraintChangedEvent(this, constrained))
         );
+    }
+
+    public AutomationStage getAutomationStage() {
+        return stage;
+    }
+
+    public void setAutomationStage(AutomationStage stage) {
+        if (stage == this.stage) return;
+        AutomationStage oldStage = this.stage;
+        this.stage = stage;
+        StageChangedEvent e = new StageChangedEvent(this, oldStage, stage);
+        observers.forEach(o -> o.objectChanged(e));
     }
 
     @Override
