@@ -77,8 +77,12 @@ public class MainController {
         Action passTest = newMenuItemAction(
                 menuBar.passTest, e -> {
                     TestWrapperNode node = mainView.testTree.getSelectedTestWrapperNode();
-                    if (node.getUserObject() instanceof Automatable) {
-                        if (userWantsToOverride()) {
+                    Test test = (Test)node.getUserObject();
+
+                    if (test instanceof Automatable) {
+                        if (node.getAutomationStage() == AutomationStage.STARTED) return;
+                        if (node.getAutomationStage() == AutomationStage
+                                .FINISHED_NORMAL && userWantsToOverride()) {
                             mainView.testTree.passTest();
                         }
                     } else {
@@ -95,8 +99,12 @@ public class MainController {
         Action failTest = newMenuItemAction(
                 menuBar.failTest, e -> {
                     TestWrapperNode node = mainView.testTree.getSelectedTestWrapperNode();
-                    if (node.getUserObject() instanceof Automatable) {
-                        if (userWantsToOverride()) {
+                    Test test = (Test)node.getUserObject();
+
+                    if (test instanceof Automatable) {
+                        if (node.getAutomationStage() == AutomationStage.STARTED) return;
+                        if (node.getAutomationStage() == AutomationStage
+                                .FINISHED_NORMAL && userWantsToOverride()) {
                             mainView.testTree.failTest();
                         }
                     } else {
@@ -200,15 +208,21 @@ public class MainController {
                                     Automatable a = (Automatable)test;
                                     testNode.setAutomationStage(AutomationStage.STARTED);
                                     try {
-                                        boolean passed = a.shouldPass(file, submitted, submission);
+                                        boolean passed = a.shouldPass(
+                                                file, submitted, submission
+                                        );
 
                                         if (passed) testNode.setResult(TestResult.PASSED);
                                         else testNode.setResult(TestResult.FAILED);
 
-                                        testNode.setAutomationStage(AutomationStage.FINISHED_NORMAL);
+                                        testNode.setAutomationStage(
+                                                AutomationStage.FINISHED_NORMAL
+                                        );
 
                                     } catch (CannotBeAutomatedException x) {
-                                        testNode.setAutomationStage(AutomationStage.FINISHED_ERROR);
+                                        testNode.setAutomationStage(
+                                                AutomationStage.FINISHED_ERROR
+                                        );
 
                                     } finally {
                                         mainView.testTree.nodeChanged(testNode);
@@ -426,10 +440,11 @@ public class MainController {
     private boolean userWantsToOverride() {
         int rv = JOptionPane.showConfirmDialog(
                 mainView,
-                "This is an automated test. Are you sure you want to\n" +
-                        "override the automated test's result?",
+                "This is an automated test. Are you sure you want to\n" + "override the" +
+                        " automated test's result?",
                 "Override Automated Test?",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
         );
         return rv == JOptionPane.YES_OPTION;
     }

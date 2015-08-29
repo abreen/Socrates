@@ -220,9 +220,7 @@ public class TestControls implements Observer<TestWrapperNode> {
 
     private void updateConstrained() {
         if (currentNode == null) {
-            resetButton.getAction().setEnabled(false);
-            passButton.getAction().setEnabled(false);
-            failButton.getAction().setEnabled(false);
+            setEnabledForAllButtons(false);
         } else if (currentNode.isConstrained()) {
             resetButton.getAction().setEnabled(true);
             if (currentNode.getResult() == TestResult.FAILED)
@@ -231,9 +229,7 @@ public class TestControls implements Observer<TestWrapperNode> {
                 passButton.getAction().setEnabled(false);
             failButton.getAction().setEnabled(false);
         } else {
-            resetButton.getAction().setEnabled(true);
-            passButton.getAction().setEnabled(true);
-            failButton.getAction().setEnabled(true);
+            setEnabledForAllButtons(true);
         }
     }
 
@@ -261,6 +257,22 @@ public class TestControls implements Observer<TestWrapperNode> {
             updateConstrained();
         } else if (event instanceof StageChangedEvent) {
             updateIcon();
+            AutomationStage stage = ((StageChangedEvent)event).newStage;
+            switch (stage) {
+            case STARTED:
+                setEnabledForAllButtons(false);
+                break;
+            case FINISHED_ERROR:
+            case FINISHED_NORMAL:
+                setEnabledForAllButtons(true);
+                break;
+            }
         }
+    }
+
+    private void setEnabledForAllButtons(boolean enabled) {
+        resetButton.getAction().setEnabled(enabled);
+        passButton.getAction().setEnabled(enabled);
+        failButton.getAction().setEnabled(enabled);
     }
 }
