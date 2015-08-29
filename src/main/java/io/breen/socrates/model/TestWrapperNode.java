@@ -21,16 +21,17 @@ public class TestWrapperNode extends DefaultMutableTreeNode
         implements Observable<TestWrapperNode>
 {
 
-    protected TestResult result;
     protected final Document notes;
-
-    private final List<Observer<TestWrapperNode>> observers;
+    protected final List<Observer<TestWrapperNode>> observers;
+    protected TestResult result;
+    protected boolean constrained;
 
     public TestWrapperNode(Test test) {
         super(test);
-        this.result = TestResult.NONE;
-        this.notes = new PlainDocument();
-        this.observers = new LinkedList<>();
+        notes = new PlainDocument();
+        observers = new LinkedList<>();
+        result = TestResult.NONE;
+        constrained = false;
     }
 
     public Document getNotesDocument() {
@@ -43,6 +44,15 @@ public class TestWrapperNode extends DefaultMutableTreeNode
 
     public void setResult(TestResult result) {
         this.result = result;
+        observers.forEach(o -> o.objectChanged(this));
+    }
+
+    public boolean isConstrained() {
+        return constrained;
+    }
+
+    public void setConstrained(boolean constrained) {
+        this.constrained = constrained;
         observers.forEach(o -> o.objectChanged(this));
     }
 
