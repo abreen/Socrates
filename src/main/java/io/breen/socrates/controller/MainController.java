@@ -117,6 +117,12 @@ public class MainController {
          */
         mainView.testTree.addTreeSelectionListener(
                 e -> {
+                    TestWrapperNode testNode = mainView.testTree
+                            .getSelectedTestWrapperNode();
+                    if (testNode != null) {
+                        mainView.testControls.update(testNode);
+                    }
+
                     if (!mainView.testTree.hasSelection()) {
                         passTest.setEnabled(false);
                         failTest.setEnabled(false);
@@ -275,21 +281,10 @@ public class MainController {
 
                         if (matchingFile != null) {
                             int n = matchingFile.testRoot.members.size();
-                            if (n > 0)
-                                nextTest.setEnabled(true);
+                            if (n > 0) nextTest.setEnabled(true);
                         } else {
                             nextTest.setEnabled(false);
                         }
-                    }
-                }
-        );
-
-        mainView.testTree.addTreeSelectionListener(
-                event -> {
-                    TestWrapperNode testNode = mainView.testTree
-                            .getSelectedTestWrapperNode();
-                    if (testNode != null) {
-                        mainView.testControls.update(testNode);
                     }
                 }
         );
