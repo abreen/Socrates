@@ -13,7 +13,20 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class TestGroupWrapperNode extends DefaultMutableTreeNode {
 
+    protected int numFailed;
+    protected double pointsTaken;
+
     public TestGroupWrapperNode(TestGroup testGroup) {
         super(testGroup);
+        numFailed = 0;
+        pointsTaken = 0.0;
+    }
+
+    public void updateNumFailed(int delta) {
+        numFailed += delta;
+    }
+
+    public void updatedPointsTaken(double delta) {
+        pointsTaken += delta;
     }
 }

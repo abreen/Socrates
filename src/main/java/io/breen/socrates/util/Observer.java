@@ -8,5 +8,5 @@ package io.breen.socrates.util;
  * @param <T> The type of the data that is being observed
  */
 public interface Observer<T> {
-    void objectChanged(T object);
+    void objectChanged(ObservableChangedEvent<T> event);
 }

@@ -5,6 +5,7 @@ import io.breen.socrates.immutable.test.Automatable;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.TestWrapperNode;
+import io.breen.socrates.util.ObservableChangedEvent;
 import io.breen.socrates.util.Observer;
 import io.breen.socrates.view.icon.DefaultTestIcon;
 import io.breen.socrates.view.icon.FailedTestIcon;
@@ -158,7 +159,7 @@ public class TestControls implements Observer<TestWrapperNode> {
         );
 
         notes.setEnabled(true);
-        notes.setDocument(testNode.getNotesDocument());
+        notes.setDocument(testNode.notes);
 
         currentNode = testNode;
     }
@@ -212,7 +213,8 @@ public class TestControls implements Observer<TestWrapperNode> {
     }
 
     @Override
-    public void objectChanged(TestWrapperNode object) {
-        changeIcon(object.getResult());
+    public void objectChanged(ObservableChangedEvent<TestWrapperNode> event) {
+        if (event instanceof TestWrapperNode.ResultChangedEvent)
+            changeIcon(((TestWrapperNode.ResultChangedEvent)event).newResult);
     }
 }
