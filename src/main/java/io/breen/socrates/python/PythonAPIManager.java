@@ -43,7 +43,7 @@ public final class PythonAPIManager {
             generateSocratesModule();
         } catch (IOException e) {
             logger.severe("could not set up Python API:" + e);
-            System.exit(7);
+            System.exit(6);
         }
 
         logger.info("set up Python API in " + tempDir);

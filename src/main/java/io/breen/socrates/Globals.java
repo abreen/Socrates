@@ -86,7 +86,7 @@ public class Globals {
 
         if (python3Command == null) {
             logger.severe("cannot find the Python 3 interpreter");
-            System.exit(6);
+            System.exit(5);
         }
     }
 

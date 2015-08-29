@@ -53,7 +53,7 @@ public class Main {
         } catch (ParseException e) {
             logger.info("got ParseException for command-line args: " + e.toString());
             System.err.println("error parsing command-line arguments");
-            System.exit(1);
+            System.exit(2);
         }
 
         if (cmd.hasOption("help")) {
@@ -81,11 +81,11 @@ public class Main {
                 loadPropertiesFrom(propPath);
             } catch (IOException e) {
                 logger.severe("could not load .properties file: " + e);
-                System.exit(2);
+                System.exit(3);
             }
         } else if (cmd.hasOption("properties")) {
             logger.severe("specified .properties file does not exist");
-            System.exit(2);
+            System.exit(4);
         }
 
         /*
