@@ -190,12 +190,15 @@ public class MainController {
                         focusOnNotes.setEnabled(true);
                     }
 
-                    Test test = (Test)testNode.getUserObject();
-                    if (test instanceof Automatable &&
+                    Test testObj = (Test)testNode.getUserObject();
+                    if (testObj instanceof Automatable &&
                             testNode.getResult() == TestResult.NONE &&
                             testNode.getAutomationStage() == AutomationStage.NONE &&
                             !testNode.isConstrained())
                     {
+                        @SuppressWarnings("unchecked") Automatable<File> test =
+                                (Automatable<File>)testObj;
+
                         SubmittedFile submitted = mainView.submissionTree
                                 .getSelectedSubmittedFile();
                         File file = criteria.files.get(submitted.localPath);
@@ -206,10 +209,9 @@ public class MainController {
 
                         (new Thread(
                                 () -> {
-                                    Automatable a = (Automatable)test;
                                     testNode.setAutomationStage(AutomationStage.STARTED);
                                     try {
-                                        boolean passed = a.shouldPass(
+                                        boolean passed = test.shouldPass(
                                                 file, submitted, submission
                                         );
 
@@ -433,8 +435,8 @@ public class MainController {
     private boolean userWantsToOverride() {
         int rv = JOptionPane.showConfirmDialog(
                 mainView,
-                "This is an automated test. Are you sure you want to\n" + "override the" +
-                        " automated test's result?",
+                "This is an automated test. Are you sure you want to\noverride the automated " +
+                        "test's result?",
                 "Override Automated Test?",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE
