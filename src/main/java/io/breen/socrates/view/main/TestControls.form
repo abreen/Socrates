@@ -55,6 +55,7 @@
               <component id="58ce3" class="javax.swing.JButton" binding="resetButton">
                 <constraints/>
                 <properties>
+                  <focusable value="false"/>
                   <text value="Reset"/>
                 </properties>
               </component>
