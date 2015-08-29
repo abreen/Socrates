@@ -19,13 +19,14 @@ import java.util.zip.ZipFile;
 public class ZipEntryResource extends Resource {
 
     protected final ZipFile parent;
-
     protected final ZipEntry entry;
+    protected Path tempFile;
 
     public ZipEntryResource(String fileName, ZipFile parent, ZipEntry entry) {
         super(fileName);
         this.parent = parent;
         this.entry = entry;
+        tempFile = null;
     }
 
     @Override
@@ -61,19 +62,26 @@ public class ZipEntryResource extends Resource {
 
     @Override
     public void createLink(Path path) throws IOException {
-        Path tempPath = Files.createTempFile("createLink", fileName);
-        Files.copy(newInputStream(), tempPath, StandardCopyOption.REPLACE_EXISTING);
-        Files.createSymbolicLink(path, tempPath);
+        if (tempFile == null)
+            extractToTempFile();
+
+        Files.createSymbolicLink(path, tempFile);
     }
 
     @Override
     public Path getPath() throws IOException {
-        Path tempPath = Files.createTempFile("getPath", fileName);
-        Files.copy(newInputStream(), tempPath, StandardCopyOption.REPLACE_EXISTING);
-        return tempPath;
+        if (tempFile == null)
+            extractToTempFile();
+
+        return tempFile;
     }
 
     private InputStream newInputStream() throws IOException {
         return parent.getInputStream(entry);
+    }
+
+    private void extractToTempFile() throws IOException {
+        tempFile = Files.createTempFile(null, fileName);
+        Files.copy(newInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
     }
 }
