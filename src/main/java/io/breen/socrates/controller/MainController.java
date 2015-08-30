@@ -7,17 +7,15 @@ import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.model.AutomationStage;
 import io.breen.socrates.model.TestResult;
+import io.breen.socrates.model.wrapper.SubmissionWrapperNode;
 import io.breen.socrates.model.wrapper.TestWrapperNode;
 import io.breen.socrates.util.Pair;
 import io.breen.socrates.view.main.MainView;
 import io.breen.socrates.view.main.MenuBarManager;
 
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class MainController {
@@ -32,7 +30,7 @@ public class MainController {
 
     public MainController() {
         menuBar = new MenuBarManager();
-        mainView = new MainView(menuBar);
+        mainView = new MainView(this, menuBar);
         menuBar.setView(mainView);
 
         /*
@@ -91,33 +89,6 @@ public class MainController {
         );
     }
 
-    private static void addTreeChangedListener(TreeModel model, Consumer<TreeModelEvent> lambda)
-    {
-        TreeModelListener listener = new TreeModelListener() {
-            @Override
-            public void treeNodesChanged(TreeModelEvent e) {
-                lambda.accept(e);
-            }
-
-            @Override
-            public void treeNodesInserted(TreeModelEvent e) {
-                // should not happen for test tree
-            }
-
-            @Override
-            public void treeNodesRemoved(TreeModelEvent e) {
-                // should not happen for test tree
-            }
-
-            @Override
-            public void treeStructureChanged(TreeModelEvent e) {
-                // should not happen for test tree
-            }
-        };
-
-        model.addTreeModelListener(listener);
-    }
-
     public void start(Criteria criteria, List<Submission> submissions) {
         this.criteria = criteria;
         this.submissions = submissions;
@@ -142,5 +113,9 @@ public class MainController {
         mainView.setVisible(true);
 
         logger.info("started MainView");
+    }
+
+    public void saveGradeReport(SubmissionWrapperNode completed, Path dest) {
+        System.out.println("saving " + completed);
     }
 }

@@ -1,12 +1,14 @@
 package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
+import io.breen.socrates.controller.MainController;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MainView extends JFrame {
 
+    private final MainController controller;
     private final MenuBarManager menuBar;
 
     public SubmissionTree submissionTree;
@@ -16,9 +18,10 @@ public class MainView extends JFrame {
     public TestControls testControls;
     private JPanel rootPanel;
 
-    public MainView(MenuBarManager menuBar) {
+    public MainView(MainController controller, MenuBarManager menuBar) {
         super("Socrates");
 
+        this.controller = controller;
         this.menuBar = menuBar;
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -32,7 +35,7 @@ public class MainView extends JFrame {
     }
 
     private void createUIComponents() {
-        submissionTree = new SubmissionTree(menuBar);
+        submissionTree = new SubmissionTree(menuBar, controller);
         fileView = new FileView(menuBar, submissionTree);
         fileInfo = new FileInfo(menuBar, submissionTree);
         testTree = new TestTree(menuBar, submissionTree);

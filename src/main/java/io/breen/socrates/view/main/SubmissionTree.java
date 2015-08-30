@@ -1,9 +1,11 @@
 package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
+import io.breen.socrates.controller.MainController;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.model.event.SubmissionCompletedChangeEvent;
 import io.breen.socrates.model.wrapper.*;
 import io.breen.socrates.util.*;
 import io.breen.socrates.util.Observer;
@@ -37,7 +39,7 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     private JTree tree;
     private DefaultMutableTreeNode root;
 
-    public SubmissionTree(MenuBarManager menuBar) {
+    public SubmissionTree(MenuBarManager menuBar, MainController main) {
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
@@ -46,9 +48,9 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                 menuBar.saveGradeReport, e -> {
                     SubmissionWrapperNode node = getCurrentSubmissionNode();
                     Submission s = (Submission)node.getUserObject();
-                    Path dest = s.submissionDir;
 
-                    // TODO
+                    Path dest = s.submissionDir;
+                    main.saveGradeReport(node, dest);
                 }
         );
         saveGradeReport.setEnabled(false);
@@ -60,9 +62,11 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                 menuBar.saveGradeReportAs, e -> {
                     SubmissionWrapperNode node = getCurrentSubmissionNode();
                     Submission s = (Submission)node.getUserObject();
-                    Path dest = s.submissionDir;
 
-                    // TODO
+                    Path dest = chooseSaveLocation(s.submissionDir);
+                    if (dest == null) return;
+
+                    main.saveGradeReport(node, dest);
                 }
         );
         saveGradeReportAs.setEnabled(false);
@@ -132,6 +136,20 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
         openFile.setEnabled(false);
     }
 
+    private static Path chooseSaveLocation(Path initialDir) {
+        JFileChooser fc = new JFileChooser(initialDir.toFile());
+        fc.setSelectedFile(new java.io.File("grade.txt"));
+        int rv = fc.showSaveDialog(null);
+
+        switch (rv) {
+        case JFileChooser.APPROVE_OPTION:
+            return fc.getSelectedFile().toPath();
+        case JFileChooser.CANCEL_OPTION:
+        default:
+            return null;
+        }
+    }
+
     private void createUIComponents() {
         root = new DefaultMutableTreeNode(null);
 
@@ -179,9 +197,23 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                         previousSubmission.setEnabled(false);
                         nextFile.setEnabled(true);
                         previousFile.setEnabled(false);
+
+                        saveGradeReport.setEnabled(false);
+                        saveGradeReportAs.setEnabled(false);
+
                     } else {
                         revealSubmission.setEnabled(true);
                         openFile.setEnabled(true);
+
+                        SubmissionWrapperNode submissionNode = getCurrentSubmissionNode();
+
+                        if (submissionNode.isComplete()) {
+                            saveGradeReport.setEnabled(true);
+                            saveGradeReportAs.setEnabled(true);
+                        } else {
+                            saveGradeReport.setEnabled(false);
+                            saveGradeReportAs.setEnabled(false);
+                        }
 
                         if (lastSubmissionSelected()) nextSubmission.setEnabled(false);
                         else nextSubmission.setEnabled(true);
@@ -341,8 +373,8 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     }
 
     /**
-     * Returns true if the currently selected file belongs to the first submission in the tree.
-     * This method returns false if there is no selection.
+     * Returns true if the currently selected file belongs to the first submission in the tree. This
+     * method returns false if there is no selection.
      */
     public boolean firstSubmissionSelected() {
         if (!hasSelection()) return false;
@@ -356,8 +388,8 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     }
 
     /**
-     * Returns true if the currently selected file belongs to the last submission in the tree.
-     * This method returns false if there is no selection.
+     * Returns true if the currently selected file belongs to the last submission in the tree. This
+     * method returns false if there is no selection.
      */
     public boolean lastSubmissionSelected() {
         if (!hasSelection()) return false;
@@ -384,8 +416,8 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
 
     /**
      * Sets the submission tree's current selection to the first file in the next submission in the
-     * tree. If the last submission is currently selected, this method does nothing. If there is
-     * no current selection, this method selects the first submission.
+     * tree. If the last submission is currently selected, this method does nothing. If there is no
+     * current selection, this method selects the first submission.
      */
     public void goToNextSubmission() {
         if (!hasSelection()) {
@@ -512,5 +544,18 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     @Override
     public void objectChanged(ObservableChangedEvent<SubmissionWrapperNode> event) {
         getModel().nodeChanged(event.source);
+
+        if (event instanceof SubmissionCompletedChangeEvent && event.source ==
+                getCurrentSubmissionNode()) {
+            SubmissionCompletedChangeEvent e = (SubmissionCompletedChangeEvent)event;
+
+            if (e.isNowComplete) {
+                saveGradeReport.setEnabled(true);
+                saveGradeReportAs.setEnabled(true);
+            } else {
+                saveGradeReport.setEnabled(false);
+                saveGradeReportAs.setEnabled(false);
+            }
+        }
     }
 }
