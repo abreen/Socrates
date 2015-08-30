@@ -1,5 +1,6 @@
 package io.breen.socrates.controller;
 
+import io.breen.socrates.immutable.TextGradeReportFormatter;
 import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
@@ -14,6 +15,7 @@ import io.breen.socrates.view.main.MainView;
 import io.breen.socrates.view.main.MenuBarManager;
 
 import javax.swing.tree.TreePath;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
@@ -116,7 +118,14 @@ public class MainController {
     }
 
     public void saveGradeReport(SubmissionWrapperNode completed, Path dest) {
-        // TODO
+        TextGradeReportFormatter fmt = new TextGradeReportFormatter(criteria);
+        try {
+            // TODO what if the SWN changes while the formatter formats it?
+            fmt.toFile(completed, dest);
+        } catch (IOException x) {
+            logger.warning("could not save grade report: " + x);
+            return;
+        }
         completed.setSaved(true);
     }
 }

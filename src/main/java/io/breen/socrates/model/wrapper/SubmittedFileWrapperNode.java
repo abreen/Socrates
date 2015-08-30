@@ -16,8 +16,9 @@ import java.util.*;
 
 /**
  * This class "wraps" a SubmittedFile and contains outcomes of tests for the file. The outcomes are
- * stored in a tree of TestWrapperNode objects, each of which individually represents either a Test
- * or a TestGroup from the criteria.
+ * stored in a tree of wrapper objects, each of which individually represents either a Test (in
+ * the case of TestWrapperNode) or a TestGroup (in the case of TestGroupWrapperNode) from the
+ * criteria.
  *
  * Instances add the tree of TestWrapperNode objects to a DefaultTreeModel. When the GUI needs to
  * display a tree containing the current state of the tests for the file, it can simply set its
