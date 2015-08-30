@@ -1,5 +1,7 @@
-package io.breen.socrates.model;
+package io.breen.socrates.model.event;
 
+import io.breen.socrates.model.TestResult;
+import io.breen.socrates.model.wrapper.TestWrapperNode;
 import io.breen.socrates.util.ObservableChangedEvent;
 
 /**

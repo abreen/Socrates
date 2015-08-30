@@ -1,4 +1,4 @@
-package io.breen.socrates.model;
+package io.breen.socrates.model.wrapper;
 
 import io.breen.socrates.immutable.submission.SubmittedFile;
 

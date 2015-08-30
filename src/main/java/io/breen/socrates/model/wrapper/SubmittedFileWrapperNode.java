@@ -1,9 +1,11 @@
-package io.breen.socrates.model;
+package io.breen.socrates.model.wrapper;
 
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
+import io.breen.socrates.model.ConstraintUpdater;
+import io.breen.socrates.model.event.*;
 import io.breen.socrates.util.*;
 import io.breen.socrates.util.Observable;
 import io.breen.socrates.util.Observer;
@@ -75,6 +77,8 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
 
     @Override
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> event) {
+        int numBefore = unfinishedTests.size();
+
         if (event instanceof ResultChangedEvent) {
             ResultChangedEvent e = (ResultChangedEvent)event;
             switch (e.newResult) {
@@ -91,8 +95,14 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
             else unfinishedTests.add(e.source);
         }
 
-        if (unfinishedTests.isEmpty()) {
-            TestsCompleteEvent e = new TestsCompleteEvent(this);
+        int numAfter = unfinishedTests.size();
+
+        CompletedStateChangedEvent e;
+        if (numAfter == 0 && numBefore != 0) {
+            e = new CompletedStateChangedEvent(this, true);
+            observers.forEach(o -> o.objectChanged(e));
+        } else if (numAfter > 0 && numBefore == 0) {
+            e = new CompletedStateChangedEvent(this, false);
             observers.forEach(o -> o.objectChanged(e));
         }
     }

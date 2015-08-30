@@ -1,6 +1,9 @@
-package io.breen.socrates.model;
+package io.breen.socrates.model.wrapper;
 
 import io.breen.socrates.immutable.test.Test;
+import io.breen.socrates.model.AutomationStage;
+import io.breen.socrates.model.TestResult;
+import io.breen.socrates.model.event.*;
 import io.breen.socrates.util.Observable;
 import io.breen.socrates.util.Observer;
 
@@ -15,7 +18,7 @@ import java.util.List;
  * object) and contains data relevant to the outcome of the wrapped test on a particular
  * submission.
  *
- * @see io.breen.socrates.model.TestGroupWrapperNode
+ * @see TestGroupWrapperNode
  */
 public class TestWrapperNode extends DefaultMutableTreeNode implements Observable<TestWrapperNode> {
 

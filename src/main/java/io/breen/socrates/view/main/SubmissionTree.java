@@ -4,9 +4,8 @@ import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
-import io.breen.socrates.model.*;
-import io.breen.socrates.util.*;
-import io.breen.socrates.util.Observer;
+import io.breen.socrates.model.wrapper.*;
+import io.breen.socrates.util.Pair;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -19,27 +18,16 @@ import java.awt.event.MouseListener;
 import java.util.*;
 import java.util.List;
 
-public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
+public class SubmissionTree {
 
     private JPanel rootPanel;
     private JScrollPane scrollPane;
 
     private JTree tree;
     private DefaultMutableTreeNode root;
-    private DefaultMutableTreeNode ungradedRoot;
-    private DefaultMutableTreeNode gradedRoot;
-    private DefaultMutableTreeNode skippedRoot;
 
     private void createUIComponents() {
         root = new DefaultMutableTreeNode(null);
-
-        ungradedRoot = new DefaultMutableTreeNode("Ungraded");
-        gradedRoot = new DefaultMutableTreeNode("Graded");
-        skippedRoot = new DefaultMutableTreeNode("Skipped");
-
-        root.add(ungradedRoot);
-        root.add(gradedRoot);
-        root.add(skippedRoot);
 
         tree = new JTree(root) {
             @Override
@@ -131,6 +119,9 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
                             } else if (value instanceof SubmittedFileWrapperNode) {
                                 SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
                                 if (sfwn.isComplete()) setForeground(Globals.GREEN);
+                            } else if (value instanceof SubmissionWrapperNode) {
+                                SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
+                                if (swn.isComplete()) setForeground(Globals.GREEN);
                             }
                         }
 
@@ -185,7 +176,7 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
         for (Map.Entry<Submission, List<Pair<SubmittedFile, File>>> entry : map.entrySet()) {
             Submission s = entry.getKey();
 
-            DefaultMutableTreeNode parent = new DefaultMutableTreeNode(s);
+            SubmissionWrapperNode parent = new SubmissionWrapperNode(s);
 
             List<MutableTreeNode> recognized = new LinkedList<>();
             List<MutableTreeNode> unrecognized = new LinkedList<>();
@@ -199,20 +190,15 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
                 else recognized.add(new SubmittedFileWrapperNode(sf, f));
             }
 
-            for (MutableTreeNode n : recognized) {
-                parent.add(n);
-                ((SubmittedFileWrapperNode)n).addObserver(this);
-            }
+            recognized.forEach(parent::add);
+            unrecognized.forEach(parent::add);
 
-            for (MutableTreeNode n : unrecognized)
-                parent.add(n);
-
-            ungradedRoot.add(parent);
+            root.add(parent);
         }
     }
 
     public void expandFirstSubmission() {
-        DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode)ungradedRoot.getFirstChild();
+        DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode)root.getFirstChild();
         tree.expandPath(new TreePath(firstChild.getPath()));
     }
 
@@ -221,73 +207,51 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
     }
 
     /**
-     * Returns true if the currently selected file belongs to the first submission in the current
-     * category subtree ("ungraded", "skipped", or "graded"), or false otherwise. This method
-     * returns false if there is no selection.
+     * Returns true if the currently selected file belongs to the first submission in the tree.
+     * This method returns false if there is no selection.
      */
     public boolean firstSubmissionSelected() {
         if (!hasSelection()) return false;
 
-        // get path to a submitted file
-        TreePath selection = tree.getSelectionPath();
-        // get path to submission
-        TreePath parent = selection.getParentPath();
-        // get path to category subtree
-        TreePath category = parent.getParentPath();
+        TreePath file = tree.getSelectionPath();
+        TreePath submission = file.getParentPath();
 
-        DefaultMutableTreeNode categoryNode = (DefaultMutableTreeNode)category
-                .getLastPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)submission.getLastPathComponent();
 
-        TreeNode firstChild = categoryNode.getFirstChild();
-
-        return parent.getLastPathComponent() == firstChild;
+        return root.getFirstChild() == node;
     }
 
     /**
-     * Returns true if the currently selected file belongs to the last submission in the current
-     * category subtree ("ungraded", "skipped", or "graded"), or false otherwise. This method
-     * returns false if there is no selection.
+     * Returns true if the currently selected file belongs to the last submission in the tree.
+     * This method returns false if there is no selection.
      */
     public boolean lastSubmissionSelected() {
         if (!hasSelection()) return false;
 
-        // get path to a submitted file
-        TreePath selection = tree.getSelectionPath();
-        // get path to submission
-        TreePath parent = selection.getParentPath();
-        // get path to category subtree
-        TreePath category = parent.getParentPath();
+        TreePath file = tree.getSelectionPath();
+        TreePath submission = file.getParentPath();
 
-        DefaultMutableTreeNode categoryNode = (DefaultMutableTreeNode)category
-                .getLastPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)submission.getLastPathComponent();
 
-        TreeNode lastChild = categoryNode.getLastChild();
-
-        return parent.getLastPathComponent() == lastChild;
+        return root.getLastChild() == node;
     }
 
     public void selectFirstSubmission() {
-        Enumeration ungraded = root.breadthFirstEnumeration();
-        while (ungraded.hasMoreElements()) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)ungraded.nextElement();
+        DefaultMutableTreeNode submission = (DefaultMutableTreeNode)root.getFirstChild();
 
-            if (node.getUserObject() instanceof Submission) {
-                if (node.getChildCount() == 0) continue;
+        while (submission != null && submission.getChildCount() == 0)
+            submission = submission.getNextSibling();
 
-                // get the first file in this submission
-                DefaultMutableTreeNode child = (DefaultMutableTreeNode)node.getFirstChild();
+        if (submission == null) return;
 
-                tree.setSelectionPath(new TreePath(child.getPath()));
-                return;
-            }
-        }
+        DefaultMutableTreeNode child = (DefaultMutableTreeNode)submission.getFirstChild();
+        tree.setSelectionPath(new TreePath(child.getPath()));
     }
 
     /**
      * Sets the submission tree's current selection to the first file in the next submission in the
-     * current category subtree ("ungraded", "skipped", or "graded"). If the last submission is
-     * currently selected, this method does nothing. If there is no current selection, this method
-     * selects the first submission.
+     * tree. If the last submission is currently selected, this method does nothing. If there is
+     * no current selection, this method selects the first submission.
      */
     public void goToNextSubmission() {
         if (!hasSelection()) {
@@ -297,61 +261,42 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
 
         if (lastSubmissionSelected()) return;
 
-        // get path to submission (parent of current file)
-        TreePath parent = tree.getSelectionPath().getParentPath();
-        Object parentNode = parent.getLastPathComponent();
+        TreePath file = tree.getSelectionPath();
+        TreePath submission = file.getParentPath();
 
-        // get path to category subtree
-        TreePath category = parent.getParentPath();
-        DefaultMutableTreeNode categoryNode = (DefaultMutableTreeNode)category
-                .getLastPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)submission.getLastPathComponent();
 
-        TreeNode nextSubmission = categoryNode.getChildAfter((TreeNode)parentNode);
+        do {
+            node = node.getNextSibling();
+        } while (node != null && node.getChildCount() == 0);
 
-        // find the first submission that contains at least one file
-        while (nextSubmission != null && nextSubmission.getChildCount() == 0)
-            nextSubmission = categoryNode.getChildAfter(nextSubmission);
+        if (node == null) return;
 
-        if (nextSubmission == null)     // no submissions after have any files
-            return;
-
-        // get the first file
-        DefaultMutableTreeNode file = (DefaultMutableTreeNode)nextSubmission.getChildAt(0);
-
-        tree.setSelectionPath(new TreePath(file.getPath()));
+        DefaultMutableTreeNode child = (DefaultMutableTreeNode)node.getFirstChild();
+        tree.setSelectionPath(new TreePath(child.getPath()));
     }
 
     /**
      * Sets the submission tree's current selection to the first file in the previous submission in
-     * the current category subtree ("ungraded", "skipped", or "graded"). If the first submission is
-     * currently selected, this method does nothing. If there is no current selection, this method
-     * does nothing.
+     * the tree. If the first submission is currently selected, this method does nothing. If there
+     * is no current selection, this method does nothing.
      */
     public void goToPreviousSubmission() {
         if (!hasSelection() || firstSubmissionSelected()) return;
 
-        // get path to submission (parent of current file)
-        TreePath parent = tree.getSelectionPath().getParentPath();
-        Object parentNode = parent.getLastPathComponent();
+        TreePath file = tree.getSelectionPath();
+        TreePath submission = file.getParentPath();
 
-        // get path to category subtree
-        TreePath category = parent.getParentPath();
-        DefaultMutableTreeNode categoryNode = (DefaultMutableTreeNode)category
-                .getLastPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)submission.getLastPathComponent();
 
-        TreeNode prevSubmission = categoryNode.getChildBefore((TreeNode)parentNode);
+        do {
+            node = node.getPreviousSibling();
+        } while (node != null && node.getChildCount() == 0);
 
-        // find the first submission that contains at least one file
-        while (prevSubmission != null && prevSubmission.getChildCount() == 0)
-            prevSubmission = categoryNode.getChildBefore(prevSubmission);
+        if (node == null) return;
 
-        if (prevSubmission == null)     // no submissions before have any files
-            return;
-
-        // get the first file
-        DefaultMutableTreeNode file = (DefaultMutableTreeNode)prevSubmission.getChildAt(0);
-
-        tree.setSelectionPath(new TreePath(file.getPath()));
+        DefaultMutableTreeNode child = (DefaultMutableTreeNode)node.getFirstChild();
+        tree.setSelectionPath(new TreePath(child.getPath()));
     }
 
     /**
@@ -361,15 +306,12 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
     public boolean firstFileInSubmissionSelected() {
         if (!hasSelection()) return false;
 
-        // get path to the submitted file
         TreePath file = tree.getSelectionPath();
-        // get path to submission
         TreePath submission = file.getParentPath();
 
-        DefaultMutableTreeNode submissionNode = (DefaultMutableTreeNode)submission
-                .getLastPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)submission.getLastPathComponent();
 
-        TreeNode firstChild = submissionNode.getFirstChild();
+        TreeNode firstChild = node.getFirstChild();
 
         return file.getLastPathComponent() == firstChild;
     }
@@ -381,15 +323,12 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
     public boolean lastFileInSubmissionSelected() {
         if (!hasSelection()) return false;
 
-        // get path to the submitted file
         TreePath file = tree.getSelectionPath();
-        // get path to submission
         TreePath submission = file.getParentPath();
 
-        DefaultMutableTreeNode submissionNode = (DefaultMutableTreeNode)submission
-                .getLastPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)submission.getLastPathComponent();
 
-        TreeNode lastChild = submissionNode.getLastChild();
+        TreeNode lastChild = node.getLastChild();
 
         return file.getLastPathComponent() == lastChild;
     }
@@ -408,20 +347,12 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
 
         if (lastFileInSubmissionSelected()) return;
 
-        // get path to currently selected file
-        TreePath file = tree.getSelectionPath();
-        Object fileNode = file.getLastPathComponent();
+        DefaultMutableTreeNode file = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        DefaultMutableTreeNode sibling = file.getNextSibling();
 
-        // get path to submission of that file
-        TreePath submission = file.getParentPath();
+        if (sibling == null) return;
 
-        DefaultMutableTreeNode submissionNode = (DefaultMutableTreeNode)submission
-                .getLastPathComponent();
-
-        DefaultMutableTreeNode nextFile = (DefaultMutableTreeNode)submissionNode.getChildAfter(
-                (TreeNode)fileNode);
-
-        tree.setSelectionPath(new TreePath(nextFile.getPath()));
+        tree.setSelectionPath(new TreePath(sibling.getPath()));
     }
 
     /**
@@ -432,33 +363,12 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
     public void goToPreviousFile() {
         if (!hasSelection() || firstFileInSubmissionSelected()) return;
 
-        // get path to currently selected file
-        TreePath file = tree.getSelectionPath();
-        Object fileNode = file.getLastPathComponent();
+        DefaultMutableTreeNode file = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        DefaultMutableTreeNode sibling = file.getPreviousSibling();
 
-        // get path to submission of that file
-        TreePath submission = file.getParentPath();
+        if (sibling == null) return;
 
-        DefaultMutableTreeNode submissionNode = (DefaultMutableTreeNode)submission
-                .getLastPathComponent();
-
-        DefaultMutableTreeNode prevFile = (DefaultMutableTreeNode)submissionNode.getChildBefore(
-                (TreeNode)fileNode
-        );
-
-        tree.setSelectionPath(new TreePath(prevFile.getPath()));
-    }
-
-    /**
-     * Called when the SubmittedFileWrapperNode that the tree is currently observing changes.
-     */
-    @Override
-    public void objectChanged(ObservableChangedEvent<SubmittedFileWrapperNode> event) {
-        if (event instanceof TestsCompleteEvent) {
-            TestsCompleteEvent e = (TestsCompleteEvent)event;
-            SubmittedFileWrapperNode node = e.source;
-            getModel().nodeChanged(node);
-        }
+        tree.setSelectionPath(new TreePath(sibling.getPath()));
     }
 
     private DefaultTreeModel getModel() {

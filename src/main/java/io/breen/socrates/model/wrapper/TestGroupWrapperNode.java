@@ -1,4 +1,4 @@
-package io.breen.socrates.model;
+package io.breen.socrates.model.wrapper;
 
 import io.breen.socrates.immutable.test.TestGroup;
 
@@ -9,7 +9,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * a File object). It is created when the immutable tree is traversed to create a stateful tree
  * holding the outcome of tests for a particular submission.
  *
- * @see io.breen.socrates.model.TestWrapperNode
+ * @see TestWrapperNode
  */
 public class TestGroupWrapperNode extends DefaultMutableTreeNode {
 

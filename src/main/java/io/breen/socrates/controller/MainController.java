@@ -6,7 +6,9 @@ import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
-import io.breen.socrates.model.*;
+import io.breen.socrates.model.AutomationStage;
+import io.breen.socrates.model.TestResult;
+import io.breen.socrates.model.wrapper.*;
 import io.breen.socrates.util.Pair;
 import io.breen.socrates.view.main.*;
 
