@@ -66,7 +66,8 @@ public class Submission {
                         public FileVisitResult visitFile(Path path, BasicFileAttributes attr)
                                 throws IOException
                         {
-                            if (!attr.isRegularFile()) return FileVisitResult.CONTINUE;
+                            if (!attr.isRegularFile() || Files.isHidden(path))
+                                return FileVisitResult.CONTINUE;
 
                             Path localPath = directory.relativize(path);
 
