@@ -24,7 +24,7 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
 
     private static Logger logger = Logger.getLogger(ConstraintUpdater.class.getName());
 
-    public final DefaultTreeModel treeModel;
+    private final DefaultTreeModel treeModel;
 
     public ConstraintUpdater(DefaultTreeModel treeModel) {
         this.treeModel = treeModel;
@@ -64,20 +64,30 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
         Test test = (Test)event.source.getUserObject();
         TestResult result = event.newResult;
 
+        Map<TestWrapperNode, Boolean> initialState = new HashMap<>();
+
         switch (result) {
         case FAILED:
             // test was just failed from being none or passed
-            updateRelevantSubtrees(parent, 1, test.deduction);
+            updateRelevantSubtrees(parent, 1, test.deduction, initialState);
             break;
         case PASSED:
         case NONE:
             // test was just passed or reset from being failed
-            updateRelevantSubtrees(parent, -1, -test.deduction);
+            updateRelevantSubtrees(parent, -1, -test.deduction, initialState);
+        }
+
+        for (Map.Entry<TestWrapperNode, Boolean> entry : initialState.entrySet()) {
+            TestWrapperNode node = entry.getKey();
+            boolean constrained = entry.getValue();
+
+            if (node.isConstrained() != constrained) treeModel.nodeChanged(node);
         }
     }
 
     private void updateRelevantSubtrees(TestGroupWrapperNode parent, int deltaFailed,
-                                        double deltaPoints)
+                                        double deltaPoints,
+                                        Map<TestWrapperNode, Boolean> initialState)
     {
         Deque<TestGroupWrapperNode> parents = new LinkedList<>();
 
@@ -132,9 +142,9 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
             root.updatedPointsTaken(deltaPoints);
 
             if (subtreeShouldBeConstrained) {
-                constrainTree(root);
+                constrainTree(root, initialState);
             } else if (subtreeShouldBeUnConstrained) {
-                unconstrainTree(root);
+                unconstrainTree(root, initialState);
 
                 Enumeration<DefaultMutableTreeNode> children = root.children();
                 while (children.hasMoreElements()) {
@@ -176,7 +186,7 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
                 }
 
                 if (needsReConstraining) {
-                    constrainTree(root);
+                    constrainTree(root, initialState);
                 } else {
                     Enumeration<DefaultMutableTreeNode> children = root.children();
                     while (children.hasMoreElements()) {
@@ -192,7 +202,9 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
         }
     }
 
-    private void constrainTree(TestGroupWrapperNode root) {
+    private void constrainTree(TestGroupWrapperNode root,
+                               Map<TestWrapperNode, Boolean> initialState)
+    {
         logger.fine("constraining tree with root: " + root);
 
         Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
@@ -201,12 +213,17 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
             if (dfsNode instanceof TestGroupWrapperNode) continue;
 
             TestWrapperNode testNode = (TestWrapperNode)dfsNode;
+
+            if (!initialState.containsKey(testNode))
+                initialState.put(testNode, testNode.isConstrained());
+
             testNode.setConstrained(true);
-            treeModel.nodeChanged(testNode);
         }
     }
 
-    private void unconstrainTree(TestGroupWrapperNode root) {
+    private void unconstrainTree(TestGroupWrapperNode root,
+                                 Map<TestWrapperNode, Boolean> initialState)
+    {
         logger.fine("un-constraining tree with root: " + root);
 
         Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
@@ -215,8 +232,11 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
             if (dfsNode instanceof TestGroupWrapperNode) continue;
 
             TestWrapperNode testNode = (TestWrapperNode)dfsNode;
+
+            if (!initialState.containsKey(testNode))
+                initialState.put(testNode, testNode.isConstrained());
+
             testNode.setConstrained(false);
-            treeModel.nodeChanged(testNode);
         }
     }
 }

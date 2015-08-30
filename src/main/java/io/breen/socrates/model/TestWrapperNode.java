@@ -19,19 +19,42 @@ import java.util.List;
  */
 public class TestWrapperNode extends DefaultMutableTreeNode implements Observable<TestWrapperNode> {
 
+    /**
+     * The Document object that the GUI uses to maintain the user's notes about this test. The
+     * contents of this document, if nonempty, will be used in the grade file.
+     */
     public final Document notes;
     protected final List<Observer<TestWrapperNode>> observers;
+    /**
+     * This node's current test result. This might be changed by a GUI thread, or, if the wrapped
+     * test is an automated test, a thread running the test.
+     */
     protected TestResult result;
+    /**
+     * Whether this node is constrained. A value of true for this field means that the test's result
+     * may not be changed by a user. This is maintained by a ConstraintUpdater object, which
+     * observes all TestWrapperNode objects in a given tree.
+     *
+     * @see io.breen.socrates.model.ConstraintUpdater
+     */
     protected boolean constrained;
+    /**
+     * If this node is an automatable node, this field stores the current "stage" of the test. When
+     * the automated test starts on its own thread, this stage is set to STARTED. Then, depending on
+     * its termination status, it is updated to FINISHED_NORMAL or FINISHED_ERROR.
+     */
     protected AutomationStage stage;
 
     public TestWrapperNode(Test test) {
         super(test);
-        notes = new PlainDocument();
-        observers = new LinkedList<>();
+
         result = TestResult.NONE;
         constrained = false;
-        stage = AutomationStage.NONE;       // only used if the test is automatable
+        stage = AutomationStage.NONE;
+
+        notes = new PlainDocument();
+
+        observers = new LinkedList<>();
     }
 
     @Override

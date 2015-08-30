@@ -8,7 +8,6 @@ import io.breen.socrates.util.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import java.util.Enumeration;
 
 /**
  * A mutable data structure containing outcomes of tests for a given submitted file. The outcomes
@@ -36,24 +35,20 @@ public class FileReport {
         this.submittedFile = submittedFile;
         this.matchingFile = matchingFile;
 
-        treeModel = new DefaultTreeModel(buildTree(matchingFile.testRoot));
+        treeModel = new DefaultTreeModel(null);
         updater = new ConstraintUpdater(treeModel);
-
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode)treeModel.getRoot();
-        Enumeration dfs = root.depthFirstEnumeration();
-        while (dfs.hasMoreElements()) {
-            Object node = dfs.nextElement();
-            if (node instanceof TestWrapperNode) ((TestWrapperNode)node).addObserver(updater);
-        }
+        DefaultMutableTreeNode root = buildTree(matchingFile.testRoot);
+        treeModel.setRoot(root);
     }
 
-    private static DefaultMutableTreeNode buildTree(TestGroup root) {
+    private DefaultMutableTreeNode buildTree(TestGroup root) {
         TestGroupWrapperNode parent = new TestGroupWrapperNode(root);
 
         for (Either<Test, TestGroup> member : root.members) {
             if (member instanceof Left) {
                 Test test = member.getLeft();
                 TestWrapperNode child = new TestWrapperNode(test);
+                child.addObserver(updater);
                 parent.add(child);
 
             } else if (member instanceof Right) {
