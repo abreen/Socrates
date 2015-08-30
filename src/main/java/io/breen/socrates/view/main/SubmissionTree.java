@@ -5,7 +5,8 @@ import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.model.wrapper.*;
-import io.breen.socrates.util.Pair;
+import io.breen.socrates.util.*;
+import io.breen.socrates.util.Observer;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -18,7 +19,7 @@ import java.awt.event.MouseListener;
 import java.util.*;
 import java.util.List;
 
-public class SubmissionTree {
+public class SubmissionTree implements Observer<SubmissionWrapperNode> {
 
     private JPanel rootPanel;
     private JScrollPane scrollPane;
@@ -192,6 +193,8 @@ public class SubmissionTree {
 
             recognized.forEach(parent::add);
             unrecognized.forEach(parent::add);
+
+            parent.addObserver(this);
 
             root.add(parent);
         }
@@ -373,5 +376,10 @@ public class SubmissionTree {
 
     private DefaultTreeModel getModel() {
         return (DefaultTreeModel)tree.getModel();
+    }
+
+    @Override
+    public void objectChanged(ObservableChangedEvent<SubmissionWrapperNode> event) {
+        getModel().nodeChanged(event.source);
     }
 }

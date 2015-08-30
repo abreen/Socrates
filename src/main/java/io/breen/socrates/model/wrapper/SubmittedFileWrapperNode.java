@@ -97,12 +97,12 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
 
         int numAfter = unfinishedTests.size();
 
-        CompletedStateChangedEvent e;
+        FileCompletedChangeEvent e;
         if (numAfter == 0 && numBefore != 0) {
-            e = new CompletedStateChangedEvent(this, true);
+            e = new FileCompletedChangeEvent(this, true);
             observers.forEach(o -> o.objectChanged(e));
         } else if (numAfter > 0 && numBefore == 0) {
-            e = new CompletedStateChangedEvent(this, false);
+            e = new FileCompletedChangeEvent(this, false);
             observers.forEach(o -> o.objectChanged(e));
         }
     }
