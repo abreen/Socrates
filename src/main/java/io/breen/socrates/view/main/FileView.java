@@ -22,6 +22,7 @@ public class FileView {
     }
 
     private Configuration config;
+    private SubmittedFile currentFile;
 
     private JEditorPane editor;
     private JPanel rootPanel;
@@ -46,14 +47,18 @@ public class FileView {
      * Update the FileView and show the contents of the current file to the user. If the second
      * parameter is null, the content type of the file will be set to plain text.
      */
-    public void update(SubmittedFile submittedFile, File matchingFile) throws IOException
-    {
+    public void update(SubmittedFile submittedFile, File matchingFile) throws IOException {
+        if (submittedFile == currentFile) return;
+
         if (matchingFile == null) {
             editor.setContentType("text/plain");
         } else {
             editor.setContentType(matchingFile.contentType);
         }
         editor.setText(submittedFile.getContents());
+        editor.setCaretPosition(0);
+
+        currentFile = submittedFile;
     }
 
     public void changeTheme(ThemeType t) {
