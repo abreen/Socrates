@@ -22,6 +22,16 @@ public class TestGroupWrapperNode extends DefaultMutableTreeNode {
         pointsTaken = 0.0;
     }
 
+    @Override
+    public String toString() {
+        return "TestGroupWrapperNode(" +
+                //"userObject=" + userObject + ", " +
+                "maxNum=" + ((TestGroup)userObject).maxNum + ", " +
+                "maxValue=" + ((TestGroup)userObject).maxValue + ", " +
+                "numFailed=" + numFailed + ", " +
+                "pointsTaken=" + pointsTaken + ")";
+    }
+
     public void updateNumFailed(int delta) {
         numFailed += delta;
     }

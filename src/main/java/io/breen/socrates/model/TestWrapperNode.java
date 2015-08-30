@@ -34,6 +34,16 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
         stage = AutomationStage.NONE;       // only used if the test is automatable
     }
 
+    @Override
+    public String toString() {
+        return "TestWrapperNode(" +
+                //"userObject=" + userObject + ", " +
+                "result=" + result + ", " +
+                "observers=" + observers + ", " +
+                "constrained=" + constrained + ", " +
+                "stage=" + stage + ")";
+    }
+
     public TestResult getResult() {
         return result;
     }
