@@ -37,7 +37,7 @@ public class MainController {
         reports = new HashMap<>();
 
         mainView = new MainView();
-        
+
         if (Globals.operatingSystem == Globals.OS.OSX) Globals.enableFullScreen(mainView);
 
         menuBar = new MenuBarManager(mainView);
