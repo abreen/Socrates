@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
- * The single location for a small number (as little as possible!) of runtime-set variables and
+ * The single location for a small number (as little as possible!) of global variables and
  * OS-specific methods that are needed anywhere and don't belong anywhere else.
  */
 public class Globals {
@@ -22,6 +22,12 @@ public class Globals {
     }
 
     public static final int NORMAL_EXIT_CODE = 0;
+    public static final Color GRAY = new Color(140, 140, 140);
+    public static final Color LIGHT_GRAY = new Color(186, 186, 186);
+    public static final Color YELLOW = new Color(205, 174, 0);
+    public static final Color RED = new Color(189, 12, 13);
+    public static final Color GREEN = new Color(49, 141, 34);
+    public static final Color BLUE = new Color(37, 123, 210);
     private static final Pattern PYTHON3_VERSION_PATTERN = Pattern.compile("Python 3.*");
     public static Properties properties;
     public static OS operatingSystem;

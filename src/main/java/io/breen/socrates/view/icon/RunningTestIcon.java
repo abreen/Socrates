@@ -1,5 +1,7 @@
 package io.breen.socrates.view.icon;
 
+import io.breen.socrates.Globals;
+
 import java.awt.*;
 
 public class RunningTestIcon extends TestIcon {
@@ -15,7 +17,7 @@ public class RunningTestIcon extends TestIcon {
 
         BasicStroke stroke = new BasicStroke();
 
-        g2d.setColor(new Color(37, 123, 210));
+        g2d.setColor(Globals.BLUE);
         g2d.setStroke(stroke);
 
         g2d.fillOval(x + padding, y + padding, dotWidth, dotWidth);

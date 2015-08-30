@@ -7,11 +7,13 @@ import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.model.*;
+import io.breen.socrates.util.Pair;
 import io.breen.socrates.view.main.*;
 
 import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -28,14 +30,11 @@ public class MainController {
 
     private Criteria criteria;
     private List<Submission> submissions;
-    private Map<SubmittedFile, FileReport> reports;
 
     private MainView mainView;
     private MenuBarManager menuBar;
 
     public MainController() {
-        reports = new HashMap<>();
-
         mainView = new MainView();
 
         if (Globals.operatingSystem == Globals.OS.OSX) Globals.enableFullScreen(mainView);
@@ -312,21 +311,43 @@ public class MainController {
          */
         mainView.submissionTree.addTreeSelectionListener(
                 event -> {
-                    FileReport report = null;
                     File matchingFile = null;
-                    SubmittedFile submitted = mainView.submissionTree.getSelectedSubmittedFile();
+                    DefaultMutableTreeNode node = mainView.submissionTree.getSelectedNode();
 
-                    if (submitted != null) {
-                        report = reports.get(submitted);
-                        matchingFile = report == null ? null : report.matchingFile;
-                        try {
-                            mainView.fileView.update(submitted, matchingFile);
-                            mainView.fileInfo.update(submitted, matchingFile);
-                            mainView.testTree.update(report);
-                            mainView.testControls.update(null);
-                        } catch (IOException x) {
-                            logger.warning("encountered I/O exception updating view");
+                    if (node != null) {
+                        if (node instanceof SubmittedFileWrapperNode) {
+                            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)node;
+                            SubmittedFile sf = (SubmittedFile)sfwn.getUserObject();
+                            matchingFile = sfwn.matchingFile;
+
+                            try {
+                                mainView.fileView.update(sf, matchingFile);
+                                mainView.fileInfo.update(sf, matchingFile);
+                            } catch (IOException x) {
+                                logger.warning("encountered I/O exception updating view");
+                            }
+
+                            mainView.testTree.update(sfwn.treeModel);
+                            mainView.testControls.reset();
+
+                        } else if (node instanceof UnrecognizedFileWrapperNode) {
+                            SubmittedFile sf = (SubmittedFile)node.getUserObject();
+
+                            try {
+                                mainView.fileView.update(sf);
+                                mainView.fileInfo.update(sf);
+                            } catch (IOException x) {
+                                logger.warning("encountered I/O exception updating view");
+                            }
+
+                            mainView.testTree.reset();
+                            mainView.testControls.reset();
                         }
+                    } else {
+                        mainView.fileView.reset();
+                        mainView.fileInfo.reset();
+                        mainView.testTree.reset();
+                        mainView.testControls.reset();
                     }
 
                     /*
@@ -417,18 +438,21 @@ public class MainController {
         this.criteria = criteria;
         this.submissions = submissions;
 
-        for (Submission submission : submissions) {
-            for (SubmittedFile submitted : submission.files) {
-                File matchingFile = criteria.files.get(submitted.localPath);
-                if (matchingFile == null) continue;
+        Map<Submission, List<Pair<SubmittedFile, File>>> map = new HashMap<>();
 
-                reports.put(submitted, new FileReport(submitted, matchingFile));
+        for (Submission s : submissions) {
+            List<Pair<SubmittedFile, File>> list = new ArrayList<>(s.files.size());
+            for (SubmittedFile f : s.files) {
+                File matchingFile = criteria.files.get(f.localPath);
+                Pair<SubmittedFile, File> pair = new Pair<>(f, matchingFile);
+                list.add(pair);
             }
+            map.put(s, list);
         }
 
         mainView.setTitle("Socrates — " + criteria.assignmentName);
 
-        mainView.submissionTree.addUngraded(submissions);
+        mainView.submissionTree.addUngraded(map);
         mainView.submissionTree.expandFirstSubmission();
 
         mainView.setVisible(true);

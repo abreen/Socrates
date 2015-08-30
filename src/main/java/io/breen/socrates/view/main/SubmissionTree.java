@@ -1,8 +1,12 @@
 package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
+import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.model.*;
+import io.breen.socrates.util.*;
+import io.breen.socrates.util.Observer;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -10,10 +14,12 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.util.Enumeration;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.*;
 import java.util.List;
 
-public class SubmissionTree {
+public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
 
     private JPanel rootPanel;
     private JScrollPane scrollPane;
@@ -40,12 +46,20 @@ public class SubmissionTree {
             public String convertValueToText(Object value, boolean selected, boolean expanded,
                                              boolean leaf, int row, boolean hasFocus)
             {
-                if (value instanceof DefaultMutableTreeNode) {
-                    Object userObject = ((DefaultMutableTreeNode)value).getUserObject();
+                if (value instanceof SubmittedFileWrapperNode) {
+                    SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
+                    return ((SubmittedFile)sfwn.getUserObject()).localPath.toString();
+
+                } else if (value instanceof UnrecognizedFileWrapperNode) {
+                    UnrecognizedFileWrapperNode ufwn = (UnrecognizedFileWrapperNode)value;
+                    return ((SubmittedFile)ufwn.getUserObject()).localPath.toString();
+
+                } else if (value instanceof DefaultMutableTreeNode) {
+                    DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode)value;
+                    Object userObject = dmtn.getUserObject();
+
                     if (userObject instanceof Submission) {
                         return ((Submission)userObject).studentName;
-                    } else if (userObject instanceof SubmittedFile) {
-                        return ((SubmittedFile)userObject).localPath.toString();
                     }
                 }
 
@@ -63,14 +77,66 @@ public class SubmissionTree {
                 new PredicateTreeSelectionModel(
                         path -> {
                             Object last = path.getLastPathComponent();
-                            if (last instanceof DefaultMutableTreeNode) {
-                                DefaultMutableTreeNode n = (DefaultMutableTreeNode)last;
-                                return n.getUserObject() instanceof SubmittedFile;
-                            } else {
-                                return false;
-                            }
+                            return last instanceof SubmittedFileWrapperNode || last instanceof
+                                    UnrecognizedFileWrapperNode;
                         }
                 )
+        );
+
+        tree.addMouseListener(
+                new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        int row = tree.getRowForLocation(e.getX(), e.getY());
+                        if (row == -1) tree.clearSelection();
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+
+                    }
+                }
+        );
+
+        tree.setCellRenderer(
+                new DefaultTreeCellRenderer() {
+                    @Override
+                    public Component getTreeCellRendererComponent(JTree tree, Object value,
+                                                                  boolean selected,
+                                                                  boolean expanded, boolean isLeaf,
+                                                                  int row, boolean focused)
+                    {
+                        super.getTreeCellRendererComponent(
+                                tree, value, selected, expanded, isLeaf, row, focused
+                        );
+
+                        if (!selected) {
+                            if (value instanceof UnrecognizedFileWrapperNode) {
+                                setForeground(UIManager.getColor("textInactiveText"));
+                            } else if (value instanceof SubmittedFileWrapperNode) {
+                                SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
+                                if (sfwn.isComplete()) setForeground(Globals.GREEN);
+                            }
+                        }
+
+                        return this;
+                    }
+                }
         );
 
         tree.setRootVisible(false);
@@ -111,14 +177,37 @@ public class SubmissionTree {
         return (Submission)node.getUserObject();
     }
 
-    public void addUngraded(List<Submission> submissions) {
-        for (Submission s : submissions) {
-            DefaultMutableTreeNode root = new DefaultMutableTreeNode(s);
+    public DefaultMutableTreeNode getSelectedNode() {
+        return (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+    }
 
-            for (SubmittedFile f : s.files)
-                root.add(new DefaultMutableTreeNode(f));
+    public void addUngraded(Map<Submission, List<Pair<SubmittedFile, File>>> map) {
+        for (Map.Entry<Submission, List<Pair<SubmittedFile, File>>> entry : map.entrySet()) {
+            Submission s = entry.getKey();
 
-            ungradedRoot.add(root);
+            DefaultMutableTreeNode parent = new DefaultMutableTreeNode(s);
+
+            List<MutableTreeNode> recognized = new LinkedList<>();
+            List<MutableTreeNode> unrecognized = new LinkedList<>();
+
+            List<Pair<SubmittedFile, File>> pairs = entry.getValue();
+            for (Pair<SubmittedFile, File> p : pairs) {
+                SubmittedFile sf = p.first;
+                File f = p.second;
+
+                if (f == null) unrecognized.add(new UnrecognizedFileWrapperNode(sf));
+                else recognized.add(new SubmittedFileWrapperNode(sf, f));
+            }
+
+            for (MutableTreeNode n : recognized) {
+                parent.add(n);
+                ((SubmittedFileWrapperNode)n).addObserver(this);
+            }
+
+            for (MutableTreeNode n : unrecognized)
+                parent.add(n);
+
+            ungradedRoot.add(parent);
         }
     }
 
@@ -354,8 +443,22 @@ public class SubmissionTree {
                 .getLastPathComponent();
 
         DefaultMutableTreeNode prevFile = (DefaultMutableTreeNode)submissionNode.getChildBefore(
-                (TreeNode)fileNode);
+                (TreeNode)fileNode
+        );
 
         tree.setSelectionPath(new TreePath(prevFile.getPath()));
+    }
+
+    @Override
+    public void objectChanged(ObservableChangedEvent<SubmittedFileWrapperNode> event) {
+        if (event instanceof FileReportCompleteEvent) {
+            FileReportCompleteEvent e = (FileReportCompleteEvent)event;
+            SubmittedFileWrapperNode node = e.source;
+            getModel().nodeChanged(node);
+        }
+    }
+
+    private DefaultTreeModel getModel() {
+        return (DefaultTreeModel)tree.getModel();
     }
 }

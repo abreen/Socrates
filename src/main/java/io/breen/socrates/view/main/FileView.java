@@ -61,6 +61,15 @@ public class FileView {
         currentFile = submittedFile;
     }
 
+    public void update(SubmittedFile submittedFile) throws IOException {
+        update(submittedFile, null);
+    }
+
+    public void reset() {
+        currentFile = null;
+        editor.setText(null);
+    }
+
     public void changeTheme(ThemeType t) {
         Map<String, String> themeEntries;
 

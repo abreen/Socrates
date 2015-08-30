@@ -12,7 +12,8 @@ import java.util.stream.Collectors;
  * For each actual file found on the file system, an immutable SubmittedFile object is created and
  * referenced by instances of this class.
  *
- * FileReport objects are built using the requirements read from the criteria and the contents of
+ * SubmittedFileWrapperNode objects are built using the requirements read from the criteria and
+ * the contents of
  * these objects.
  */
 public class Submission {

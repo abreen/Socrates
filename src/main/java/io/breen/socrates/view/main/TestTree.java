@@ -161,18 +161,13 @@ public class TestTree {
         }
     }
 
-    /**
-     * Replace the TestTree's model with the specified FileReport. This causes the JTree's contents
-     * to be replaced by the state of the specified FileReport. All future method calls on this
-     * TestTree will affect the specified FileReport.
-     */
-    public void update(FileReport report) {
-        if (report == null) {
-            tree.setModel(null);
-        } else {
-            tree.setModel(report.treeModel);
-            expandFirstTest();
-        }
+    public void update(DefaultTreeModel treeModel) {
+        tree.setModel(treeModel);
+        expandFirstTest();
+    }
+
+    public void reset() {
+        tree.setModel(null);
     }
 
     public void addTreeSelectionListener(TreeSelectionListener listener) {

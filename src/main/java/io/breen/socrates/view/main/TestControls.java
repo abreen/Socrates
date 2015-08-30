@@ -118,25 +118,28 @@ public class TestControls implements Observer<TestWrapperNode> {
         properties.setOpaque(false);
     }
 
+    public void reset() {
+        if (currentNode != null) currentNode.removeObserver(this);
+
+        currentNode = null;
+
+        description.setText(NO_TEST_SELECTED_DESC);
+
+        updateIcon();
+
+        properties.resetAll();
+
+        notes.setEnabled(false);
+        notes.setDocument(EMPTY_DOCUMENT);
+
+        resetButton.getAction().setEnabled(false);
+        passButton.getAction().setEnabled(false);
+        failButton.getAction().setEnabled(false);
+    }
+
     public void update(TestWrapperNode testNode) {
         if (testNode == null) {
-            if (currentNode != null) currentNode.removeObserver(this);
-
-            currentNode = null;
-
-            description.setText(NO_TEST_SELECTED_DESC);
-
-            updateIcon();
-
-            properties.resetAll();
-
-            notes.setEnabled(false);
-            notes.setDocument(EMPTY_DOCUMENT);
-
-            resetButton.getAction().setEnabled(false);
-            passButton.getAction().setEnabled(false);
-            failButton.getAction().setEnabled(false);
-
+            reset();
             return;
         }
 

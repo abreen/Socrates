@@ -12,7 +12,7 @@ public class NoResultTestIcon extends TestIcon {
 
         BasicStroke stroke = new BasicStroke();
 
-        g2d.setColor(new Color(140, 140, 140));
+        g2d.setColor(Color.GRAY);
         g2d.setStroke(stroke);
         g2d.fillOval(x + 4, y + 4, width - 6, height - 6);
 

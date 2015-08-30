@@ -49,6 +49,8 @@ public class FileInfo {
             return defaults;
         }
     }
+
+    private static final String NO_FILE_SELECTED_FILENAME = "(no file selected)";
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
             "EEE L/d h:mm:ss a"
     );
@@ -111,5 +113,14 @@ public class FileInfo {
         properties.set(
                 FileProperty.MODIFIED_DATE.index, getModified(file.fullPath).format(formatter)
         );
+    }
+
+    public void update(SubmittedFile submittedFile) throws IOException {
+        update(submittedFile, null);
+    }
+
+    public void reset() {
+        fileName.setText(NO_FILE_SELECTED_FILENAME);
+        properties.resetAll();
     }
 }
