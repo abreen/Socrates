@@ -332,7 +332,8 @@ public class TestTree {
     }
 
     public void nodeChanged(TreeNode node) {
-        getModel().nodeChanged(node);
+        DefaultTreeModel model = getModel();
+        if (model != null) model.nodeChanged(node);
     }
 
     private DefaultMutableTreeNode getRoot() {
