@@ -169,13 +169,16 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
                             .getLastPathComponent();
 
+                    if (!event.isAddedPath()) node = null;
+
                     if (node == null) {
                         revealSubmission.setEnabled(false);
                         openFile.setEnabled(false);
 
                         nextSubmission.setEnabled(true);
-                        nextFile.setEnabled(true);
                         previousSubmission.setEnabled(false);
+                        nextFile.setEnabled(true);
+                        previousFile.setEnabled(false);
                     } else {
                         revealSubmission.setEnabled(true);
                         openFile.setEnabled(true);
