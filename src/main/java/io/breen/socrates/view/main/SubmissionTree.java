@@ -293,15 +293,14 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
 
                             } else if (value instanceof SubmissionWrapperNode) {
                                 SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
-                                if (swn.isComplete()) {
+                                if (swn.isComplete())
                                     setForeground(Globals.GREEN);
-
-                                    if (!swn.isSaved()) {
-                                        setFont(italic);
-                                    }
-
-                                }
                             }
+                        }
+
+                        if (value instanceof SubmissionWrapperNode) {
+                            SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
+                            if (swn.isComplete() && !swn.isSaved()) setFont(italic);
                         }
 
                         return this;
