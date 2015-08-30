@@ -17,15 +17,12 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
-import java.util.Enumeration;
 
 public class TestTree {
 
     private JPanel rootPanel;
     private JScrollPane scrollPane;
     private JTree tree;
-
-    private ConstraintUpdater updater;
 
     private static String testGroupToString(TestGroup group) {
         Ceiling<Integer> maxNum = group.maxNum;
@@ -171,19 +168,9 @@ public class TestTree {
      */
     public void update(FileReport report) {
         if (report == null) {
-            updater = null;
             tree.setModel(null);
         } else {
-            DefaultTreeModel treeModel = report.treeModel;
-            updater = new ConstraintUpdater(treeModel);
-
-            Enumeration<DefaultMutableTreeNode> dfs = getRoot(treeModel).depthFirstEnumeration();
-            while (dfs.hasMoreElements()) {
-                DefaultMutableTreeNode node = dfs.nextElement();
-                if (node instanceof TestWrapperNode) ((TestWrapperNode)node).addObserver(updater);
-            }
-
-            tree.setModel(treeModel);
+            tree.setModel(report.treeModel);
             expandFirstTest();
         }
     }
