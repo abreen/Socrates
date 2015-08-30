@@ -2,22 +2,25 @@ package io.breen.socrates;
 
 import org.apache.commons.lang.SystemUtils;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
- * The single location for a small number (as little as possible!) of runtime-set variables that are
- * needed anywhere.
+ * The single location for a small number (as little as possible!) of runtime-set variables and
+ * OS-specific methods that are needed anywhere and don't belong anywhere else.
  */
 public class Globals {
 
     public enum OS {
         WINDOWS, OSX, LINUX, OTHER
     }
+
     public static final int NORMAL_EXIT_CODE = 0;
     private static final Pattern PYTHON3_VERSION_PATTERN = Pattern.compile("Python 3.*");
     public static Properties properties;
@@ -106,5 +109,18 @@ public class Globals {
     public static ZoneId getZoneId() {
         String zoneString = properties.getProperty("timezone");
         return ZoneId.of(zoneString);
+    }
+
+    public static void enableFullScreen(Window window) {
+        String className = "com.apple.eawt.FullScreenUtilities";
+        String methodName = "setWindowCanFullScreen";
+
+        try {
+            Class<?> clazz = Class.forName(className);
+            java.lang.reflect.Method method = clazz.getMethod(
+                    methodName, Window.class, boolean.class
+            );
+            method.invoke(null, window, true);
+        } catch (Throwable ignored) {}
     }
 }

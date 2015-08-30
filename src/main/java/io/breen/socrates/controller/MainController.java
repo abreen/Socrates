@@ -1,5 +1,6 @@
 package io.breen.socrates.controller;
 
+import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
@@ -36,6 +37,9 @@ public class MainController {
         reports = new HashMap<>();
 
         mainView = new MainView();
+        
+        if (Globals.operatingSystem == Globals.OS.OSX) Globals.enableFullScreen(mainView);
+
         menuBar = new MenuBarManager(mainView);
 
         // ctrl will end up being Command on OS X
