@@ -13,5 +13,11 @@ public abstract class Ceiling<T> {
         return (Ceiling<T>)ANY;
     }
 
-    private static class Any extends Ceiling {}
+    private static class Any extends Ceiling {
+
+        @Override
+        public String toString() {
+            return "Any";
+        }
+    }
 }
