@@ -14,7 +14,10 @@ import io.breen.socrates.view.icon.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.text.*;
+import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
 
 public class TestControls implements Observer<TestWrapperNode> {
@@ -54,6 +57,8 @@ public class TestControls implements Observer<TestWrapperNode> {
     private static final Document EMPTY_DOCUMENT = new PlainDocument();
     private static final int ICON_WIDTH = 24;
     private static final int ICON_HEIGHT = 24;
+    public final Action clearNotes;
+    public final Action focusOnNotes;
     private JPanel rootPanel;
     private JPanel innerPanel;
     private JPanel buttonPanel;
@@ -65,12 +70,61 @@ public class TestControls implements Observer<TestWrapperNode> {
     private JScrollPane notesScrollPane;
     private JLabel icon;
     private JButton resetButton;
-
     private TestWrapperNode currentNode;
 
-    public TestControls() {
+    public TestControls(MenuBarManager menuBar, TestTree testTree, SubmissionTree submissionTree) {
         updateIcon();
         description.setText(NO_TEST_SELECTED_DESC);
+
+        passButton.setAction(menuBar.passTest.getAction());
+        failButton.setAction(menuBar.failTest.getAction());
+        resetButton.setAction(menuBar.resetTest.getAction());
+
+        /*
+         * The menu item text for the menu item Actions are too long for our buttons, so we
+         * override the text from each Action here.
+         */
+        passButton.setText("Pass");
+        failButton.setText("Fail");
+        resetButton.setText("Reset");
+
+        int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        int shift = InputEvent.SHIFT_DOWN_MASK;
+        int alt = InputEvent.ALT_DOWN_MASK;
+
+        clearNotes = MenuBarManager.newMenuItemAction(
+                menuBar.clearNotes, e -> clearNotes()
+        );
+        clearNotes.setEnabled(false);
+        clearNotes.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, ctrl)
+        );
+
+        focusOnNotes = MenuBarManager.newMenuItemAction(
+                menuBar.focusOnNotes, e -> focusOnNotes()
+        );
+        focusOnNotes.setEnabled(false);
+        focusOnNotes.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, ctrl)
+        );
+
+        testTree.addTreeSelectionListener(
+                event -> {
+                    TreePath path = event.getPath();
+                    TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
+
+                    if (node == null) {
+                        clearNotes.setEnabled(false);
+                        focusOnNotes.setEnabled(false);
+                    } else {
+                        update(node);
+                        clearNotes.setEnabled(true);
+                        focusOnNotes.setEnabled(true);
+                    }
+                }
+        );
+
+        submissionTree.addTreeSelectionListener(event -> reset());
     }
 
     public static TestIcon newIcon(TestWrapperNode node) {

@@ -18,10 +18,10 @@
         </properties>
         <border type="none"/>
         <children>
-          <nested-form id="449fd" form-file="io/breen/socrates/view/main/SubmissionTree.form" binding="submissionTree">
+          <nested-form id="449fd" form-file="io/breen/socrates/view/main/SubmissionTree.form" binding="submissionTree" custom-create="true">
             <constraints border-constraint="Center"/>
           </nested-form>
-          <nested-form id="36314" form-file="io/breen/socrates/view/main/FileInfo.form" binding="fileInfo">
+          <nested-form id="36314" form-file="io/breen/socrates/view/main/FileInfo.form" binding="fileInfo" custom-create="true">
             <constraints border-constraint="South"/>
           </nested-form>
         </children>
@@ -31,7 +31,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <nested-form id="e6a18" form-file="io/breen/socrates/view/main/FileView.form" binding="fileView">
+          <nested-form id="e6a18" form-file="io/breen/socrates/view/main/FileView.form" binding="fileView" custom-create="true">
             <constraints border-constraint="Center"/>
           </nested-form>
         </children>
@@ -45,10 +45,10 @@
         </properties>
         <border type="none"/>
         <children>
-          <nested-form id="8adcb" form-file="io/breen/socrates/view/main/TestTree.form" binding="testTree">
+          <nested-form id="8adcb" form-file="io/breen/socrates/view/main/TestTree.form" binding="testTree" custom-create="true">
             <constraints border-constraint="Center"/>
           </nested-form>
-          <nested-form id="b4535" form-file="io/breen/socrates/view/main/TestControls.form" binding="testControls">
+          <nested-form id="b4535" form-file="io/breen/socrates/view/main/TestControls.form" binding="testControls" custom-create="true">
             <constraints border-constraint="South"/>
           </nested-form>
         </children>

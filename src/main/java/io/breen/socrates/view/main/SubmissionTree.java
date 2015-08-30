@@ -14,18 +14,123 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class SubmissionTree implements Observer<SubmissionWrapperNode> {
 
+    private static Logger logger = Logger.getLogger(SubmissionTree.class.getName());
+    public final Action saveGradeReport;
+    public final Action saveGradeReportAs;
+    public final Action nextSubmission;
+    public final Action previousSubmission;
+    public final Action revealSubmission;
+    public final Action nextFile;
+    public final Action previousFile;
+    public final Action openFile;
     private JPanel rootPanel;
     private JScrollPane scrollPane;
-
     private JTree tree;
     private DefaultMutableTreeNode root;
+
+    public SubmissionTree(MenuBarManager menuBar) {
+        int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        int shift = InputEvent.SHIFT_DOWN_MASK;
+        int alt = InputEvent.ALT_DOWN_MASK;
+
+        saveGradeReport = MenuBarManager.newMenuItemAction(
+                menuBar.saveGradeReport, e -> {
+                    SubmissionWrapperNode node = getCurrentSubmissionNode();
+                    Submission s = (Submission)node.getUserObject();
+                    Path dest = s.submissionDir;
+
+                    // TODO
+                }
+        );
+        saveGradeReport.setEnabled(false);
+        saveGradeReport.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ctrl)
+        );
+
+        saveGradeReportAs = MenuBarManager.newMenuItemAction(
+                menuBar.saveGradeReportAs, e -> {
+                    SubmissionWrapperNode node = getCurrentSubmissionNode();
+                    Submission s = (Submission)node.getUserObject();
+                    Path dest = s.submissionDir;
+
+                    // TODO
+                }
+        );
+        saveGradeReportAs.setEnabled(false);
+        saveGradeReportAs.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ctrl | shift)
+        );
+
+        nextSubmission = MenuBarManager.newMenuItemAction(
+                menuBar.nextSubmission, e -> goToNextSubmission()
+        );
+        nextSubmission.setEnabled(true);
+        nextSubmission.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | shift)
+        );
+
+        previousSubmission = MenuBarManager.newMenuItemAction(
+                menuBar.previousSubmission, e -> goToPreviousSubmission()
+        );
+        previousSubmission.setEnabled(false);
+        previousSubmission.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | shift)
+        );
+
+        revealSubmission = MenuBarManager.newMenuItemAction(
+                menuBar.revealSubmission, e -> {
+                    Submission s = getSelectedSubmission();
+                    Path path = s.submissionDir;
+                    try {
+                        Desktop.getDesktop().open(path.toFile());
+                    } catch (IOException x) {
+                        logger.warning("got I/O exception revealing submission: " + x);
+                    }
+                }
+        );
+        revealSubmission.setEnabled(false);
+        revealSubmission.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | shift)
+        );
+
+        nextFile = MenuBarManager.newMenuItemAction(
+                menuBar.nextFile, e -> goToNextFile()
+        );
+        nextFile.setEnabled(true);
+        nextFile.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | alt)
+        );
+
+        previousFile = MenuBarManager.newMenuItemAction(
+                menuBar.previousFile, e -> goToPreviousFile()
+        );
+        previousFile.setEnabled(false);
+        previousFile.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | alt)
+        );
+
+        openFile = MenuBarManager.newMenuItemAction(
+                menuBar.openFile, e -> {
+                    SubmittedFile f = getSelectedSubmittedFile();
+                    Path path = f.fullPath;
+                    try {
+                        Desktop.getDesktop().open(path.toFile());
+                    } catch (IOException x) {
+                        logger.warning("got I/O exception revealing file: " + x);
+                    }
+                }
+        );
+        openFile.setEnabled(false);
+    }
 
     private void createUIComponents() {
         root = new DefaultMutableTreeNode(null);
@@ -70,6 +175,38 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                                     UnrecognizedFileWrapperNode;
                         }
                 )
+        );
+
+        tree.addTreeSelectionListener(
+                event -> {
+                    TreePath path = event.getPath();
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                            .getLastPathComponent();
+
+                    if (node == null) {
+                        revealSubmission.setEnabled(false);
+                        openFile.setEnabled(false);
+
+                        nextSubmission.setEnabled(true);
+                        nextFile.setEnabled(true);
+                        previousSubmission.setEnabled(false);
+                    } else {
+                        revealSubmission.setEnabled(true);
+                        openFile.setEnabled(true);
+
+                        if (lastSubmissionSelected()) nextSubmission.setEnabled(false);
+                        else nextSubmission.setEnabled(true);
+
+                        if (firstSubmissionSelected()) previousSubmission.setEnabled(false);
+                        else previousSubmission.setEnabled(true);
+
+                        if (lastFileInSubmissionSelected()) nextFile.setEnabled(false);
+                        else nextFile.setEnabled(true);
+
+                        if (firstFileInSubmissionSelected()) previousFile.setEnabled(false);
+                        else previousFile.setEnabled(true);
+                    }
+                }
         );
 
         tree.addMouseListener(
@@ -171,6 +308,11 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
 
     public DefaultMutableTreeNode getSelectedNode() {
         return (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+    }
+
+    public SubmissionWrapperNode getCurrentSubmissionNode() {
+        TreePath file = tree.getSelectionPath();
+        return (SubmissionWrapperNode)file.getParentPath().getLastPathComponent();
     }
 
     public void addUngraded(Map<Submission, List<Pair<SubmittedFile, File>>> map) {

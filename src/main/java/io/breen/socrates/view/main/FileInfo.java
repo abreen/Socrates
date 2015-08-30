@@ -3,9 +3,12 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.logging.Logger;
 
 public class FileInfo {
 
@@ -49,23 +53,46 @@ public class FileInfo {
             return defaults;
         }
     }
-
     private static final String NO_FILE_SELECTED_FILENAME = "(no file selected)";
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
             "EEE L/d h:mm:ss a"
     );
+    private static Logger logger = Logger.getLogger(FileInfo.class.getName());
     private JPanel rootPanel;
     private JLabel fileName;
     private JPanel innerPanel;
     private PropertiesList properties;
 
-    public FileInfo() {
+    public FileInfo(MenuBarManager menuBar, SubmissionTree submissionTree) {
         properties = new PropertiesList(
                 FileProperty.getKeys(), FileProperty.getDefaults()
         );
 
         properties.setOpaque(false);
         innerPanel.add(properties, BorderLayout.CENTER);
+
+        submissionTree.addTreeSelectionListener(
+                event -> {
+                    TreePath path = event.getPath();
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                            .getLastPathComponent();
+
+                    if (node != null) {
+                        SubmittedFile sf = (SubmittedFile)node.getUserObject();
+                        File matchingFile = null;
+                        if (node instanceof SubmittedFileWrapperNode)
+                            matchingFile = ((SubmittedFileWrapperNode)node).matchingFile;
+
+                        try {
+                            update(sf, matchingFile);
+                        } catch (IOException x) {
+                            logger.warning("encountered I/O exception updating info");
+                        }
+                    } else {
+                        reset();
+                    }
+                }
+        );
     }
 
     private static LocalDateTime getModified(Path path) throws IOException {

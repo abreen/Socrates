@@ -1,6 +1,5 @@
 package io.breen.socrates.controller;
 
-import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
@@ -8,21 +7,16 @@ import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.model.AutomationStage;
 import io.breen.socrates.model.TestResult;
-import io.breen.socrates.model.wrapper.*;
+import io.breen.socrates.model.wrapper.TestWrapperNode;
 import io.breen.socrates.util.Pair;
-import io.breen.socrates.view.main.*;
+import io.breen.socrates.view.main.MainView;
+import io.breen.socrates.view.main.MenuBarManager;
 
-import javax.swing.*;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.nio.file.Path;
+import javax.swing.tree.TreePath;
 import java.util.*;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -37,169 +31,24 @@ public class MainController {
     private MenuBarManager menuBar;
 
     public MainController() {
-        mainView = new MainView();
-
-        if (Globals.operatingSystem == Globals.OS.OSX) Globals.enableFullScreen(mainView);
-
-        menuBar = new MenuBarManager(mainView);
-
-        // ctrl will end up being Command on OS X
-        int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-        int shift = InputEvent.SHIFT_DOWN_MASK;
-        int alt = InputEvent.ALT_DOWN_MASK;
+        menuBar = new MenuBarManager();
+        mainView = new MainView(menuBar);
+        menuBar.setView(mainView);
 
         /*
-         * Set up theme-related options.
-         */
-        newMenuItemAction(
-                menuBar.defaultTheme, e -> mainView.fileView.changeTheme(FileView.ThemeType.DEFAULT)
-        );
-
-        newMenuItemAction(
-                menuBar.base16Light,
-                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_LIGHT)
-        );
-
-        newMenuItemAction(
-                menuBar.base16Dark,
-                e -> mainView.fileView.changeTheme(FileView.ThemeType.BASE16_DARK)
-        );
-
-        /*
-         * Set up test-related actions.
-         */
-        Action passTest = newMenuItemAction(
-                menuBar.passTest, e -> {
-                    TestWrapperNode node = mainView.testTree.getSelectedTestWrapperNode();
-                    Test test = (Test)node.getUserObject();
-
-                    if (test instanceof Automatable) {
-                        AutomationStage stage = node.getAutomationStage();
-                        switch (stage) {
-                        case STARTED:
-                            // cannot change result while test is running
-                            return;
-                        case FINISHED_NORMAL:
-                        case NONE:
-                            if (userWantsToOverride()) mainView.testTree.passTest();
-                            return;
-                        case FINISHED_ERROR:
-                            mainView.testTree.passTest();
-                        }
-                    } else {
-                        mainView.testTree.passTest();
-                    }
-                }
-        );
-        passTest.setEnabled(false);
-        passTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, ctrl)
-        );
-        mainView.testControls.setPassTestAction(passTest);
-
-        Action failTest = newMenuItemAction(
-                menuBar.failTest, e -> {
-                    TestWrapperNode node = mainView.testTree.getSelectedTestWrapperNode();
-                    Test test = (Test)node.getUserObject();
-
-                    if (test instanceof Automatable) {
-                        AutomationStage stage = node.getAutomationStage();
-                        switch (stage) {
-                        case STARTED:
-                            // cannot change result while test is running
-                            return;
-                        case FINISHED_NORMAL:
-                        case NONE:
-                            if (userWantsToOverride()) mainView.testTree.failTest();
-                            return;
-                        case FINISHED_ERROR:
-                            mainView.testTree.failTest();
-                        }
-                    } else {
-                        mainView.testTree.failTest();
-                    }
-                }
-        );
-        failTest.setEnabled(false);
-        failTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ctrl)
-        );
-        mainView.testControls.setFailTestAction(failTest);
-
-        Action resetTest = newMenuItemAction(
-                menuBar.resetTest, e -> mainView.testTree.resetTest()
-        );
-        resetTest.setEnabled(false);
-        mainView.testControls.setResetTestAction(resetTest);
-
-        /*
-         * Set up test navigation options.
-         */
-        Action nextTest = newMenuItemAction(
-                menuBar.nextTest, e -> mainView.testTree.goToNextTest()
-        );
-        nextTest.setEnabled(false);
-        nextTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl)
-        );
-
-        Action previousTest = newMenuItemAction(
-                menuBar.previousTest, e -> mainView.testTree.goToPreviousTest()
-        );
-        previousTest.setEnabled(false);
-        previousTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl)
-        );
-
-        Action clearNotes = newMenuItemAction(
-                menuBar.clearNotes, e -> mainView.testControls.clearNotes()
-        );
-        clearNotes.setEnabled(false);
-        clearNotes.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, ctrl)
-        );
-
-        Action focusOnNotes = newMenuItemAction(
-                menuBar.focusOnNotes, e -> mainView.testControls.focusOnNotes()
-        );
-        focusOnNotes.setEnabled(false);
-        focusOnNotes.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, ctrl)
-        );
-
-        /*
-         * TreeSelectionListener for updating the disabled state of the test state
-         * and navigation options.
+         * The MainController will listen to the TestTree to see if an automated test
+         * gets selected. If so, this thread will spawn a new thread to run the test.
          */
         mainView.testTree.addTreeSelectionListener(
-                e -> {
-                    TestWrapperNode testNode = mainView.testTree.getSelectedTestWrapperNode();
+                event -> {
+                    TreePath path = event.getPath();
+                    TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
 
-                    mainView.testControls.update(testNode);
-
-                    if (testNode == null) {
-                        nextTest.setEnabled(true);
-                        previousTest.setEnabled(false);
-
-                        clearNotes.setEnabled(false);
-                        focusOnNotes.setEnabled(false);
-                        return;
-                    } else {
-                        nextTest.setEnabled(true);
-
-                        if (mainView.testTree.firstTestForFileSelected())
-                            previousTest.setEnabled(false);
-                        else previousTest.setEnabled(true);
-
-                        clearNotes.setEnabled(true);
-                        focusOnNotes.setEnabled(true);
-                    }
-
-                    Test testObj = (Test)testNode.getUserObject();
+                    Test testObj = (Test)node.getUserObject();
                     if (testObj instanceof Automatable &&
-                            testNode.getResult() == TestResult.NONE &&
-                            testNode.getAutomationStage() == AutomationStage.NONE &&
-                            !testNode.isConstrained())
+                            node.getResult() == TestResult.NONE &&
+                            node.getAutomationStage() == AutomationStage.NONE &&
+                            !node.isConstrained())
                     {
                         @SuppressWarnings("unchecked") Automatable<File> test =
                                 (Automatable<File>)testObj;
@@ -214,199 +63,32 @@ public class MainController {
 
                         (new Thread(
                                 () -> {
-                                    testNode.setAutomationStage(AutomationStage.STARTED);
+                                    node.setAutomationStage(AutomationStage.STARTED);
                                     try {
                                         boolean passed = test.shouldPass(
                                                 file, submitted, submission
                                         );
 
-                                        if (passed) testNode.setResult(TestResult.PASSED);
-                                        else testNode.setResult(TestResult.FAILED);
+                                        if (passed) node.setResult(TestResult.PASSED);
+                                        else node.setResult(TestResult.FAILED);
 
-                                        testNode.setAutomationStage(
+                                        node.setAutomationStage(
                                                 AutomationStage.FINISHED_NORMAL
                                         );
 
                                     } catch (CannotBeAutomatedException x) {
-                                        testNode.setAutomationStage(
+                                        node.setAutomationStage(
                                                 AutomationStage.FINISHED_ERROR
                                         );
 
                                     } finally {
-                                        mainView.testTree.nodeChanged(testNode);
+                                        mainView.testTree.nodeChanged(node);
                                     }
                                 }
                         )).start();
                     }
                 }
         );
-
-        /*
-         * Set up submission-related actions.
-         */
-        Action nextSubmission = newMenuItemAction(
-                menuBar.nextSubmission, e -> mainView.submissionTree.goToNextSubmission()
-        );
-        nextSubmission.setEnabled(true);
-        nextSubmission.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | shift)
-        );
-
-        Action previousSubmission = newMenuItemAction(
-                menuBar.previousSubmission, e -> mainView.submissionTree.goToPreviousSubmission()
-        );
-        previousSubmission.setEnabled(false);
-        previousSubmission.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | shift)
-        );
-
-        Action revealSubmission = newMenuItemAction(
-                menuBar.revealSubmission, e -> {
-                    Submission s = mainView.submissionTree.getSelectedSubmission();
-                    Path path = s.submissionDir;
-                    try {
-                        Desktop.getDesktop().open(path.toFile());
-                    } catch (IOException x) {
-                        logger.warning("got I/O exception revealing submission: " + x);
-                    }
-                }
-        );
-        revealSubmission.setEnabled(false);
-        revealSubmission.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | shift)
-        );
-
-        /*
-         * Set up file-related actions.
-         */
-        Action nextFile = newMenuItemAction(
-                menuBar.nextFile, e -> mainView.submissionTree.goToNextFile()
-        );
-        nextFile.setEnabled(true);
-        nextFile.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | alt)
-        );
-
-        Action previousFile = newMenuItemAction(
-                menuBar.previousFile, e -> mainView.submissionTree.goToPreviousFile()
-        );
-        previousFile.setEnabled(false);
-        previousFile.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | alt)
-        );
-
-        Action openFile = newMenuItemAction(
-                menuBar.openFile, e -> {
-                    SubmittedFile f = mainView.submissionTree.getSelectedSubmittedFile();
-                    Path path = f.fullPath;
-                    try {
-                        Desktop.getDesktop().open(path.toFile());
-                    } catch (IOException x) {
-                        logger.warning("got I/O exception revealing file: " + x);
-                    }
-                }
-        );
-        openFile.setEnabled(false);
-
-        /*
-         * Set up event listeners.
-         */
-        mainView.submissionTree.addTreeSelectionListener(
-                event -> {
-                    File matchingFile = null;
-                    DefaultMutableTreeNode node = mainView.submissionTree.getSelectedNode();
-
-                    if (node != null) {
-                        if (node instanceof SubmittedFileWrapperNode) {
-                            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)node;
-                            SubmittedFile sf = (SubmittedFile)sfwn.getUserObject();
-                            matchingFile = sfwn.matchingFile;
-
-                            try {
-                                mainView.fileView.update(sf, matchingFile);
-                                mainView.fileInfo.update(sf, matchingFile);
-                            } catch (IOException x) {
-                                logger.warning("encountered I/O exception updating view");
-                            }
-
-                            mainView.testTree.update(sfwn.treeModel);
-                            mainView.testControls.reset();
-
-                        } else if (node instanceof UnrecognizedFileWrapperNode) {
-                            SubmittedFile sf = (SubmittedFile)node.getUserObject();
-
-                            try {
-                                mainView.fileView.update(sf);
-                                mainView.fileInfo.update(sf);
-                            } catch (IOException x) {
-                                logger.warning("encountered I/O exception updating view");
-                            }
-
-                            mainView.testTree.reset();
-                            mainView.testControls.reset();
-                        }
-                    } else {
-                        mainView.fileView.reset();
-                        mainView.fileInfo.reset();
-                        mainView.testTree.reset();
-                        mainView.testControls.reset();
-                    }
-
-                    /*
-                     * Update enabled state of actions.
-                     */
-                    if (!mainView.submissionTree.hasSelection()) {
-                        revealSubmission.setEnabled(false);
-                        openFile.setEnabled(false);
-
-                        nextSubmission.setEnabled(true);
-                        nextFile.setEnabled(true);
-                        previousSubmission.setEnabled(false);
-
-                        nextTest.setEnabled(false);
-                        previousTest.setEnabled(false);
-                    } else {
-                        revealSubmission.setEnabled(true);
-                        openFile.setEnabled(true);
-
-                        if (mainView.submissionTree.lastSubmissionSelected())
-                            nextSubmission.setEnabled(false);
-                        else nextSubmission.setEnabled(true);
-
-                        if (mainView.submissionTree.firstSubmissionSelected())
-                            previousSubmission.setEnabled(false);
-                        else previousSubmission.setEnabled(true);
-
-                        if (mainView.submissionTree.lastFileInSubmissionSelected())
-                            nextFile.setEnabled(false);
-                        else nextFile.setEnabled(true);
-
-                        if (mainView.submissionTree.firstFileInSubmissionSelected())
-                            previousFile.setEnabled(false);
-                        else previousFile.setEnabled(true);
-
-                        if (matchingFile != null) {
-                            int n = matchingFile.testRoot.members.size();
-                            if (n > 0) nextTest.setEnabled(true);
-                        } else {
-                            nextTest.setEnabled(false);
-                        }
-                    }
-                }
-        );
-    }
-
-    private static Action newMenuItemAction(JMenuItem item, Consumer<ActionEvent> lambda)
-    {
-        Action a = new AbstractAction(item.getText()) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                lambda.accept(e);
-            }
-        };
-
-        item.setAction(a);
-        return a;
     }
 
     private static void addTreeChangedListener(TreeModel model, Consumer<TreeModelEvent> lambda)
@@ -460,17 +142,5 @@ public class MainController {
         mainView.setVisible(true);
 
         logger.info("started MainView");
-    }
-
-    private boolean userWantsToOverride() {
-        int rv = JOptionPane.showConfirmDialog(
-                mainView,
-                "This is an automated test. Are you sure you want to\noverride the automated " +
-                        "test's result?",
-                "Override Automated Test?",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-        return rv == JOptionPane.YES_OPTION;
     }
 }

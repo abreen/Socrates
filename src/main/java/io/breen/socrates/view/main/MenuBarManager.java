@@ -3,22 +3,28 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.function.Consumer;
 
 public class MenuBarManager {
 
     public final JMenuBar menuBar;
 
-    public final JMenu sessionMenu;
+    //public final JMenu sessionMenu;
     public final JMenu submissionMenu;
     public final JMenu fileMenu;
     public final JMenu testMenu;
 
+    /*
     public final JMenuItem openSession;         // TODO
     public final JMenuItem saveSession;         // TODO
+    */
 
     public final JMenuItem nextSubmission;
     public final JMenuItem previousSubmission;
     public final JMenuItem revealSubmission;
+    public final JMenuItem saveGradeReport;
+    public final JMenuItem saveGradeReportAs;
 
     public final JMenuItem nextFile;
     public final JMenuItem previousFile;
@@ -37,13 +43,14 @@ public class MenuBarManager {
     public final JMenuItem focusOnNotes;
 
 
-    public MenuBarManager(MainView view) {
+    public MenuBarManager() {
         menuBar = new JMenuBar();
 
         /*
          * The Session menu contains options for saving the current session or
          * opening a previously saved session.
          */
+        /*
         sessionMenu = new JMenu("Session");
 
         openSession = new JMenuItem("Open Saved Session...");
@@ -51,6 +58,7 @@ public class MenuBarManager {
 
         sessionMenu.add(openSession);
         sessionMenu.add(saveSession);
+        */
 
 
         /*
@@ -75,10 +83,16 @@ public class MenuBarManager {
             revealSubmission.setText("Reveal in File System");
         }
 
+        saveGradeReport = new JMenuItem("Save Grade Report");
+        saveGradeReportAs = new JMenuItem("Save Grade Report As...");
+
         submissionMenu.add(nextSubmission);
         submissionMenu.add(previousSubmission);
         submissionMenu.addSeparator();
         submissionMenu.add(revealSubmission);
+        submissionMenu.addSeparator();
+        submissionMenu.add(saveGradeReport);
+        submissionMenu.add(saveGradeReportAs);
 
 
         /*
@@ -147,12 +161,27 @@ public class MenuBarManager {
         testMenu.addSeparator();
         testMenu.add(clearNotes);
         testMenu.add(focusOnNotes);
+    }
 
+    /**
+     * Utility method for easily creating a new Action and immediately assigning the Action to the
+     * specified JMenuItem. For its text property, the new Action will take the text from the
+     * JMenuItem.
+     */
+    public static Action newMenuItemAction(JMenuItem item, Consumer<ActionEvent> lambda) {
+        Action a = new AbstractAction(item.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                lambda.accept(e);
+            }
+        };
 
-        /*
-         * Add all menus to the main menu bar, and set the view's menu bar to this one.
-         */
-        menuBar.add(sessionMenu);
+        item.setAction(a);
+        return a;
+    }
+
+    public void setView(MainView view) {
+        //menuBar.add(sessionMenu);
         menuBar.add(submissionMenu);
         menuBar.add(fileMenu);
         menuBar.add(testMenu);

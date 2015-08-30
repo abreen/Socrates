@@ -3,15 +3,19 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.util.Configuration;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class FileView {
 
@@ -21,12 +25,52 @@ public class FileView {
         BASE16_DARK
     }
 
+    private static Logger logger = Logger.getLogger(FileView.class.getName());
+    public final Action defaultTheme;
+    public final Action base16Light;
+    public final Action base16Dark;
     private Configuration config;
     private SubmittedFile currentFile;
-
     private JEditorPane editor;
     private JPanel rootPanel;
     private JScrollPane scrollPane;
+
+    public FileView(MenuBarManager menuBar, SubmissionTree submissionTree) {
+        defaultTheme = MenuBarManager.newMenuItemAction(
+                menuBar.defaultTheme, e -> changeTheme(FileView.ThemeType.DEFAULT)
+        );
+
+        base16Light = MenuBarManager.newMenuItemAction(
+                menuBar.base16Light, e -> changeTheme(FileView.ThemeType.BASE16_LIGHT)
+        );
+
+        base16Dark = MenuBarManager.newMenuItemAction(
+                menuBar.base16Dark, e -> changeTheme(FileView.ThemeType.BASE16_DARK)
+        );
+
+        submissionTree.addTreeSelectionListener(
+                event -> {
+                    TreePath path = event.getPath();
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                            .getLastPathComponent();
+
+                    if (node != null) {
+                        SubmittedFile sf = (SubmittedFile)node.getUserObject();
+                        File matchingFile = null;
+                        if (node instanceof SubmittedFileWrapperNode)
+                            matchingFile = ((SubmittedFileWrapperNode)node).matchingFile;
+
+                        try {
+                            update(sf, matchingFile);
+                        } catch (IOException x) {
+                            logger.warning("encountered I/O exception updating view");
+                        }
+                    } else {
+                        reset();
+                    }
+                }
+        );
+    }
 
     private void createUIComponents() {
         DefaultSyntaxKit.initKit();
