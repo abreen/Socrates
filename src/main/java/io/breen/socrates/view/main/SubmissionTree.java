@@ -5,6 +5,7 @@ import io.breen.socrates.controller.MainController;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.model.event.GradeReportSavedEvent;
 import io.breen.socrates.model.event.SubmissionCompletedChangeEvent;
 import io.breen.socrates.model.wrapper.*;
 import io.breen.socrates.util.*;
@@ -38,8 +39,14 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     private JScrollPane scrollPane;
     private JTree tree;
     private DefaultMutableTreeNode root;
+    private MainView view;
+    private List<SubmissionWrapperNode> notSaved;
 
-    public SubmissionTree(MenuBarManager menuBar, MainController main) {
+    public SubmissionTree(MenuBarManager menuBar, MainController main, MainView view) {
+        this.view = view;
+
+        notSaved = new LinkedList<>();
+
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
@@ -375,6 +382,15 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
             recognized.forEach(parent::add);
             unrecognized.forEach(parent::add);
 
+            /*
+             * A submission might be "complete" at this point, if the submission contained no
+             * expected files or was empty.
+             */
+            if (parent.isComplete()) {
+                notSaved.add(parent);
+                view.setAllSaved(false);
+            }
+
             parent.addObserver(this);
 
             root.add(parent);
@@ -563,17 +579,32 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     public void objectChanged(ObservableChangedEvent<SubmissionWrapperNode> event) {
         getModel().nodeChanged(event.source);
 
-        if (event instanceof SubmissionCompletedChangeEvent && event.source ==
-                getCurrentSubmissionNode()) {
+        if (event instanceof SubmissionCompletedChangeEvent) {
             SubmissionCompletedChangeEvent e = (SubmissionCompletedChangeEvent)event;
 
             if (e.isNowComplete) {
-                saveGradeReport.setEnabled(true);
-                saveGradeReportAs.setEnabled(true);
+                notSaved.add(e.source);
+                view.setAllSaved(false);
             } else {
-                saveGradeReport.setEnabled(false);
-                saveGradeReportAs.setEnabled(false);
+                notSaved.remove(e.source);
             }
+
+            if (event.source == getCurrentSubmissionNode()) {
+                if (e.isNowComplete) {
+                    saveGradeReport.setEnabled(true);
+                    saveGradeReportAs.setEnabled(true);
+                } else {
+                    saveGradeReport.setEnabled(false);
+                    saveGradeReportAs.setEnabled(false);
+                }
+            }
+        } else if (event instanceof GradeReportSavedEvent) {
+            GradeReportSavedEvent e = (GradeReportSavedEvent)event;
+
+            notSaved.remove(e.source);
+
+            if (notSaved.isEmpty()) view.setAllSaved(true);
+
         }
     }
 }

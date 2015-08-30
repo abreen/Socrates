@@ -35,7 +35,7 @@ public class MainView extends JFrame {
     }
 
     private void createUIComponents() {
-        submissionTree = new SubmissionTree(menuBar, controller);
+        submissionTree = new SubmissionTree(menuBar, controller, this);
         fileView = new FileView(menuBar, submissionTree);
         fileInfo = new FileInfo(menuBar, submissionTree);
         testTree = new TestTree(menuBar, submissionTree);
@@ -47,5 +47,16 @@ public class MainView extends JFrame {
          * action of the buttons on the controls.
          */
         testControls = new TestControls(menuBar, testTree, submissionTree);
+    }
+
+    public void setAllSaved(boolean saved) {
+        if (Globals.operatingSystem != Globals.OS.OSX) return;
+
+        JRootPane root = getRootPane();
+        if (saved) {
+            root.putClientProperty("Window.documentModified", Boolean.FALSE);
+        } else {
+            root.putClientProperty("Window.documentModified", Boolean.TRUE);
+        }
     }
 }

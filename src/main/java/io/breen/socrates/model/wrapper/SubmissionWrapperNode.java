@@ -53,6 +53,9 @@ public class SubmissionWrapperNode extends DefaultMutableTreeNode
 
     @Override
     public void objectChanged(ObservableChangedEvent<SubmittedFileWrapperNode> event) {
+        // any change of submitted files should invalidate saved state
+        setSaved(false);
+
         int numBefore = unfinishedFiles.size();
 
         if (event instanceof FileCompletedChangeEvent) {
