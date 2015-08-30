@@ -140,7 +140,7 @@ public class TestControls implements Observer<TestWrapperNode> {
             return;
         }
 
-        currentNode.removeObserver(this);
+        if (currentNode != null) currentNode.removeObserver(this);
         currentNode = testNode;
         currentNode.addObserver(this);
 
