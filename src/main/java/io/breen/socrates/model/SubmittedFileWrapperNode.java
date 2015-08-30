@@ -92,7 +92,7 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
         }
 
         if (unfinishedTests.isEmpty()) {
-            FileReportCompleteEvent e = new FileReportCompleteEvent(this);
+            TestsCompleteEvent e = new TestsCompleteEvent(this);
             observers.forEach(o -> o.objectChanged(e));
         }
     }

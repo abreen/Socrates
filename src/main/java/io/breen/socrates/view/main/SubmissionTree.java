@@ -449,10 +449,13 @@ public class SubmissionTree implements Observer<SubmittedFileWrapperNode> {
         tree.setSelectionPath(new TreePath(prevFile.getPath()));
     }
 
+    /**
+     * Called when the SubmittedFileWrapperNode that the tree is currently observing changes.
+     */
     @Override
     public void objectChanged(ObservableChangedEvent<SubmittedFileWrapperNode> event) {
-        if (event instanceof FileReportCompleteEvent) {
-            FileReportCompleteEvent e = (FileReportCompleteEvent)event;
+        if (event instanceof TestsCompleteEvent) {
+            TestsCompleteEvent e = (TestsCompleteEvent)event;
             SubmittedFileWrapperNode node = e.source;
             getModel().nodeChanged(node);
         }
