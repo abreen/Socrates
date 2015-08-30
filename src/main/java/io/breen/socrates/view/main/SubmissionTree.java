@@ -163,20 +163,6 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
             }
         };
 
-        /*
-         * This ensures that only submitted files in the tree can be selected --- not
-         * submission directories or anything else.
-         */
-        tree.setSelectionModel(
-                new PredicateTreeSelectionModel(
-                        path -> {
-                            Object last = path.getLastPathComponent();
-                            return last instanceof SubmittedFileWrapperNode || last instanceof
-                                    UnrecognizedFileWrapperNode;
-                        }
-                )
-        );
-
         tree.addTreeSelectionListener(
                 event -> {
                     TreePath path = event.getPath();

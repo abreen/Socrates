@@ -4,6 +4,7 @@ import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
+import io.breen.socrates.model.wrapper.UnrecognizedFileWrapperNode;
 import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
@@ -77,7 +78,10 @@ public class FileInfo {
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
                             .getLastPathComponent();
 
-                    if (node != null) {
+                    if (!event.isAddedPath()) node = null;
+
+                    if (node != null && (node instanceof SubmittedFileWrapperNode || node
+                            instanceof UnrecognizedFileWrapperNode)) {
                         SubmittedFile sf = (SubmittedFile)node.getUserObject();
                         File matchingFile = null;
                         if (node instanceof SubmittedFileWrapperNode)

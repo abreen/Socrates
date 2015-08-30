@@ -118,14 +118,16 @@ public class TestTree {
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
                             .getLastPathComponent();
 
-                    if (node != null) {
+                    if (!event.isAddedPath()) node = null;
+
+                    if (node != null && (node instanceof SubmittedFileWrapperNode || node
+                            instanceof UnrecognizedFileWrapperNode)) {
                         File matchingFile = null;
                         if (node instanceof SubmittedFileWrapperNode) {
                             SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)node;
                             matchingFile = sfwn.matchingFile;
                             update(sfwn.treeModel);
-
-                        } else if (node instanceof UnrecognizedFileWrapperNode) {
+                        } else {
                             reset();
                         }
 
