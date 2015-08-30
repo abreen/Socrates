@@ -140,9 +140,9 @@ public class TestControls implements Observer<TestWrapperNode> {
             return;
         }
 
+        currentNode.removeObserver(this);
         currentNode = testNode;
-
-        testNode.addObserver(this);
+        currentNode.addObserver(this);
 
         Test test = (Test)testNode.getUserObject();
         DecimalFormat fmt = new DecimalFormat("#.#");
