@@ -18,8 +18,6 @@ public class MenuBarManager {
 
     public final JMenuItem nextSubmission;
     public final JMenuItem previousSubmission;
-    public final JMenuItem skipSubmission;      // TODO
-    public final JMenuItem unGradeSubmission;   // TODO
     public final JMenuItem revealSubmission;
 
     public final JMenuItem nextFile;
@@ -64,8 +62,6 @@ public class MenuBarManager {
 
         nextSubmission = new JMenuItem("Next Submission");
         previousSubmission = new JMenuItem("Previous Submission");
-        skipSubmission = new JMenuItem("Skip Submission");
-        unGradeSubmission = new JMenuItem("Un-Grade Submission");
 
         revealSubmission = new JMenuItem();
         switch (Globals.operatingSystem) {
@@ -81,9 +77,6 @@ public class MenuBarManager {
 
         submissionMenu.add(nextSubmission);
         submissionMenu.add(previousSubmission);
-        submissionMenu.addSeparator();
-        submissionMenu.add(skipSubmission);
-        submissionMenu.add(unGradeSubmission);
         submissionMenu.addSeparator();
         submissionMenu.add(revealSubmission);
 
