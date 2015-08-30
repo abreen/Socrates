@@ -86,9 +86,8 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
     public void setConstrained(boolean constrained) {
         if (constrained == this.constrained) return;
         this.constrained = constrained;
-        observers.forEach(
-                o -> o.objectChanged(new ConstraintChangedEvent(this, constrained))
-        );
+        ConstraintChangedEvent e = new ConstraintChangedEvent(this, constrained);
+        observers.forEach(o -> o.objectChanged(e));
     }
 
     public AutomationStage getAutomationStage() {
