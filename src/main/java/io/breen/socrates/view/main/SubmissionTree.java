@@ -166,13 +166,10 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                     UnrecognizedFileWrapperNode ufwn = (UnrecognizedFileWrapperNode)value;
                     return ((SubmittedFile)ufwn.getUserObject()).localPath.toString();
 
-                } else if (value instanceof DefaultMutableTreeNode) {
-                    DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode)value;
-                    Object userObject = dmtn.getUserObject();
-
-                    if (userObject instanceof Submission) {
-                        return ((Submission)userObject).studentName;
-                    }
+                } else if (value instanceof SubmissionWrapperNode) {
+                    SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
+                    Submission submission = (Submission)swn.getUserObject();
+                    return submission.studentName;
                 }
 
                 return super.convertValueToText(
@@ -272,15 +269,31 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                                 tree, value, selected, expanded, isLeaf, row, focused
                         );
 
+                        Font normal = Font.decode("Dialog");
+                        Font italic = Font.decode("Dialog-ITALIC");
+                        Color inactive = UIManager.getColor("textInactiveText");
+
+                        setFont(normal);
+
                         if (!selected) {
                             if (value instanceof UnrecognizedFileWrapperNode) {
-                                setForeground(UIManager.getColor("textInactiveText"));
+                                setForeground(inactive);
+
                             } else if (value instanceof SubmittedFileWrapperNode) {
                                 SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
+
                                 if (sfwn.isComplete()) setForeground(Globals.GREEN);
+
                             } else if (value instanceof SubmissionWrapperNode) {
                                 SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
-                                if (swn.isComplete()) setForeground(Globals.GREEN);
+                                if (swn.isComplete()) {
+                                    setForeground(Globals.GREEN);
+
+                                    if (!swn.isSaved()) {
+                                        setFont(italic);
+                                    }
+
+                                }
                             }
                         }
 
@@ -332,8 +345,13 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     }
 
     public SubmissionWrapperNode getCurrentSubmissionNode() {
-        TreePath file = tree.getSelectionPath();
-        return (SubmissionWrapperNode)file.getParentPath().getLastPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+
+        if (node instanceof SubmissionWrapperNode) return (SubmissionWrapperNode)node;
+        else if (node instanceof SubmittedFileWrapperNode || node instanceof
+                UnrecognizedFileWrapperNode)
+            return (SubmissionWrapperNode)node.getParent();
+        else return null;
     }
 
     public void addUngraded(Map<Submission, List<Pair<SubmittedFile, File>>> map) {

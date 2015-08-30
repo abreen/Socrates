@@ -116,6 +116,7 @@ public class MainController {
     }
 
     public void saveGradeReport(SubmissionWrapperNode completed, Path dest) {
-        System.out.println("saving " + completed);
+        // TODO
+        completed.setSaved(true);
     }
 }

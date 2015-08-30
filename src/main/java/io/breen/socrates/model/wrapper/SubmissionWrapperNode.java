@@ -1,8 +1,7 @@
 package io.breen.socrates.model.wrapper;
 
 import io.breen.socrates.immutable.submission.Submission;
-import io.breen.socrates.model.event.FileCompletedChangeEvent;
-import io.breen.socrates.model.event.SubmissionCompletedChangeEvent;
+import io.breen.socrates.model.event.*;
 import io.breen.socrates.util.Observable;
 import io.breen.socrates.util.*;
 import io.breen.socrates.util.Observer;
@@ -23,8 +22,14 @@ public class SubmissionWrapperNode extends DefaultMutableTreeNode
     protected final List<Observer<SubmissionWrapperNode>> observers;
     private final Set<SubmittedFileWrapperNode> unfinishedFiles;
 
+    /**
+     * Whether a grade report has been saved for this submission.
+     */
+    private boolean saved;
+
     public SubmissionWrapperNode(Submission submission) {
         super(submission);
+        saved = false;
         unfinishedFiles = new HashSet<>();
         observers = new LinkedList<>();
     }
@@ -76,5 +81,16 @@ public class SubmissionWrapperNode extends DefaultMutableTreeNode
     @Override
     public void removeObserver(Observer<SubmissionWrapperNode> observer) {
         observers.remove(observer);
+    }
+
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        if (saved == this.saved) return;
+        this.saved = saved;
+        GradeReportSavedEvent e = new GradeReportSavedEvent(this);
+        observers.forEach(o -> o.objectChanged(e));
     }
 }
