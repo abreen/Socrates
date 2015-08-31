@@ -106,7 +106,7 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                     }
                 }
         );
-        nextSubmission.setEnabled(true);
+        nextSubmission.setEnabled(false);
         nextSubmission.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | shift)
         );
@@ -163,7 +163,7 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                     }
                 }
         );
-        nextFile.setEnabled(true);
+        nextFile.setEnabled(false);
         nextFile.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | alt)
         );
@@ -258,7 +258,7 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                         revealSubmission.setEnabled(false);
                         openFile.setEnabled(false);
 
-                        nextSubmission.setEnabled(true);
+                        nextSubmission.setEnabled(false);
                         previousSubmission.setEnabled(false);
                         nextFile.setEnabled(false);
                         previousFile.setEnabled(false);
@@ -306,7 +306,7 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                                                 node
                                         )
                                 );
-                               
+
                                 if (next == null) previousFile.setEnabled(false);
                                 else previousFile.setEnabled(true);
                             } else {
