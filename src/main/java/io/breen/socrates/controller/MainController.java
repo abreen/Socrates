@@ -1,5 +1,6 @@
 package io.breen.socrates.controller;
 
+import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.TextGradeReportFormatter;
 import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
@@ -14,6 +15,7 @@ import io.breen.socrates.util.Pair;
 import io.breen.socrates.view.main.MainView;
 import io.breen.socrates.view.main.MenuBarManager;
 
+import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -90,7 +92,7 @@ public class MainController {
         );
     }
 
-    public void start(Criteria criteria, List<Submission> submissions) {
+    public void start(Path criteriaPath, Criteria criteria, List<Submission> submissions) {
         this.criteria = criteria;
         this.submissions = submissions;
 
@@ -106,7 +108,13 @@ public class MainController {
             map.put(s, list);
         }
 
-        mainView.setTitle("Socrates — " + criteria.assignmentName);
+        if (Globals.operatingSystem == Globals.OS.OSX) {
+            JRootPane root = mainView.getRootPane();
+            root.putClientProperty("Window.documentFile", criteriaPath.toFile());
+            mainView.setTitle(criteria.assignmentName);
+        } else {
+            mainView.setTitle("Socrates — " + criteria.assignmentName);
+        }
 
         mainView.submissionTree.addUngraded(map);
         mainView.submissionTree.expandFirstSubmission();

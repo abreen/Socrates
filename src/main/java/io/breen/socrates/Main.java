@@ -136,7 +136,7 @@ public class Main {
          * submission could be added, that step of the setup will be skipped.
          */
         SetupController setup = new SetupController(main);
-        setup.start(criteria, submissions);
+        setup.start(criteriaPath, criteria, submissions);
     }
 
     private static void setDefaultProperties() {

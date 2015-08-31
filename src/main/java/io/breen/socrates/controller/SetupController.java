@@ -19,6 +19,7 @@ public class SetupController {
 
     private static Logger logger = Logger.getLogger(SetupController.class.getName());
 
+    private Path criteriaPath;
     private Criteria criteria;
     private List<Submission> submissions;
 
@@ -35,6 +36,7 @@ public class SetupController {
                     if (path != null) {
                         try {
                             criteria = Criteria.loadFromPath(path);
+                            criteriaPath = path;
                         } catch (IOException | InvalidCriteriaException |
                                 MissingResourceException x) {
                             DetailOptionPane.showMessageDialog(
@@ -112,7 +114,8 @@ public class SetupController {
         );
     }
 
-    public void start(Criteria criteria, List<Submission> submissions) {
+    public void start(Path criteriaPath, Criteria criteria, List<Submission> submissions) {
+        this.criteriaPath = criteriaPath;
         this.criteria = criteria;
         this.submissions = submissions;
 
@@ -128,13 +131,13 @@ public class SetupController {
             // we can skip the setup entirely
             HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
             HookManager.runHook(Hook.BEFORE_GRADING);
-            main.start(criteria, submissions);
+            main.start(criteriaPath, criteria, submissions);
         }
     }
 
     public void transferToMain() {
         view.setVisible(false);
         view.dispose();
-        main.start(criteria, submissions);
+        main.start(criteriaPath, criteria, submissions);
     }
 }
