@@ -167,6 +167,7 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
             if (notes.length() > 0) {
                 builder.append("\n\n\tGrader notes: ");
                 builder.append(notes);
+                builder.append("\n");
             }
 
             return builder.toString();
