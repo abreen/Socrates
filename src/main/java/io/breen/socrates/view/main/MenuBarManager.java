@@ -37,6 +37,7 @@ public class MenuBarManager {
     public final JMenuItem passTest;
     public final JMenuItem failTest;
     public final JMenuItem resetTest;
+    public final JMenuItem resetAllTests;
     public final JMenuItem nextTest;
     public final JMenuItem previousTest;
     public final JMenuItem clearNotes;
@@ -145,6 +146,7 @@ public class MenuBarManager {
         passTest = new JMenuItem("Pass Test");
         failTest = new JMenuItem("Fail Test");
         resetTest = new JMenuItem("Reset Test");
+        resetAllTests = new JMenuItem("Reset All Tests");
 
         nextTest = new JMenuItem("Next Test");
         previousTest = new JMenuItem("Previous Test");
@@ -155,6 +157,7 @@ public class MenuBarManager {
         testMenu.add(passTest);
         testMenu.add(failTest);
         testMenu.add(resetTest);
+        testMenu.add(resetAllTests);
         testMenu.addSeparator();
         testMenu.add(nextTest);
         testMenu.add(previousTest);

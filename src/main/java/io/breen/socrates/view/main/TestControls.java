@@ -57,8 +57,13 @@ public class TestControls implements Observer<TestWrapperNode> {
     private static final Document EMPTY_DOCUMENT = new PlainDocument();
     private static final int ICON_WIDTH = 24;
     private static final int ICON_HEIGHT = 24;
+
+    public final Action passTest;
+    public final Action failTest;
+    public final Action resetTest;
     public final Action clearNotes;
     public final Action focusOnNotes;
+
     private JPanel rootPanel;
     private JPanel innerPanel;
     private JPanel buttonPanel;
@@ -76,21 +81,73 @@ public class TestControls implements Observer<TestWrapperNode> {
         updateIcon();
         description.setText(NO_TEST_SELECTED_DESC);
 
-        passButton.setAction(menuBar.passTest.getAction());
-        failButton.setAction(menuBar.failTest.getAction());
-        resetButton.setAction(menuBar.resetTest.getAction());
-
-        /*
-         * The menu item text for the menu item Actions are too long for our buttons, so we
-         * override the text from each Action here.
-         */
-        passButton.setText("Pass");
-        failButton.setText("Fail");
-        resetButton.setText("Reset");
-
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
+
+        passTest = MenuBarManager.newMenuItemAction(
+                menuBar.passTest, e -> {
+                    TestWrapperNode node = testTree.getSelectedTestWrapperNode();
+                    Test test = (Test)node.getUserObject();
+
+                    if (test instanceof Automatable) {
+                        AutomationStage stage = node.getAutomationStage();
+                        switch (stage) {
+                        case STARTED:
+                            // cannot change result while test is running
+                            return;
+                        case FINISHED_NORMAL:
+                        case NONE:
+                            if (!userWantsToOverride()) return;
+                        case FINISHED_ERROR:
+                            node.setResult(TestResult.PASSED);
+                        }
+                    } else {
+                        node.setResult(TestResult.PASSED);
+                    }
+                }
+        );
+        passTest.setEnabled(false);
+        passTest.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, ctrl)
+        );
+
+        failTest = MenuBarManager.newMenuItemAction(
+                menuBar.failTest, e -> {
+                    TestWrapperNode node = testTree.getSelectedTestWrapperNode();
+                    Test test = (Test)node.getUserObject();
+
+                    if (test instanceof Automatable) {
+                        AutomationStage stage = node.getAutomationStage();
+                        switch (stage) {
+                        case STARTED:
+                            // cannot change result while test is running
+                            return;
+                        case FINISHED_NORMAL:
+                        case NONE:
+                            if (!userWantsToOverride()) return;
+                        case FINISHED_ERROR:
+                            node.setResult(TestResult.FAILED);
+                        }
+                    } else {
+                        node.setResult(TestResult.FAILED);
+                    }
+                }
+        );
+        failTest.setEnabled(false);
+        failTest.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ctrl)
+        );
+
+        resetTest = MenuBarManager.newMenuItemAction(
+                menuBar.resetTest, e -> {
+                    TestWrapperNode node = testTree.getSelectedTestWrapperNode();
+                    Test test = (Test)node.getUserObject();
+                    node.setResult(TestResult.NONE);
+                    if (test instanceof Automatable) node.setAutomationStage(AutomationStage.NONE);
+                }
+        );
+        resetTest.setEnabled(false);
 
         clearNotes = MenuBarManager.newMenuItemAction(
                 menuBar.clearNotes, e -> clearNotes()
@@ -125,6 +182,18 @@ public class TestControls implements Observer<TestWrapperNode> {
         );
 
         submissionTree.addTreeSelectionListener(event -> reset());
+
+        passButton.setAction(passTest);
+        failButton.setAction(failTest);
+        resetButton.setAction(resetTest);
+
+        /*
+         * The menu item text for the menu item Actions are too long for our buttons, so we
+         * override the text from each Action here.
+         */
+        passButton.setText("Pass");
+        failButton.setText("Fail");
+        resetButton.setText("Reset");
     }
 
     public static TestIcon newIcon(TestWrapperNode node) {
@@ -189,9 +258,11 @@ public class TestControls implements Observer<TestWrapperNode> {
         notes.setEnabled(false);
         notes.setDocument(EMPTY_DOCUMENT);
 
-        resetButton.getAction().setEnabled(false);
-        passButton.getAction().setEnabled(false);
-        failButton.getAction().setEnabled(false);
+        passTest.setEnabled(false);
+        failTest.setEnabled(false);
+        resetTest.setEnabled(false);
+        clearNotes.setEnabled(false);
+        focusOnNotes.setEnabled(false);
     }
 
     public void update(TestWrapperNode testNode) {
@@ -230,36 +301,6 @@ public class TestControls implements Observer<TestWrapperNode> {
         notes.setDocument(testNode.notes);
     }
 
-    /**
-     * Sets the Action for the "Pass" button. The button's text will not be changed to the Action's
-     * text --- the old text will be retained.
-     */
-    public void setPassTestAction(Action a) {
-        String textBefore = passButton.getText();
-        passButton.setAction(a);
-        passButton.setText(textBefore);
-    }
-
-    /**
-     * Sets the Action for the "Fail" button. The button's text will not be changed to the Action's
-     * text --- the old text will be retained.
-     */
-    public void setFailTestAction(Action a) {
-        String textBefore = failButton.getText();
-        failButton.setAction(a);
-        failButton.setText(textBefore);
-    }
-
-    /**
-     * Sets the Action for the "Reset" button. The button's text will not be changed to the Action's
-     * text --- the old text will be retained.
-     */
-    public void setResetTestAction(Action a) {
-        String textBefore = resetButton.getText();
-        resetButton.setAction(a);
-        resetButton.setText(textBefore);
-    }
-
     private void updateIcon() {
         TestIcon i = newIcon(currentNode);
         i.setIconHeight(24);
@@ -271,11 +312,12 @@ public class TestControls implements Observer<TestWrapperNode> {
         if (currentNode == null) {
             setEnabledForAllButtons(false);
         } else if (currentNode.isConstrained()) {
-            resetButton.getAction().setEnabled(true);
-            if (currentNode.getResult() == TestResult.FAILED)
-                passButton.getAction().setEnabled(true);
-            else passButton.getAction().setEnabled(false);
-            failButton.getAction().setEnabled(false);
+            resetTest.setEnabled(true);
+
+            if (currentNode.getResult() == TestResult.FAILED) passTest.setEnabled(true);
+            else passTest.setEnabled(false);
+
+            failTest.setEnabled(false);
         } else {
             setEnabledForAllButtons(true);
         }
@@ -318,8 +360,20 @@ public class TestControls implements Observer<TestWrapperNode> {
     }
 
     private void setEnabledForAllButtons(boolean enabled) {
-        resetButton.getAction().setEnabled(enabled);
-        passButton.getAction().setEnabled(enabled);
-        failButton.getAction().setEnabled(enabled);
+        resetTest.setEnabled(enabled);
+        passTest.setEnabled(enabled);
+        failTest.setEnabled(enabled);
+    }
+
+    private boolean userWantsToOverride() {
+        int rv = JOptionPane.showConfirmDialog(
+                null,
+                "This is an automated test. Are you sure you want to\noverride the automated " +
+                        "test's result?",
+                "Override Automated Test?",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+        return rv == JOptionPane.YES_OPTION;
     }
 }

@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 public class SubmissionTree implements Observer<SubmissionWrapperNode> {
 
     private static Logger logger = Logger.getLogger(SubmissionTree.class.getName());
+    public final Action resetAllTests;
     public final Action saveGradeReport;
     public final Action saveGradeReportAs;
     public final Action nextSubmission;
@@ -51,6 +52,16 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
+
+        resetAllTests = MenuBarManager.newMenuItemAction(
+                menuBar.resetAllTests, e -> {
+                    DefaultMutableTreeNode node = getSelectedNode();
+                    if (node == null || !(node instanceof SubmittedFileWrapperNode)) return;
+
+                    ((SubmittedFileWrapperNode)node).resetAllTests();
+                }
+        );
+        resetAllTests.setEnabled(false);
 
         saveGradeReport = MenuBarManager.newMenuItemAction(
                 menuBar.saveGradeReport, e -> {
@@ -198,12 +209,14 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                     if (!event.isAddedPath()) node = null;
 
                     if (node == null) {
+                        resetAllTests.setEnabled(false);
+
                         revealSubmission.setEnabled(false);
                         openFile.setEnabled(false);
 
                         nextSubmission.setEnabled(true);
                         previousSubmission.setEnabled(false);
-                        nextFile.setEnabled(true);
+                        nextFile.setEnabled(false);
                         previousFile.setEnabled(false);
 
                         saveGradeReport.setEnabled(false);
@@ -211,7 +224,14 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
 
                     } else {
                         revealSubmission.setEnabled(true);
-                        openFile.setEnabled(true);
+
+                        if (node instanceof SubmittedFileWrapperNode) {
+                            openFile.setEnabled(true);
+                            resetAllTests.setEnabled(true);
+                        } else {
+                            openFile.setEnabled(false);
+                            resetAllTests.setEnabled(false);
+                        }
 
                         SubmissionWrapperNode submissionNode = getCurrentSubmissionNode();
 

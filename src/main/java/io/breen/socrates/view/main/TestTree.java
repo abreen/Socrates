@@ -1,13 +1,14 @@
 package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
-import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.test.*;
+import io.breen.socrates.immutable.test.Test;
+import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.ceiling.AtMost;
 import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.model.AutomationStage;
 import io.breen.socrates.model.TestResult;
-import io.breen.socrates.model.wrapper.*;
+import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
+import io.breen.socrates.model.wrapper.TestWrapperNode;
 import io.breen.socrates.view.icon.TestIcon;
 
 import javax.swing.*;
@@ -21,9 +22,6 @@ import java.text.DecimalFormat;
 
 public class TestTree {
 
-    public final Action passTest;
-    public final Action failTest;
-    public final Action resetTest;
     public final Action nextTest;
     public final Action previousTest;
     private JPanel rootPanel;
@@ -34,67 +32,6 @@ public class TestTree {
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
-
-        passTest = MenuBarManager.newMenuItemAction(
-                menuBar.passTest, e -> {
-                    TestWrapperNode node = getSelectedTestWrapperNode();
-                    Test test = (Test)node.getUserObject();
-
-                    if (test instanceof Automatable) {
-                        AutomationStage stage = node.getAutomationStage();
-                        switch (stage) {
-                        case STARTED:
-                            // cannot change result while test is running
-                            return;
-                        case FINISHED_NORMAL:
-                        case NONE:
-                            if (userWantsToOverride()) passTest();
-                            return;
-                        case FINISHED_ERROR:
-                            passTest();
-                        }
-                    } else {
-                        passTest();
-                    }
-                }
-        );
-        passTest.setEnabled(false);
-        passTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, ctrl)
-        );
-
-        failTest = MenuBarManager.newMenuItemAction(
-                menuBar.failTest, e -> {
-                    TestWrapperNode node = getSelectedTestWrapperNode();
-                    Test test = (Test)node.getUserObject();
-
-                    if (test instanceof Automatable) {
-                        AutomationStage stage = node.getAutomationStage();
-                        switch (stage) {
-                        case STARTED:
-                            // cannot change result while test is running
-                            return;
-                        case FINISHED_NORMAL:
-                        case NONE:
-                            if (userWantsToOverride()) failTest();
-                            return;
-                        case FINISHED_ERROR:
-                            failTest();
-                        }
-                    } else {
-                        failTest();
-                    }
-                }
-        );
-        failTest.setEnabled(false);
-        failTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ctrl)
-        );
-
-        resetTest = MenuBarManager.newMenuItemAction(
-                menuBar.resetTest, e -> resetTest()
-        );
-        resetTest.setEnabled(false);
 
         nextTest = MenuBarManager.newMenuItemAction(
                 menuBar.nextTest, e -> goToNextTest()
@@ -120,24 +57,17 @@ public class TestTree {
 
                     if (!event.isAddedPath()) node = null;
 
-                    if (node != null && (node instanceof SubmittedFileWrapperNode || node
-                            instanceof UnrecognizedFileWrapperNode)) {
-                        File matchingFile = null;
+                    if (node != null) {
                         if (node instanceof SubmittedFileWrapperNode) {
                             SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)node;
-                            matchingFile = sfwn.matchingFile;
+                            int n = sfwn.matchingFile.testRoot.members.size();
+                            if (n > 0) nextTest.setEnabled(true);
                             update(sfwn.treeModel);
                         } else {
+                            nextTest.setEnabled(false);
+                            previousTest.setEnabled(false);
                             reset();
                         }
-
-                        if (matchingFile != null) {
-                            int n = matchingFile.testRoot.members.size();
-                            if (n > 0) nextTest.setEnabled(true);
-                        } else {
-                            nextTest.setEnabled(false);
-                        }
-
                     } else {
                         nextTest.setEnabled(false);
                         previousTest.setEnabled(false);
@@ -209,11 +139,14 @@ public class TestTree {
                     TreePath path = event.getPath();
                     TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
 
+                    if (!event.isAddedPath()) node = null;
+
                     if (node == null) {
                         nextTest.setEnabled(true);
                         previousTest.setEnabled(false);
                     } else {
-                        nextTest.setEnabled(true);
+                        if (lastTestForFileSelected()) nextTest.setEnabled(false);
+                        else nextTest.setEnabled(true);
 
                         if (firstTestForFileSelected()) previousTest.setEnabled(false);
                         else previousTest.setEnabled(true);
@@ -471,15 +404,4 @@ public class TestTree {
         return (DefaultTreeModel)tree.getModel();
     }
 
-    private boolean userWantsToOverride() {
-        int rv = JOptionPane.showConfirmDialog(
-                null,
-                "This is an automated test. Are you sure you want to\noverride the automated " +
-                        "test's result?",
-                "Override Automated Test?",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-        return rv == JOptionPane.YES_OPTION;
-    }
 }
