@@ -22,6 +22,7 @@ public class Main {
          * Set up System properties. These are ugly, platform-specific options.
          */
         System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
 
         /*
          * Set up default Socrates properties. These properties are the ones saved
