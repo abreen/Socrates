@@ -19,7 +19,6 @@
             <properties>
               <editable value="false"/>
               <minimumSize width="300" height="-1"/>
-              <preferredSize width="300" height="-1"/>
             </properties>
           </component>
         </children>

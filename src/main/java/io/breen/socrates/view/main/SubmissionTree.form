@@ -18,7 +18,6 @@
             <constraints/>
             <properties>
               <maximumSize width="-1" height="-1"/>
-              <preferredSize width="200" height="-1"/>
             </properties>
           </component>
         </children>
