@@ -2,9 +2,8 @@ package io.breen.socrates.model.wrapper;
 
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.SubmittedFile;
-import io.breen.socrates.immutable.test.Test;
-import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.model.ConstraintUpdater;
+import io.breen.socrates.immutable.test.*;
+import io.breen.socrates.model.*;
 import io.breen.socrates.model.event.*;
 import io.breen.socrates.util.*;
 import io.breen.socrates.util.Observable;
@@ -120,5 +119,21 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
 
     public boolean isComplete() {
         return unfinishedTests.isEmpty();
+    }
+
+    public void resetAllTests() {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode)treeModel.getRoot();
+        Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        while (dfs.hasMoreElements()) {
+            DefaultMutableTreeNode n = dfs.nextElement();
+
+            if (n instanceof TestWrapperNode) {
+                TestWrapperNode node = (TestWrapperNode)n;
+                Test test = (Test)node.getUserObject();
+
+                node.setResult(TestResult.NONE);
+                if (test instanceof Automatable) node.setAutomationStage(AutomationStage.NONE);
+            }
+        }
     }
 }
