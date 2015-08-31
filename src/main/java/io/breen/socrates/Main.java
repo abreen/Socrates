@@ -4,8 +4,7 @@ import io.breen.socrates.constructor.InvalidCriteriaException;
 import io.breen.socrates.controller.MainController;
 import io.breen.socrates.controller.SetupController;
 import io.breen.socrates.immutable.criteria.Criteria;
-import io.breen.socrates.immutable.submission.ReceiptFormatException;
-import io.breen.socrates.immutable.submission.Submission;
+import io.breen.socrates.immutable.submission.*;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -118,6 +117,8 @@ public class Main {
                     logger.warning("I/O exception occurred adding submission: " + x);
                 } catch (ReceiptFormatException x) {
                     logger.warning("invalid receipt for submission '" + p + "'");
+                } catch (AlreadyGradedException x) {
+                    logger.warning("already has grade file: submission '" + p + "'");
                 }
             }
 

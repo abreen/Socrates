@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 
 public class SubmissionTree implements Observer<SubmissionWrapperNode> {
 
-    public static final String DEFAULT_GRADE_FILE_NAME = "grade.txt";
     private static Logger logger = Logger.getLogger(SubmissionTree.class.getName());
     public final Action saveGradeReport;
     public final Action saveGradeReportAs;
@@ -58,7 +57,10 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                     SubmissionWrapperNode node = getCurrentSubmissionNode();
                     Submission s = (Submission)node.getUserObject();
 
-                    Path dest = Paths.get(s.submissionDir.toString(), DEFAULT_GRADE_FILE_NAME);
+                    Path dest = Paths.get(
+                            s.submissionDir.toString(),
+                            Globals.DEFAULT_GRADE_FILE_NAME
+                    );
                     main.saveGradeReport(node, dest);
                 }
         );
@@ -147,7 +149,7 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
 
     private static Path chooseSaveLocation(Path initialDir) {
         JFileChooser fc = new JFileChooser(initialDir.toFile());
-        fc.setSelectedFile(new java.io.File(DEFAULT_GRADE_FILE_NAME));
+        fc.setSelectedFile(new java.io.File(Globals.DEFAULT_GRADE_FILE_NAME));
         int rv = fc.showSaveDialog(null);
 
         switch (rv) {

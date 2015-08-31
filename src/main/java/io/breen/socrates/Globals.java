@@ -28,6 +28,7 @@ public class Globals {
     public static final Color RED = new Color(189, 12, 13);
     public static final Color GREEN = new Color(49, 141, 34);
     public static final Color BLUE = new Color(37, 123, 210);
+    public static final String DEFAULT_GRADE_FILE_NAME = "grade.txt";
     private static final Pattern PYTHON3_VERSION_PATTERN = Pattern.compile("Python 3.*");
     public static Properties properties;
     public static OS operatingSystem;

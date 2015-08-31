@@ -5,8 +5,7 @@ import io.breen.socrates.constructor.MissingResourceException;
 import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.hooks.HookManager;
 import io.breen.socrates.immutable.hooks.triggers.Hook;
-import io.breen.socrates.immutable.submission.ReceiptFormatException;
-import io.breen.socrates.immutable.submission.Submission;
+import io.breen.socrates.immutable.submission.*;
 import io.breen.socrates.view.DetailOptionPane;
 import io.breen.socrates.view.setup.SetupView;
 
@@ -74,6 +73,9 @@ public class SetupController {
                             } catch (ReceiptFormatException x) {
                                 errors.put(p, x);
                                 logger.warning("RFE thrown when adding submission: " + x);
+                            } catch (AlreadyGradedException x) {
+                                errors.put(p, x);
+                                logger.info("AGE thrown when adding submission: " + x);
                             }
                         }
 

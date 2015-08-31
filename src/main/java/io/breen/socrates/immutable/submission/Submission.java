@@ -1,5 +1,7 @@
 package io.breen.socrates.immutable.submission;
 
+import io.breen.socrates.Globals;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -51,7 +53,7 @@ public class Submission {
      * @see Submission
      */
     public static Submission fromDirectory(Path directory)
-            throws IOException, ReceiptFormatException
+            throws IOException, ReceiptFormatException, AlreadyGradedException
     {
         if (Files.notExists(directory)) throw new IllegalArgumentException("does not exist");
 
@@ -70,10 +72,14 @@ public class Submission {
                                 return FileVisitResult.CONTINUE;
 
                             Path localPath = directory.relativize(path);
+                            String fileName = path.getFileName().toString();
 
-                            if (path.getFileName().toString().endsWith(".receipt")) {
+                            if (fileName.endsWith(".receipt")) {
                                 // only consider receipts when we look at a file
                                 return FileVisitResult.CONTINUE;
+                            } else if (fileName.equals(Globals.DEFAULT_GRADE_FILE_NAME)) {
+                                // won't open already graded submissions
+                                throw new AlreadyGradedExceptionIO(new AlreadyGradedException());
                             } else {
                                 // found a submitted file that is not a receipt
                                 SubmittedFile submittedFile;
@@ -105,7 +111,9 @@ public class Submission {
                     }
             );
         } catch (ReceiptFormatExceptionIO exc) {
-            throw exc.receiptFormatException;
+            throw exc.e;
+        } catch (AlreadyGradedExceptionIO exc) {
+            throw exc.e;
         } catch (IOException exc) {
             throw exc;
         }
@@ -125,17 +133,24 @@ public class Submission {
     }
 
     /**
-     * "Wrapper" exception class for ReceiptFormatException that extends IOException, so that the
-     * visitFile() method used above can throw two types of exception: the standard IOException (if
-     * Receipt.fromReceiptFile throws one) or ReceiptFormatException wrapped in an instance of this
-     * class (if Receipt.fromReceiptFile throws a ReceiptFormatException).
+     * "Wrapper" exception classes so that the visitFile() method used above can throw different
+     * types of exception.
      */
     private static class ReceiptFormatExceptionIO extends IOException {
 
-        public final ReceiptFormatException receiptFormatException;
+        public final ReceiptFormatException e;
 
         public ReceiptFormatExceptionIO(ReceiptFormatException e) {
-            this.receiptFormatException = e;
+            this.e = e;
+        }
+    }
+
+    private static class AlreadyGradedExceptionIO extends IOException {
+
+        public final AlreadyGradedException e;
+
+        public AlreadyGradedExceptionIO(AlreadyGradedException e) {
+            this.e = e;
         }
     }
 }
