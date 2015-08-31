@@ -5,6 +5,8 @@ import io.breen.socrates.controller.MainController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainView extends JFrame {
 
@@ -17,6 +19,7 @@ public class MainView extends JFrame {
     public TestTree testTree;
     public TestControls testControls;
     private JPanel rootPanel;
+    private boolean allSaved;
 
     public MainView(MainController controller, MenuBarManager menuBar) {
         super("Socrates");
@@ -24,7 +27,7 @@ public class MainView extends JFrame {
         this.controller = controller;
         this.menuBar = menuBar;
 
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         setContentPane(rootPanel);
 
         setMinimumSize(new Dimension(800, 600));
@@ -32,6 +35,30 @@ public class MainView extends JFrame {
         setLocationRelativeTo(null);
 
         if (Globals.operatingSystem == Globals.OS.OSX) Globals.enableFullScreen(this);
+
+        allSaved = true;
+
+        addWindowListener(
+                new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        if (!allSaved) {
+                            int rv = JOptionPane.showConfirmDialog(
+                                    MainView.this,
+                                    "There are completed submissions whose grade reports are\n" +
+                                            "not saved. Do you want to discard those reports?",
+                                    "Discard Unsaved Grade Reports?",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE
+                            );
+
+                            if (rv != JOptionPane.YES_OPTION) return;
+                        }
+
+                        dispose();
+                    }
+                }
+        );
     }
 
     private void createUIComponents() {
@@ -50,13 +77,15 @@ public class MainView extends JFrame {
     }
 
     public void setAllSaved(boolean saved) {
-        if (Globals.operatingSystem != Globals.OS.OSX) return;
+        allSaved = saved;
 
-        JRootPane root = getRootPane();
-        if (saved) {
-            root.putClientProperty("Window.documentModified", Boolean.FALSE);
-        } else {
-            root.putClientProperty("Window.documentModified", Boolean.TRUE);
+        if (Globals.operatingSystem == Globals.OS.OSX) {
+            JRootPane root = getRootPane();
+            if (saved) {
+                root.putClientProperty("Window.documentModified", Boolean.FALSE);
+            } else {
+                root.putClientProperty("Window.documentModified", Boolean.TRUE);
+            }
         }
     }
 }
