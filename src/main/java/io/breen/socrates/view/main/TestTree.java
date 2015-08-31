@@ -5,10 +5,10 @@ import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.ceiling.AtMost;
 import io.breen.socrates.immutable.test.ceiling.Ceiling;
-import io.breen.socrates.model.AutomationStage;
-import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import io.breen.socrates.model.wrapper.TestWrapperNode;
+import io.breen.socrates.util.ObservableChangedEvent;
+import io.breen.socrates.util.Observer;
 import io.breen.socrates.view.icon.TestIcon;
 
 import javax.swing.*;
@@ -19,8 +19,9 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.DecimalFormat;
+import java.util.Enumeration;
 
-public class TestTree {
+public class TestTree implements Observer<TestWrapperNode> {
 
     public final Action nextTest;
     public final Action previousTest;
@@ -235,7 +236,33 @@ public class TestTree {
     }
 
     public void update(DefaultTreeModel treeModel) {
+        TreeModel currentModel = tree.getModel();
+        if (currentModel != null) {
+            Enumeration<DefaultMutableTreeNode> dfs = getRoot().depthFirstEnumeration();
+            while (dfs.hasMoreElements()) {
+                DefaultMutableTreeNode n = dfs.nextElement();
+
+                if (n instanceof TestWrapperNode) {
+                    TestWrapperNode node = (TestWrapperNode)n;
+                    node.removeObserver(this);
+                }
+            }
+        }
+
         tree.setModel(treeModel);
+
+        if (treeModel != null) {
+            Enumeration<DefaultMutableTreeNode> dfs = getRoot().depthFirstEnumeration();
+            while (dfs.hasMoreElements()) {
+                DefaultMutableTreeNode n = dfs.nextElement();
+
+                if (n instanceof TestWrapperNode) {
+                    TestWrapperNode node = (TestWrapperNode)n;
+                    node.addObserver(this);
+                }
+            }
+        }
+
         expandFirstTest();
     }
 
@@ -255,46 +282,6 @@ public class TestTree {
 
     public boolean hasSelection() {
         return tree.getSelectionPath() != null;
-    }
-
-    /**
-     * Set the result of the currently selected TestWrapperNode to TestResult.PASSED. If there is no
-     * selection, this method does nothing.
-     */
-    public void passTest() {
-        if (!hasSelection()) return;
-
-        TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
-        test.setResult(TestResult.PASSED);
-
-        getModel().nodeChanged(test);
-    }
-
-    /**
-     * Set the result of the currently selected TestWrapperNode to TestResult.FAILED. If there is no
-     * selection, this method does nothing.
-     */
-    public void failTest() {
-        if (!hasSelection()) return;
-
-        TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
-        test.setResult(TestResult.FAILED);
-
-        getModel().nodeChanged(test);
-    }
-
-    /**
-     * Resets the result of the currently selected TestWrapperNode to TestResult.NONE. If there is
-     * no selection, this method does nothing.
-     */
-    public void resetTest() {
-        if (!hasSelection()) return;
-
-        TestWrapperNode test = (TestWrapperNode)tree.getLastSelectedPathComponent();
-        test.setResult(TestResult.NONE);
-        test.setAutomationStage(AutomationStage.NONE);
-
-        getModel().nodeChanged(test);
     }
 
     /**
@@ -386,11 +373,6 @@ public class TestTree {
         tree.expandPath(new TreePath(firstChild.getPath()));
     }
 
-    public void nodeChanged(TreeNode node) {
-        DefaultTreeModel model = getModel();
-        if (model != null) model.nodeChanged(node);
-    }
-
     private DefaultMutableTreeNode getRoot() {
         TreeModel model = tree.getModel();
         return (DefaultMutableTreeNode)(model == null ? null : model.getRoot());
@@ -404,4 +386,8 @@ public class TestTree {
         return (DefaultTreeModel)tree.getModel();
     }
 
+    @Override
+    public void objectChanged(ObservableChangedEvent<TestWrapperNode> event) {
+        getModel().nodeChanged(event.source);
+    }
 }

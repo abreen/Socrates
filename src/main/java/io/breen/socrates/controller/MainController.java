@@ -80,9 +80,6 @@ public class MainController {
                                         node.setAutomationStage(
                                                 AutomationStage.FINISHED_ERROR
                                         );
-
-                                    } finally {
-                                        mainView.testTree.nodeChanged(node);
                                     }
                                 }
                         )).start();
