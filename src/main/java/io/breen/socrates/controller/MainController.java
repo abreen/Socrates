@@ -59,7 +59,9 @@ public class MainController {
 
                         if (file == null) return;
 
-                        Submission submission = mainView.submissionTree.getSelectedSubmission();
+                        SubmissionWrapperNode swn = mainView.submissionTree
+                                .getCurrentSubmissionNode();
+                        Submission submission = (Submission)swn.getUserObject();
 
                         (new Thread(
                                 () -> {
