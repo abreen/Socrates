@@ -118,14 +118,14 @@ public class MainController {
     }
 
     public void saveGradeReport(SubmissionWrapperNode completed, Path dest) {
+        mainView.setEnabled(false);
         TextGradeReportFormatter fmt = new TextGradeReportFormatter(criteria);
         try {
-            // TODO what if the SWN changes while the formatter formats it?
             fmt.toFile(completed, dest);
+            completed.setSaved(true);
         } catch (IOException x) {
             logger.warning("could not save grade report: " + x);
-            return;
         }
-        completed.setSaved(true);
+        mainView.setEnabled(true);
     }
 }
