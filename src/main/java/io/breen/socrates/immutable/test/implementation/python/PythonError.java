@@ -1,4 +1,4 @@
-package io.breen.socrates.immutable.file.implementation.python;
+package io.breen.socrates.immutable.test.implementation.python;
 
 /**
  * An exception thrown when a PythonInspector attempts to make an XML-RPC method call and the server
