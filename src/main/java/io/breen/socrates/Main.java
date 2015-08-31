@@ -118,7 +118,7 @@ public class Main {
                 } catch (ReceiptFormatException x) {
                     logger.warning("invalid receipt for submission '" + p + "'");
                 } catch (AlreadyGradedException x) {
-                    logger.warning("already has grade file: submission '" + p + "'");
+                    logger.warning("skipping submission: already has a grade file: '" + p + "'");
                 }
             }
 

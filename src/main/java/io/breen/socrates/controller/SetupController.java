@@ -84,7 +84,7 @@ public class SetupController {
                         if (numErrors > 0) {
                             StringBuilder sb = new StringBuilder();
                             for (Map.Entry<Path, Exception> e : errors.entrySet())
-                                sb.append(e.getKey() + ": " + e.getValue() + "\n");
+                                sb.append(e.getValue().getMessage() + ": " + e.getKey() + "\n");
 
                             String msg = "There was a problem opening " + numErrors + "" +
                                     " submission" + (numErrors == 1 ? "" : "s") + ".";
@@ -93,7 +93,7 @@ public class SetupController {
                                         (numAdded == 1 ? " is" : "s are") + " available" +
                                         " to grade.";
                             }
-                            String title = (numErrors == 1 ? "Error" : "Errors") + " " +
+                            String title = (numErrors == 1 ? "Issue" : "Issues") + " " +
                                     "Opening Submissions";
 
                             DetailOptionPane.showMessageDialog(

@@ -42,7 +42,7 @@ public final class Receipt {
                 ldt = LocalDateTime.parse(line, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             } catch (DateTimeParseException e) {
                 throw new ReceiptFormatException(
-                        "receipt " + path + " has invalid timestamp: " + line
+                        "receipt has invalid timestamp: " + line
                 );
             }
 
