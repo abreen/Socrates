@@ -5,6 +5,7 @@ import importlib
 import inspect
 
 PORT = 45003
+PATH = '/xmlrpc'
 
 module_name = None
 module = None
@@ -18,12 +19,12 @@ objects = {}
 
 def _wrap(func):
     def inner(*args, **kwargs):
-        print('function:', func.__name__)
-        print('args:', args)
-        print('kwargs:', kwargs)
+        # print('function:', func.__name__)
+        # print('args:', args)
+        # print('kwargs:', kwargs)
 
         try:
-            return {'error': False, 'response': func(*args, **kwargs)}
+            return {'error': False, 'result': func(*args, **kwargs)}
         except BaseException as e:
             return {'error': True, 'errorType': str(type(e).__name__), 'errorMessage': str(e)}
 
@@ -58,7 +59,6 @@ def module_open(name):
 
 def eval(code):
     import builtins
-
     return builtins.eval(code, dict(globals(), **globalz), objects)
 
 
@@ -118,10 +118,10 @@ def method_eval(object_identifier, method_name, args, kwargs):
 
 
 class RequestHandler(SimpleXMLRPCRequestHandler):
-    rpc_paths = ('/xmlrpc',)
+    rpc_paths = (PATH,)
 
 
-server = SimpleXMLRPCServer(('localhost', PORT), requestHandler=RequestHandler)
+server = SimpleXMLRPCServer(('127.0.0.1', PORT), requestHandler=RequestHandler)
 
 d = dict(globals(), **locals())
 for name, value in d.items():

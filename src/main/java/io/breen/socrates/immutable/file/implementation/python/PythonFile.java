@@ -1,4 +1,4 @@
-package io.breen.socrates.immutable.file.implementation;
+package io.breen.socrates.immutable.file.implementation.python;
 
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.test.Test;

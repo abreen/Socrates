@@ -2,7 +2,7 @@ package io.breen.socrates.immutable.file;
 
 import io.breen.socrates.constructor.SocratesConstructor;
 import io.breen.socrates.immutable.file.implementation.PlainFile;
-import io.breen.socrates.immutable.file.implementation.PythonFile;
+import io.breen.socrates.immutable.file.implementation.python.PythonFile;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.util.Either;
