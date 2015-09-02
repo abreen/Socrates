@@ -22,7 +22,7 @@
             <constraints border-constraint="North"/>
             <properties>
               <font name="Dialog" size="14" style="1"/>
-              <text value="Open a criteria file"/>
+              <text value="Open a criteria"/>
             </properties>
           </component>
           <component id="6fbe5" class="javax.swing.JTextArea" default-binding="true">
@@ -32,7 +32,7 @@
               <font name="Dialog"/>
               <lineWrap value="true"/>
               <opaque value="false"/>
-              <text value="A criteria file is a special file prepared by a grading coordinator that contains the expected files in a student submission and how to grade them.&#10;&#10;Without a criteria file, you cannot use Socrates to grade submissions. If you do not have a criteria file, contact the grading coordinator for your course."/>
+              <text value="A criteria is a special file prepared by a grading coordinator that contains the expected parts of a student submission and how to grade them. A criteria may be a criteria file (a plain text file with the .scf extension) or a criteria package (a ZIP archive with the .scp extension). Criteria packages contain one criteria file, but also contain other files that may be required for automated grading.&#10;&#10;Without a criteria, you cannot use Socrates to grade submissions. If you do not have a criteria, contact the grading coordinator for your course."/>
               <wrapStyleWord value="true"/>
             </properties>
           </component>
@@ -80,7 +80,7 @@
               <font name="Dialog"/>
               <lineWrap value="true"/>
               <opaque value="false"/>
-              <text value="Now select the student submissions you would like to grade. You must select at least one, but you may add more once you have started by using the File → Add Submissions... option.&#10;&#10;Each submission you select must be a folder containing the files submitted by one student. If you were sent a compressed archive (for example, a ZIP file) containing the submissions, decompress the archive before continuing.&#10;&#10;If you are using receipts, make sure each receipt is stored alongside its receipted file."/>
+              <text value="Now select the student submissions you would like to grade. You must select at least one submission. Socrates will refuse to open a submission if it already contains a grade file, to ensure that the existing grade file is not overwritten.&#10;&#10;Each submission you select must be a folder containing the files submitted by one student. If you were sent a compressed archive (for example, a ZIP file) containing the submissions, decompress the archive before continuing.&#10;&#10;If you are using receipts, make sure each receipt is stored alongside its receipted file."/>
               <wrapStyleWord value="true"/>
             </properties>
           </component>
