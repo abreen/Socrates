@@ -1,11 +1,7 @@
 package io.breen.socrates.immutable.file.implementation;
 
 import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.test.Test;
-import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.util.Either;
 
-import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -17,8 +13,10 @@ import java.util.*;
  */
 public final class PlainFile extends File {
 
-    public PlainFile(Path path, double pointValue, Map<Date, Double> dueDates,
-                     List<Either<Test, TestGroup>> tests)
+    public PlainFile() {}
+
+    public PlainFile(String path, double pointValue, Map<Date, Double> dueDates,
+                     List<Object> tests)
     {
         super(path, pointValue, "text/plain", dueDates, tests);
     }

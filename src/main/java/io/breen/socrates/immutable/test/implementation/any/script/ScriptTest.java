@@ -21,7 +21,12 @@ public class ScriptTest extends Test implements Automatable {
 
     private static Logger logger = Logger.getLogger(ScriptTest.class.getName());
 
-    protected final Resource script;
+    public Resource script;
+
+    /**
+     * This empty constructor is used by SnakeYAML.
+     */
+    public ScriptTest() {}
 
     public ScriptTest(double deduction, String description, Resource script) {
         super(deduction, description);

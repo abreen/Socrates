@@ -68,8 +68,7 @@ public class CriteriaTest {
             // basic criteria file, but with an unrecognized top-level mapping
             Files.createFile(InputFile.BASIC_UNRECOGNIZED.p);
             BufferedWriter w = Files.newBufferedWriter(
-                    InputFile.BASIC_UNRECOGNIZED.p,
-                    StandardCharsets.UTF_8
+                    InputFile.BASIC_UNRECOGNIZED.p, StandardCharsets.UTF_8
             );
             w.append("assignment_name: " + TEST_ASSIGNMENT_NAME + "\n");
             w.append("foo: bar\n");
@@ -81,8 +80,7 @@ public class CriteriaTest {
             // basic criteria file, but with a file specification that is not a mapping
             Files.createFile(InputFile.FILE_NONMAPPING.p);
             BufferedWriter w = Files.newBufferedWriter(
-                    InputFile.FILE_NONMAPPING.p,
-                    StandardCharsets.UTF_8
+                    InputFile.FILE_NONMAPPING.p, StandardCharsets.UTF_8
             );
             w.append("assignment_name: " + TEST_ASSIGNMENT_NAME + "\n");
             w.append("files:\n");

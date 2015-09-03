@@ -2,8 +2,6 @@ package io.breen.socrates.model;
 
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.immutable.test.ceiling.AtMost;
-import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.model.event.ResultChangedEvent;
 import io.breen.socrates.model.wrapper.TestGroupWrapperNode;
 import io.breen.socrates.model.wrapper.TestWrapperNode;
@@ -112,30 +110,28 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
 
         for (TestGroupWrapperNode root : parents) {
             TestGroup group = (TestGroup)root.getUserObject();
-            Ceiling<Integer> maxNum = group.maxNum;
-            Ceiling<Double> maxValue = group.maxValue;
+            int maxNum = group.maxNum;
+            double maxValue = group.maxValue;
             boolean subtreeShouldBeConstrained = false;
             boolean subtreeShouldBeUnConstrained = false;
 
-            if (maxNum != Ceiling.ANY) {
-                int maxN = ((AtMost<Integer>)maxNum).getValue();
-                boolean alreadyConstrained = root.getNumFailed() >= maxN;
-                if (alreadyConstrained && root.getNumFailed() + deltaFailed < maxN) {
+            if (maxNum != 0) {
+                boolean alreadyConstrained = root.getNumFailed() >= maxNum;
+                if (alreadyConstrained && root.getNumFailed() + deltaFailed < maxNum) {
                     // this subtree must be un-constrained due to a new change in number
                     subtreeShouldBeUnConstrained = true;
-                } else if (root.getNumFailed() + deltaFailed >= maxN) {
+                } else if (root.getNumFailed() + deltaFailed >= maxNum) {
                     // this subtree must be constrained due to a new change in number
                     subtreeShouldBeConstrained = true;
                 }
             }
 
-            if (maxValue != Ceiling.ANY) {
-                double maxV = ((AtMost<Double>)maxValue).getValue();
-                boolean alreadyConstrained = root.getPointsTaken() >= maxV;
-                if (alreadyConstrained && root.getPointsTaken() + deltaPoints < maxV) {
+            if (maxValue != 0.0) {
+                boolean alreadyConstrained = root.getPointsTaken() >= maxValue;
+                if (alreadyConstrained && root.getPointsTaken() + deltaPoints < maxValue) {
                     // this subtree must be un-constrained due to a new change in points
                     subtreeShouldBeUnConstrained |= true;
-                } else if (root.getPointsTaken() + deltaPoints >= maxV) {
+                } else if (root.getPointsTaken() + deltaPoints >= maxValue) {
                     // this subtree must be constrained due to a new change in points
                     subtreeShouldBeConstrained |= true;
                 }
@@ -171,20 +167,18 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
 
             for (TestGroupWrapperNode root : needsCheck) {
                 TestGroup group = (TestGroup)root.getUserObject();
-                Ceiling<Integer> maxNum = group.maxNum;
-                Ceiling<Double> maxValue = group.maxValue;
+                int maxNum = group.maxNum;
+                double maxValue = group.maxValue;
                 boolean needsReConstraining = false;
 
-                if (maxNum != Ceiling.ANY) {
-                    int maxN = ((AtMost<Integer>)maxNum).getValue();
-                    if (root.getNumFailed() >= maxN) {
+                if (maxNum != 0) {
+                    if (root.getNumFailed() >= maxNum) {
                         needsReConstraining = true;
                     }
                 }
 
-                if (maxValue != Ceiling.ANY) {
-                    double maxV = ((AtMost<Double>)maxValue).getValue();
-                    if (root.getPointsTaken() >= maxV) {
+                if (maxValue != 0.0) {
+                    if (root.getPointsTaken() >= maxValue) {
                         needsReConstraining = true;
                     }
                 }
@@ -192,7 +186,8 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
                 if (needsReConstraining) {
                     constrainTree(root, initialState);
                 } else {
-                    @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> children = root
+                    @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> children =
+                            root
                             .children();
                     while (children.hasMoreElements()) {
                         DefaultMutableTreeNode child = children.nextElement();

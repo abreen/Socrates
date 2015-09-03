@@ -8,6 +8,11 @@ import io.breen.socrates.immutable.test.Test;
 
 public class AlwaysPassingTest extends Test implements Automatable<PlainFile> {
 
+    /**
+     * This empty constructor is used by SnakeYAML.
+     */
+    public AlwaysPassingTest() {}
+
     public AlwaysPassingTest(double deduction) {
         super(deduction, "(always passing)");
     }

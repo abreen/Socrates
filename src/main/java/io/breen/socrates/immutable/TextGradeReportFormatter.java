@@ -66,7 +66,7 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
             totalPoints += file.pointValue;
             earnedPoints += file.pointValue;
 
-            w.append(file.path.toString());
+            w.append(file.path);
             w.append(" (");
             w.append(decFmt.format(file.pointValue));
             if (file.pointValue == 1) w.append(" point)");
@@ -120,7 +120,8 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
     private List<Deduction> getDeductions(TestGroupWrapperNode root) {
         List<Deduction> deductions = new LinkedList<>();
 
-        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root
+                .depthFirstEnumeration();
         while (dfs.hasMoreElements()) {
             DefaultMutableTreeNode n = dfs.nextElement();
 

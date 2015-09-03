@@ -5,8 +5,8 @@ import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.model.*;
 import io.breen.socrates.model.event.*;
-import io.breen.socrates.util.*;
 import io.breen.socrates.util.Observable;
+import io.breen.socrates.util.*;
 import io.breen.socrates.util.Observer;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -57,17 +57,17 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
     private DefaultMutableTreeNode buildTree(TestGroup root) {
         TestGroupWrapperNode parent = new TestGroupWrapperNode(root);
 
-        for (Either<Test, TestGroup> member : root.members) {
-            if (member instanceof Left) {
-                Test test = member.getLeft();
+        for (Object member : root.members) {
+            if (member instanceof Test) {
+                Test test = (Test)member;
                 TestWrapperNode child = new TestWrapperNode(test);
                 child.addObserver(updater);
                 child.addObserver(this);
                 unfinishedTests.add(child);
                 parent.add(child);
 
-            } else if (member instanceof Right) {
-                TestGroup group = member.getRight();
+            } else if (member instanceof TestGroup) {
+                TestGroup group = (TestGroup)member;
                 parent.add(buildTree(group));
             }
         }

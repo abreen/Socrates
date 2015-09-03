@@ -10,6 +10,11 @@ import io.breen.socrates.immutable.test.*;
  */
 public class TakesAwhileTest extends Test implements Automatable {
 
+    /**
+     * This empty constructor is used by SnakeYAML.
+     */
+    public TakesAwhileTest() {}
+
     public TakesAwhileTest(double deduction) {
         super(deduction, "takes awhile");
     }

@@ -3,8 +3,6 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.immutable.test.ceiling.AtMost;
-import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import io.breen.socrates.model.wrapper.TestWrapperNode;
 import io.breen.socrates.util.ObservableChangedEvent;
@@ -91,24 +89,19 @@ public class TestTree implements Observer<TestWrapperNode> {
     }
 
     private static String testGroupToString(TestGroup group) {
-        Ceiling<Integer> maxNum = group.maxNum;
-        Ceiling<Double> maxValue = group.maxValue;
+        int maxNum = group.maxNum;
+        double maxValue = group.maxValue;
 
         DecimalFormat fmt = new DecimalFormat("#.#");
 
-        if (maxNum == Ceiling.ANY && maxValue == Ceiling.ANY) {
+        if (maxNum == 0 && maxValue == 0.0) {
             return "fail any";
-        } else if (maxNum != Ceiling.ANY && maxValue == Ceiling.ANY) {
-            int max = ((AtMost<Integer>)maxNum).getValue();
-            return "fail ≤ " + max;
-        } else if (maxNum == Ceiling.ANY && maxValue != Ceiling.ANY) {
-            double max = ((AtMost<Double>)maxValue).getValue();
-            return "take ≤ " + fmt.format(max) + " points";
+        } else if (maxNum != 0 && maxValue == 0.0) {
+            return "fail ≤ " + maxNum;
+        } else if (maxNum == 0 && maxValue != 0.0) {
+            return "take ≤ " + fmt.format(maxValue) + " points";
         } else {
-            int maxN = ((AtMost<Integer>)maxNum).getValue();
-            double maxV = ((AtMost<Double>)maxValue).getValue();
-
-            return "fail ≤ " + maxN + " and take ≤ " + fmt.format(maxV) + " points";
+            return "fail ≤ " + maxNum + " and take ≤ " + fmt.format(maxValue) + " points";
         }
     }
 
@@ -269,7 +262,8 @@ public class TestTree implements Observer<TestWrapperNode> {
         tree.setModel(treeModel);
 
         if (treeModel != null) {
-            @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = getRoot().depthFirstEnumeration();
+            @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = getRoot()
+                    .depthFirstEnumeration();
             while (dfs.hasMoreElements()) {
                 DefaultMutableTreeNode n = dfs.nextElement();
 

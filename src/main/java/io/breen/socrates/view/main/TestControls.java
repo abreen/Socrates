@@ -78,7 +78,9 @@ public class TestControls implements Observer<TestWrapperNode> {
     private JButton resetButton;
     private TestWrapperNode currentNode;
 
-    public TestControls(MenuBarManager menuBar, final TestTree testTree, SubmissionTree submissionTree) {
+    public TestControls(MenuBarManager menuBar, final TestTree testTree,
+                        SubmissionTree submissionTree)
+    {
         updateIcon();
         description.setText(NO_TEST_SELECTED_DESC);
 
@@ -199,12 +201,14 @@ public class TestControls implements Observer<TestWrapperNode> {
                 }
         );
 
-        submissionTree.addTreeSelectionListener(new TreeSelectionListener() {
-                                                    @Override
-                                                    public void valueChanged(TreeSelectionEvent e) {
-                                                        reset();
-                                                    }
-                                                });
+        submissionTree.addTreeSelectionListener(
+                new TreeSelectionListener() {
+                    @Override
+                    public void valueChanged(TreeSelectionEvent e) {
+                        reset();
+                    }
+                }
+        );
 
         passButton.setAction(passTest);
         failButton.setAction(failTest);

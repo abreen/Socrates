@@ -1,6 +1,7 @@
 package io.breen.socrates.immutable.criteria;
 
 import io.breen.socrates.immutable.file.File;
+import io.breen.socrates.immutable.file.implementation.PlainFile;
 import io.breen.socrates.immutable.file.implementation.PythonFile;
 import io.breen.socrates.immutable.test.TestGroup;
 import org.yaml.snakeyaml.TypeDescription;
@@ -9,6 +10,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -133,7 +135,7 @@ public final class Criteria {
     private static Criteria loadCriteriaFileFromPath(Path path)
             throws IOException, InvalidCriteriaException
     {
-        return loadCriteriaFileFromReader(Files.newBufferedReader(path));
+        return loadCriteriaFileFromReader(Files.newBufferedReader(path, Charset.defaultCharset()));
     }
 
     private static Criteria loadCriteriaFileFromReader(Reader reader)
@@ -142,24 +144,43 @@ public final class Criteria {
         Constructor cons = new Constructor(Criteria.class);
 
         cons.addTypeDescription(new TypeDescription(Criteria.class, "!criteria"));
-
         cons.addTypeDescription(new TypeDescription(TestGroup.class, "!group"));
 
+        cons.addTypeDescription(new TypeDescription(PlainFile.class, "!file:plain"));
         cons.addTypeDescription(new TypeDescription(PythonFile.class, "!file:python"));
-        //        cons.addTypeDescription(new TypeDescription(ReviewTest.class,
-        // "!test:python:review"));
+
+        cons.addTypeDescription(
+                new TypeDescription(
+                        io.breen.socrates.immutable.test.implementation.plain.ReviewTest.class,
+                        "!test:plain:review"
+                )
+        );
+        cons.addTypeDescription(
+                new TypeDescription(
+                        io.breen.socrates.immutable.test.implementation.python.ReviewTest.class,
+                        "!test:python:review"
+                )
+        );
 
         Yaml yaml = new Yaml(cons);
+        Criteria c = null;
         try {
-            return yaml.loadAs(reader, Criteria.class);
+            c = yaml.loadAs(reader, Criteria.class);
         } catch (YAMLException x) {
             throw new InvalidCriteriaException(x.toString());
         }
+
+        for (File f : c.files)
+            f.afterConstruction();
+
+        return c;
     }
 
     public File getFileByLocalPath(Path path) {
-        for (File f : files)
-            if (f.path.equals(path)) return f;
+        for (File f : files) {
+            Path p = Paths.get(f.path);
+            if (p.equals(path)) return f;
+        }
 
         return null;
     }

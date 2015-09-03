@@ -97,7 +97,7 @@ public class Main {
             } catch (InvalidPathException x) {
                 logger.warning("command-line option for criteria path was invalid");
             } catch (IOException | InvalidCriteriaException x) {
-                logger.warning(criteriaPath + " specified an invalid criteria");
+                logger.warning(criteriaPath + " specified an invalid criteria: " + x);
             }
         }
 

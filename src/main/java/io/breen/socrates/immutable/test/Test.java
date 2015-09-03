@@ -19,8 +19,13 @@ package io.breen.socrates.immutable.test;
  */
 public abstract class Test {
 
-    public final double deduction;
-    public final String description;
+    public double deduction;
+    public String description;
+
+    /**
+     * This empty constructor is used by SnakeYAML.
+     */
+    public Test() {}
 
     public Test(double deduction, String description) {
         this.deduction = deduction;

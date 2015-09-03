@@ -1,5 +1,7 @@
 package io.breen.socrates.immutable.file;
 
+import io.breen.socrates.immutable.PostConstructionAction;
+import io.breen.socrates.immutable.Verifiable;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.implementation.any.LateSubmissionTest;
 import io.breen.socrates.util.Right;
@@ -12,7 +14,7 @@ import java.util.*;
  *
  * @see io.breen.socrates.immutable.criteria.Criteria
  */
-public abstract class File {
+public abstract class File implements Verifiable, PostConstructionAction {
 
     /**
      * The relative path from the root of any student's submission directory specifying where the
@@ -45,14 +47,32 @@ public abstract class File {
 
     public List<Object> tests = new LinkedList<>();
 
-    //    public File(Path localPath, double pointValue, String contentType,
-    //                Map<LocalDateTime, Double> dueDates, List<Either<Test, TestGroup>> tests)
-    //    {
-    //        this.path = localPath;
-    //        this.contentType = contentType;
-    //        this.pointValue = pointValue;
-    //        this.testRoot = createTestRoot(pointValue, dueDates, tests);
-    //    }
+    /**
+     * This empty constructor is used by SnakeYAML.
+     */
+    public File() {}
+
+    public File(String path, double pointValue, String contentType, Map<Date, Double> dueDates,
+                List<Object> tests)
+    {
+        this.path = path;
+        this.contentType = contentType;
+        this.pointValue = pointValue;
+        this.dueDates = dueDates;
+        this.tests = tests;
+        testRoot = createTestRoot();
+    }
+
+    @Override
+    public void afterConstruction() {
+        testRoot = createTestRoot();
+    }
+
+    @Override
+    public void verify() {
+        if (path == null || contentType == null || tests == null)
+            throw new IllegalArgumentException();
+    }
 
     /**
      * This method creates this file's test "root". The root is a test group that limits the maximum

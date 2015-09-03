@@ -27,6 +27,11 @@ public class TestGroup {
 
     public double maxValue;
 
+    /**
+     * This empty constructor is used by SnakeYAML.
+     */
+    public TestGroup() {}
+
     public TestGroup(List<Object> members, int maxNum, double maxValue) {
         this.members = members;
         this.maxNum = maxNum;

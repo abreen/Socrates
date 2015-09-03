@@ -312,8 +312,9 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                                 }
 
                                 if (isLastSibling(node)) {
-                                    DefaultMutableTreeNode next = getNextNonLeafSibling(getParent
-                                                                                                (node));
+                                    DefaultMutableTreeNode next = getNextNonLeafSibling(
+                                            getParent(node)
+                                    );
 
                                     if (next == null) nextFile.setEnabled(false);
                                     else nextFile.setEnabled(true);
@@ -334,7 +335,8 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                                     previousFile.setEnabled(true);
                                 }
 
-                                if (isLastSibling(getParent(node))) nextSubmission.setEnabled(false);
+                                if (isLastSibling(getParent(node)))
+                                    nextSubmission.setEnabled(false);
                                 else nextSubmission.setEnabled(true);
 
                                 if (isFirstSibling(getParent(node)))
@@ -351,9 +353,11 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                                 else previousSubmission.setEnabled(true);
 
                                 if (isLeaf(node)) {
-                                    DefaultMutableTreeNode nextNonLeaf = getNextNonLeafSibling(node);
-                                    DefaultMutableTreeNode prevNonLeaf = getPreviousNonLeafSibling
+                                    DefaultMutableTreeNode nextNonLeaf = getNextNonLeafSibling
                                             (node);
+                                    DefaultMutableTreeNode prevNonLeaf = getPreviousNonLeafSibling(
+                                            node
+                                    );
 
                                     if (nextNonLeaf == null) nextFile.setEnabled(false);
                                     else nextFile.setEnabled(true);
@@ -363,8 +367,9 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                                 } else {
                                     nextFile.setEnabled(true);
 
-                                    DefaultMutableTreeNode prevNonLeaf = getPreviousNonLeafSibling
-                                            (node);
+                                    DefaultMutableTreeNode prevNonLeaf = getPreviousNonLeafSibling(
+                                            node
+                                    );
 
                                     if (prevNonLeaf == null) previousFile.setEnabled(false);
                                     else previousFile.setEnabled(true);
