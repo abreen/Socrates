@@ -6,9 +6,7 @@ import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.util.Either;
 
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The simplest kind of non-abstract File subclass. A PlainFile is any file that can be opened by a
@@ -19,7 +17,7 @@ import java.util.Map;
  */
 public final class PlainFile extends File {
 
-    public PlainFile(Path path, double pointValue, Map<LocalDateTime, Double> dueDates,
+    public PlainFile(Path path, double pointValue, Map<Date, Double> dueDates,
                      List<Either<Test, TestGroup>> tests)
     {
         super(path, pointValue, "text/plain", dueDates, tests);

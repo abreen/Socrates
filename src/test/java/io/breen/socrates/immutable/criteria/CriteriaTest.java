@@ -4,6 +4,7 @@ import org.junit.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
 import static org.junit.Assert.assertEquals;
@@ -49,13 +50,15 @@ public class CriteriaTest {
         {
             // invalid top-level
             Files.createFile(InputFile.INVALID_TOP.p);
-            Files.newBufferedWriter(InputFile.INVALID_TOP.p).append("1234").close();
+            Files.newBufferedWriter(InputFile.INVALID_TOP.p, StandardCharsets.UTF_8)
+                 .append("1234")
+                 .close();
         }
 
         {
             // basic working criteria file
             Files.createFile(InputFile.BASIC.p);
-            BufferedWriter w = Files.newBufferedWriter(InputFile.BASIC.p);
+            BufferedWriter w = Files.newBufferedWriter(InputFile.BASIC.p, StandardCharsets.UTF_8);
             w.append("assignment_name: " + TEST_ASSIGNMENT_NAME + "\n");
             w.append("files: []");
             w.close();
@@ -64,7 +67,10 @@ public class CriteriaTest {
         {
             // basic criteria file, but with an unrecognized top-level mapping
             Files.createFile(InputFile.BASIC_UNRECOGNIZED.p);
-            BufferedWriter w = Files.newBufferedWriter(InputFile.BASIC_UNRECOGNIZED.p);
+            BufferedWriter w = Files.newBufferedWriter(
+                    InputFile.BASIC_UNRECOGNIZED.p,
+                    StandardCharsets.UTF_8
+            );
             w.append("assignment_name: " + TEST_ASSIGNMENT_NAME + "\n");
             w.append("foo: bar\n");
             w.append("files: []");
@@ -74,7 +80,10 @@ public class CriteriaTest {
         {
             // basic criteria file, but with a file specification that is not a mapping
             Files.createFile(InputFile.FILE_NONMAPPING.p);
-            BufferedWriter w = Files.newBufferedWriter(InputFile.FILE_NONMAPPING.p);
+            BufferedWriter w = Files.newBufferedWriter(
+                    InputFile.FILE_NONMAPPING.p,
+                    StandardCharsets.UTF_8
+            );
             w.append("assignment_name: " + TEST_ASSIGNMENT_NAME + "\n");
             w.append("files:\n");
             w.append("  - !file:plain 123\n");

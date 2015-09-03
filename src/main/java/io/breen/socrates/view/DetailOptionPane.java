@@ -3,6 +3,8 @@ package io.breen.socrates.view;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class DetailOptionPane extends JOptionPane {
 
@@ -29,15 +31,18 @@ public class DetailOptionPane extends JOptionPane {
             panel.add(scrollPane, BorderLayout.CENTER);
             panel.add(buttonPanel, BorderLayout.PAGE_END);
 
-            JDialog dialog = new JDialog((Frame)null, "Details", true);
+            final JDialog dialog = new JDialog((Frame)null, "Details", true);
             dialog.setContentPane(panel);
             dialog.setSize(new Dimension(400, 300));
             dialog.setLocationRelativeTo(null);
 
             closeButton.addActionListener(
-                    e -> {
-                        dialog.setVisible(false);
-                        dialog.dispose();
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        }
                     }
             );
 

@@ -2,7 +2,7 @@
   <artifact type="jar" name="socrates:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/socrates_jar</output-path>
     <properties id="ant-postprocessing">
-      <options enabled="true">
+      <options>
         <file>file://$PROJECT_DIR$/build.xml</file>
         <target>osx</target>
       </options>

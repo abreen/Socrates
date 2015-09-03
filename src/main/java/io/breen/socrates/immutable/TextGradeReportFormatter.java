@@ -12,8 +12,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -21,7 +20,7 @@ import java.util.*;
  */
 public class TextGradeReportFormatter extends GradeReportFormatter {
 
-    private final static DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern(
+    private final static SimpleDateFormat dateFmt = new SimpleDateFormat(
             "EEEE, MMMM d, yyyy h:mm:ss a"
     );
 
@@ -33,10 +32,11 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
 
     protected void format(SubmissionWrapperNode node, Writer w) throws IOException {
         Submission submission = (Submission)node.getUserObject();
-        LocalDateTime now = LocalDateTime.now();
+        Date now = new Date();
 
         Map<File, SubmittedFileWrapperNode> map = new HashMap<>(criteria.files.size());
-        Enumeration<DefaultMutableTreeNode> children = node.children();
+        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> children = node
+                .children();
         while (children.hasMoreElements()) {
             DefaultMutableTreeNode n = children.nextElement();
 
@@ -120,7 +120,7 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
     private List<Deduction> getDeductions(TestGroupWrapperNode root) {
         List<Deduction> deductions = new LinkedList<>();
 
-        Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
         while (dfs.hasMoreElements()) {
             DefaultMutableTreeNode n = dfs.nextElement();
 

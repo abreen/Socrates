@@ -4,6 +4,7 @@ import io.breen.socrates.immutable.test.implementation.any.script.ScriptTest;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.logging.Logger;
 
@@ -54,7 +55,7 @@ public final class PythonAPIManager {
         Path module = Paths.get(tempDir.toString(), "socrates.py");
         Files.createFile(module);
 
-        BufferedWriter writer = Files.newBufferedWriter(module);
+        BufferedWriter writer = Files.newBufferedWriter(module, StandardCharsets.UTF_8);
         for (String line : moduleSource) {
             writer.write(line, 0, line.length());
             writer.newLine();

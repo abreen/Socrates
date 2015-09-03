@@ -9,6 +9,7 @@ import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.python.PythonProcessBuilder;
 
 import java.io.BufferedReader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Logger;
@@ -62,8 +63,13 @@ public class ScriptTest extends Test implements Automatable {
             if (exitCode != Globals.NORMAL_EXIT_CODE)
                 throw new ScriptTestAbnormalExit(this, exitCode);
 
-            BufferedReader reader = Files.newBufferedReader(output);
-            String lastLine = reader.lines().reduce((prev, current) -> current).get();
+            BufferedReader reader = Files.newBufferedReader(output, Charset.defaultCharset());
+            String lastLine = null;
+            while (true) {
+                String line = reader.readLine();
+                if (line == null) break;
+                else lastLine = line;
+            }
 
             if (lastLine == null) throw new ScriptTestInvalidResult(this, null);
 

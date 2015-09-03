@@ -2,6 +2,7 @@ package io.breen.socrates.immutable.submission;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Logger;
@@ -66,7 +67,7 @@ public class SubmittedFile {
     }
 
     public String getContents() throws IOException {
-        BufferedReader reader = Files.newBufferedReader(fullPath);
+        BufferedReader reader = Files.newBufferedReader(fullPath, Charset.defaultCharset());
         StringBuilder builder = new StringBuilder();
 
         String line;

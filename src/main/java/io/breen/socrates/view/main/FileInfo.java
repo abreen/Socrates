@@ -8,6 +8,8 @@ import io.breen.socrates.model.wrapper.UnrecognizedFileWrapperNode;
 import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -15,8 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
 public class FileInfo {
@@ -55,8 +57,8 @@ public class FileInfo {
         }
     }
     private static final String NO_FILE_SELECTED_FILENAME = "(no file selected)";
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-            "EEE L/d h:mm:ss a"
+    private final static SimpleDateFormat formatter = new SimpleDateFormat(
+            "EEE M/d h:mm:ss a"
     );
     private static Logger logger = Logger.getLogger(FileInfo.class.getName());
     private JPanel rootPanel;
@@ -73,35 +75,38 @@ public class FileInfo {
         innerPanel.add(properties, BorderLayout.CENTER);
 
         submissionTree.addTreeSelectionListener(
-                event -> {
-                    TreePath path = event.getPath();
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
-                            .getLastPathComponent();
+                new TreeSelectionListener() {
+                    @Override
+                    public void valueChanged(TreeSelectionEvent e) {
+                        TreePath path = e.getPath();
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                                .getLastPathComponent();
 
-                    if (!event.isAddedPath()) node = null;
+                        if (!e.isAddedPath()) node = null;
 
-                    if (node != null && (node instanceof SubmittedFileWrapperNode || node
-                            instanceof UnrecognizedFileWrapperNode)) {
-                        SubmittedFile sf = (SubmittedFile)node.getUserObject();
-                        File matchingFile = null;
-                        if (node instanceof SubmittedFileWrapperNode)
-                            matchingFile = ((SubmittedFileWrapperNode)node).matchingFile;
+                        if (node != null && (node instanceof SubmittedFileWrapperNode || node
+                                instanceof UnrecognizedFileWrapperNode)) {
+                            SubmittedFile sf = (SubmittedFile)node.getUserObject();
+                            File matchingFile = null;
+                            if (node instanceof SubmittedFileWrapperNode)
+                                matchingFile = ((SubmittedFileWrapperNode)node).matchingFile;
 
-                        try {
-                            update(sf, matchingFile);
-                        } catch (IOException x) {
-                            logger.warning("encountered I/O exception updating info");
+                            try {
+                                update(sf, matchingFile);
+                            } catch (IOException x) {
+                                logger.warning("encountered I/O exception updating info");
+                            }
+                        } else {
+                            reset();
                         }
-                    } else {
-                        reset();
                     }
                 }
         );
     }
 
-    private static LocalDateTime getModified(Path path) throws IOException {
+    private static Date getModified(Path path) throws IOException {
         FileTime modified = Files.getLastModifiedTime(path);
-        return LocalDateTime.ofInstant(modified.toInstant(), Globals.getZoneId());
+        return new Date(modified.toMillis());
     }
 
     private void createUIComponents() {
@@ -138,11 +143,11 @@ public class FileInfo {
 
         properties.set(
                 FileProperty.SUBMITTED_DATE.index,
-                file.receipt == null ? "Unknown" : file.receipt.getLatestDate().format(formatter)
+                file.receipt == null ? "Unknown" : formatter.format(file.receipt.getLatestDate())
         );
 
         properties.set(
-                FileProperty.MODIFIED_DATE.index, getModified(file.fullPath).format(formatter)
+                FileProperty.MODIFIED_DATE.index, formatter.format(getModified(file.fullPath))
         );
     }
 

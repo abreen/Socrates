@@ -4,12 +4,12 @@ import org.apache.commons.lang.SystemUtils;
 
 import java.awt.*;
 import java.io.IOException;
-import java.nio.file.*;
-import java.time.ZoneId;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 /**
  * The single location for a small number (as little as possible!) of global variables and
@@ -28,8 +28,8 @@ public class Globals {
     public static final Color RED = new Color(189, 12, 13);
     public static final Color GREEN = new Color(49, 141, 34);
     public static final Color BLUE = new Color(37, 123, 210);
+    public static final SimpleDateFormat ISO8601;
     public static final String DEFAULT_GRADE_FILE_NAME = "grade.txt";
-    private static final Pattern PYTHON3_VERSION_PATTERN = Pattern.compile("Python 3.*");
     public static Properties properties;
     public static OS operatingSystem;
     /**
@@ -40,6 +40,9 @@ public class Globals {
     private static Logger logger = Logger.getLogger(Globals.class.getName());
 
     static {
+        ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        ISO8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+
         if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_MAC_OSX) {
             operatingSystem = OS.OSX;
         } else if (SystemUtils.IS_OS_WINDOWS) {
@@ -51,8 +54,19 @@ public class Globals {
         }
 
         List<Path> paths = new LinkedList<>();
-        paths.add(Paths.get("python"));
-        paths.add(Paths.get("python3"));
+
+        Map<String, String> env = System.getenv();
+        if (env.containsKey("PATH")) {
+            String path = env.get("PATH");
+
+            String pathSep = System.getProperty("path.separator");
+            String[] dirs = path.split(pathSep);
+
+            for (String dir : dirs) {
+                paths.add(Paths.get(dir, "python"));
+                paths.add(Paths.get(dir, "python3"));
+            }
+        }
 
         switch (Globals.operatingSystem) {
         case WINDOWS:
@@ -79,9 +93,7 @@ public class Globals {
                 logger.warning(
                         "interrupted trying to test Python command " + p + ": " + x
                 );
-            } catch (IOException x) {
-                logger.warning("I/O error trying to test Python command " + p + ": " + x);
-            }
+            } catch (IOException ignored) {}
         }
 
         if (python3Command == null) {
@@ -94,28 +106,26 @@ public class Globals {
             throws IOException, InterruptedException
     {
         String pathStr = path.toString();
-        ProcessBuilder builder = new ProcessBuilder(pathStr, "--version");
 
-        Path temp = Files.createTempFile(null, null);
-        builder.redirectOutput(temp.toFile());
+        ProcessBuilder builder = new ProcessBuilder(
+                pathStr, "-c", "def f(): pass"
+        );
 
-        Process process = builder.start();
-        if (process.waitFor() != NORMAL_EXIT_CODE) {
-            Files.delete(temp);
+        if (builder.start().waitFor() == NORMAL_EXIT_CODE) {
+            // this path is probably valid for a Python interpreter
+
+            // but is it Python >= 3.3?
+            ProcessBuilder builder2 = new ProcessBuilder(
+                    pathStr,
+                    "-c",
+                    "import sys; v = sys.version_info; sys.exit(v.major * 10 + v.minor)"
+            );
+
+            int exitCode = builder2.start().waitFor();
+            return exitCode >= 33 && exitCode < 40;
+        } else {
             return false;
         }
-
-        String versionString = Files.newBufferedReader(temp).readLine();
-
-        if (versionString == null)
-            // file was empty
-            return false;
-        else return PYTHON3_VERSION_PATTERN.matcher(versionString).matches();
-    }
-
-    public static ZoneId getZoneId() {
-        String zoneString = properties.getProperty("timezone");
-        return ZoneId.of(zoneString);
     }
 
     public static void enableFullScreen(Window window) {

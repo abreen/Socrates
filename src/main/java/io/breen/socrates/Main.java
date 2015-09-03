@@ -8,8 +8,8 @@ import io.breen.socrates.immutable.submission.*;
 import org.apache.commons.cli.*;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.*;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -141,20 +141,20 @@ public class Main {
 
     private static void setDefaultProperties() {
         Properties defaults = new Properties();
-        defaults.setProperty("timezone", ZoneId.systemDefault().getId());
+        // no default properties
         Globals.properties = new Properties(defaults);
         logger.config("setting default properties: " + defaults.toString());
     }
 
     private static void storeProperties(Path path) throws IOException {
         logger.config("storing properties to: " + path);
-        BufferedWriter writer = Files.newBufferedWriter(path);
+        BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset());
         Globals.properties.store(writer, null);
     }
 
     private static void loadPropertiesFrom(Path path) throws IOException {
         logger.config("loading properties from: " + path);
-        BufferedReader reader = Files.newBufferedReader(path);
+        BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset());
         Globals.properties.load(reader);
         logger.config("loaded these properties: " + Globals.properties.toString());
     }

@@ -1,28 +1,26 @@
 package io.breen.socrates.immutable.submission;
 
+import io.breen.socrates.Globals;
+
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.text.ParseException;
 import java.util.*;
 
 /**
  * Class representing a receipt file designed to store information about the submission date and
  * time of a file. This class assumes receipt files are plain text files with newline-separated
- * dates in ISO 8601 format (without offsets). For the precise expected format, see
- * DateTimeFormatter.ISO_LOCAL_DATE_TIME.
- *
- * @see DateTimeFormatter
+ * dates in ISO 8601 format (without offsets).
  */
 public final class Receipt {
 
-    private final PriorityQueue<LocalDateTime> dates;
+    private final PriorityQueue<Date> dates;
 
-    public Receipt(List<LocalDateTime> dates) {
-        this.dates = new PriorityQueue<>(Collections.reverseOrder());
+    public Receipt(List<Date> dates) {
+        this.dates = new PriorityQueue<>(6, Collections.reverseOrder());
         this.dates.addAll(dates);
     }
 
@@ -32,15 +30,15 @@ public final class Receipt {
      */
     public static Receipt fromReceiptFile(Path path) throws IOException, ReceiptFormatException
     {
-        List<LocalDateTime> list = new LinkedList<>();
-        BufferedReader reader = Files.newBufferedReader(path);
+        List<Date> list = new LinkedList<>();
+        BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset());
 
         String line;
         while ((line = reader.readLine()) != null) {
-            LocalDateTime ldt;
+            Date ldt;
             try {
-                ldt = LocalDateTime.parse(line, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            } catch (DateTimeParseException e) {
+                ldt = Globals.ISO8601.parse(line);
+            } catch (ParseException e) {
                 throw new ReceiptFormatException(
                         "receipt has invalid timestamp: " + line
                 );
@@ -61,7 +59,7 @@ public final class Receipt {
                 ")";
     }
 
-    public LocalDateTime getLatestDate() {
+    public Date getLatestDate() {
         return dates.peek();
     }
 }

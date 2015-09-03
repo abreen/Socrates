@@ -5,8 +5,8 @@ import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * A test that checks the submitted file's receipt to determine whether it was submitted after a
@@ -15,14 +15,14 @@ import java.time.format.DateTimeFormatter;
  */
 public class LateSubmissionTest extends Test implements Automatable {
 
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-            "L/d h:mm:ss a"
+    private final static SimpleDateFormat formatter = new SimpleDateFormat(
+            "M/d h:mm:ss a"
     );
 
-    protected final LocalDateTime cutoff;
+    protected final Date cutoff;
 
-    public LateSubmissionTest(double deduction, LocalDateTime cutoff) {
-        super(deduction, "submitted after " + cutoff.format(formatter));
+    public LateSubmissionTest(double deduction, Date cutoff) {
+        super(deduction, "submitted after " + formatter.format(cutoff));
         this.cutoff = cutoff;
     }
 
@@ -32,8 +32,8 @@ public class LateSubmissionTest extends Test implements Automatable {
     {
         if (target.receipt == null) throw new CannotBeAutomatedException();
 
-        LocalDateTime ldt = target.receipt.getLatestDate();
-        return ldt.isBefore(cutoff);
+        Date d = target.receipt.getLatestDate();
+        return d.before(cutoff);
     }
 
     @Override

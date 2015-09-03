@@ -149,7 +149,8 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
             } else if (subtreeShouldBeUnConstrained) {
                 unconstrainTree(root, initialState);
 
-                Enumeration<DefaultMutableTreeNode> children = root.children();
+                @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> children =
+                        root.children();
                 while (children.hasMoreElements()) {
                     DefaultMutableTreeNode child = children.nextElement();
                     if (child instanceof TestGroupWrapperNode && !parents.contains(child))
@@ -191,7 +192,8 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
                 if (needsReConstraining) {
                     constrainTree(root, initialState);
                 } else {
-                    Enumeration<DefaultMutableTreeNode> children = root.children();
+                    @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> children = root
+                            .children();
                     while (children.hasMoreElements()) {
                         DefaultMutableTreeNode child = children.nextElement();
                         if (child instanceof TestGroupWrapperNode)
@@ -210,7 +212,7 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
     {
         logger.fine("constraining tree with root: " + root);
 
-        Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
         while (dfs.hasMoreElements()) {
             DefaultMutableTreeNode dfsNode = dfs.nextElement();
             if (dfsNode instanceof TestGroupWrapperNode) continue;
@@ -229,7 +231,7 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
     {
         logger.fine("un-constraining tree with root: " + root);
 
-        Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
         while (dfs.hasMoreElements()) {
             DefaultMutableTreeNode dfsNode = dfs.nextElement();
             if (dfsNode instanceof TestGroupWrapperNode) continue;

@@ -11,9 +11,12 @@ import jsyntaxpane.util.Configuration;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -37,40 +40,55 @@ public class FileView {
     private JScrollPane scrollPane;
 
     public FileView(MenuBarManager menuBar, SubmissionTree submissionTree) {
-        defaultTheme = MenuBarManager.newMenuItemAction(
-                menuBar.defaultTheme, e -> changeTheme(FileView.ThemeType.DEFAULT)
-        );
+        defaultTheme = new AbstractAction(menuBar.defaultTheme.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeTheme(ThemeType.DEFAULT);
+            }
+        };
+        menuBar.defaultTheme.setAction(defaultTheme);
 
-        base16Light = MenuBarManager.newMenuItemAction(
-                menuBar.base16Light, e -> changeTheme(FileView.ThemeType.BASE16_LIGHT)
-        );
+        base16Light = new AbstractAction(menuBar.base16Light.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeTheme(ThemeType.BASE16_LIGHT);
+            }
+        };
+        menuBar.base16Light.setAction(base16Light);
 
-        base16Dark = MenuBarManager.newMenuItemAction(
-                menuBar.base16Dark, e -> changeTheme(FileView.ThemeType.BASE16_DARK)
-        );
+        base16Dark = new AbstractAction(menuBar.base16Dark.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeTheme(ThemeType.BASE16_DARK);
+            }
+        };
+        menuBar.base16Dark.setAction(base16Dark);
 
         submissionTree.addTreeSelectionListener(
-                event -> {
-                    TreePath path = event.getPath();
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
-                            .getLastPathComponent();
+                new TreeSelectionListener() {
+                    @Override
+                    public void valueChanged(TreeSelectionEvent e) {
+                        TreePath path = e.getPath();
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                                .getLastPathComponent();
 
-                    if (!event.isAddedPath()) node = null;
+                        if (!e.isAddedPath()) node = null;
 
-                    if (node != null && (node instanceof SubmittedFileWrapperNode || node
-                            instanceof UnrecognizedFileWrapperNode)) {
-                        SubmittedFile sf = (SubmittedFile)node.getUserObject();
-                        File matchingFile = null;
-                        if (node instanceof SubmittedFileWrapperNode)
-                            matchingFile = ((SubmittedFileWrapperNode)node).matchingFile;
+                        if (node != null && (node instanceof SubmittedFileWrapperNode || node
+                                instanceof UnrecognizedFileWrapperNode)) {
+                            SubmittedFile sf = (SubmittedFile)node.getUserObject();
+                            File matchingFile = null;
+                            if (node instanceof SubmittedFileWrapperNode)
+                                matchingFile = ((SubmittedFileWrapperNode)node).matchingFile;
 
-                        try {
-                            update(sf, matchingFile);
-                        } catch (IOException x) {
-                            logger.warning("encountered I/O exception updating view");
+                            try {
+                                update(sf, matchingFile);
+                            } catch (IOException x) {
+                                logger.warning("encountered I/O exception updating view");
+                            }
+                        } else {
+                            reset();
                         }
-                    } else {
-                        reset();
                     }
                 }
         );

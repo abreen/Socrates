@@ -14,6 +14,7 @@ import io.breen.socrates.view.icon.TestIcon;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -34,45 +35,56 @@ public class TestTree implements Observer<TestWrapperNode> {
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
 
-        nextTest = MenuBarManager.newMenuItemAction(
-                menuBar.nextTest, e -> goToNextTest()
-        );
+        nextTest = new AbstractAction(menuBar.nextTest.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                goToNextTest();
+            }
+        };
         nextTest.setEnabled(false);
         nextTest.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl)
         );
+        menuBar.nextTest.setAction(nextTest);
 
-        previousTest = MenuBarManager.newMenuItemAction(
-                menuBar.previousTest, e -> goToPreviousTest()
-        );
+        previousTest = new AbstractAction(menuBar.previousTest.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                goToPreviousTest();
+            }
+        };
         previousTest.setEnabled(false);
         previousTest.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl)
         );
+        menuBar.previousTest.setAction(previousTest);
 
         submissionTree.addTreeSelectionListener(
-                event -> {
-                    TreePath path = event.getPath();
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
-                            .getLastPathComponent();
+                new TreeSelectionListener() {
+                    @Override
+                    public void valueChanged(TreeSelectionEvent e) {
+                        TreePath path = e.getPath();
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                                .getLastPathComponent();
 
-                    if (!event.isAddedPath()) node = null;
+                        if (!e.isAddedPath()) node = null;
 
-                    if (node != null) {
-                        if (node instanceof SubmittedFileWrapperNode) {
-                            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)node;
-                            int n = sfwn.matchingFile.testRoot.members.size();
-                            if (n > 0) nextTest.setEnabled(true);
-                            update(sfwn.treeModel);
+                        if (node != null) {
+                            if (node instanceof SubmittedFileWrapperNode) {
+                                SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)node;
+                                int n = sfwn.matchingFile.testRoot.members.size();
+                                if (n > 0) nextTest.setEnabled(true);
+                                update(sfwn.treeModel);
+                            } else {
+                                nextTest.setEnabled(false);
+                                previousTest.setEnabled(false);
+                                reset();
+                            }
                         } else {
                             nextTest.setEnabled(false);
                             previousTest.setEnabled(false);
                             reset();
                         }
-                    } else {
-                        nextTest.setEnabled(false);
-                        previousTest.setEnabled(false);
-                        reset();
                     }
                 }
         );
@@ -126,31 +138,35 @@ public class TestTree implements Observer<TestWrapperNode> {
          * This ensures that only tests can be selected.
          */
         tree.setSelectionModel(
-                new PredicateTreeSelectionModel(
-                        path -> {
-                            DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
-                                    .getLastPathComponent();
-                            return node.getUserObject() instanceof Test;
-                        }
-                )
+                new PredicateTreeSelectionModel() {
+                    @Override
+                    public boolean predicate(TreePath path) {
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                                .getLastPathComponent();
+                        return node.getUserObject() instanceof Test;
+                    }
+                }
         );
 
         tree.addTreeSelectionListener(
-                event -> {
-                    TreePath path = event.getPath();
-                    TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
+                new TreeSelectionListener() {
+                    @Override
+                    public void valueChanged(TreeSelectionEvent e) {
+                        TreePath path = e.getPath();
+                        TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
 
-                    if (!event.isAddedPath()) node = null;
+                        if (!e.isAddedPath()) node = null;
 
-                    if (node == null) {
-                        nextTest.setEnabled(true);
-                        previousTest.setEnabled(false);
-                    } else {
-                        if (lastTestForFileSelected()) nextTest.setEnabled(false);
-                        else nextTest.setEnabled(true);
+                        if (node == null) {
+                            nextTest.setEnabled(true);
+                            previousTest.setEnabled(false);
+                        } else {
+                            if (lastTestForFileSelected()) nextTest.setEnabled(false);
+                            else nextTest.setEnabled(true);
 
-                        if (firstTestForFileSelected()) previousTest.setEnabled(false);
-                        else previousTest.setEnabled(true);
+                            if (firstTestForFileSelected()) previousTest.setEnabled(false);
+                            else previousTest.setEnabled(true);
+                        }
                     }
                 }
         );
@@ -238,7 +254,8 @@ public class TestTree implements Observer<TestWrapperNode> {
     public void update(DefaultTreeModel treeModel) {
         TreeModel currentModel = tree.getModel();
         if (currentModel != null) {
-            Enumeration<DefaultMutableTreeNode> dfs = getRoot().depthFirstEnumeration();
+            @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = getRoot()
+                    .depthFirstEnumeration();
             while (dfs.hasMoreElements()) {
                 DefaultMutableTreeNode n = dfs.nextElement();
 
@@ -252,7 +269,7 @@ public class TestTree implements Observer<TestWrapperNode> {
         tree.setModel(treeModel);
 
         if (treeModel != null) {
-            Enumeration<DefaultMutableTreeNode> dfs = getRoot().depthFirstEnumeration();
+            @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = getRoot().depthFirstEnumeration();
             while (dfs.hasMoreElements()) {
                 DefaultMutableTreeNode n = dfs.nextElement();
 

@@ -7,7 +7,6 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Class representing immutable objects that store the contents of a single student's submission.
@@ -31,7 +30,7 @@ public class Submission {
     public final List<SubmittedFile> files;
 
     public Submission(String studentName, Path submissionDir) {
-        this(studentName, submissionDir, new LinkedList<>());
+        this(studentName, submissionDir, new LinkedList<SubmittedFile>());
     }
 
     public Submission(String studentName, Path submissionDir, List<SubmittedFile> files) {
@@ -52,14 +51,14 @@ public class Submission {
      * @throws ReceiptFormatException If a receipt file has an invalid format
      * @see Submission
      */
-    public static Submission fromDirectory(Path directory)
+    public static Submission fromDirectory(final Path directory)
             throws IOException, ReceiptFormatException, AlreadyGradedException
     {
         if (Files.notExists(directory)) throw new IllegalArgumentException("does not exist");
 
         if (!Files.isDirectory(directory)) throw new IllegalArgumentException("not a directory");
 
-        List<SubmittedFile> submittedFiles = new LinkedList<>();
+        final List<SubmittedFile> submittedFiles = new LinkedList<>();
 
         try {
             Files.walkFileTree(
@@ -127,9 +126,7 @@ public class Submission {
         return "Submission\n" +
                 "\tstudentName=" + studentName + "\n" +
                 "\tsubmissionDir=" + submissionDir + "\n" +
-                "\tfiles=" + files.stream()
-                                  .map(SubmittedFile::toString)
-                                  .collect(Collectors.joining("\n"));
+                "\tfiles=" + files;
     }
 
     /**
