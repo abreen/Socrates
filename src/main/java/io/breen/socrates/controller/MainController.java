@@ -57,7 +57,7 @@ public class MainController {
 
                         SubmittedFile submitted = mainView.submissionTree
                                 .getSelectedSubmittedFile();
-                        File file = criteria.files.get(submitted.localPath);
+                        File file = criteria.getFileByLocalPath(submitted.localPath);
 
                         if (file == null) return;
 
@@ -101,7 +101,7 @@ public class MainController {
         for (Submission s : submissions) {
             List<Pair<SubmittedFile, File>> list = new ArrayList<>(s.files.size());
             for (SubmittedFile f : s.files) {
-                File matchingFile = criteria.files.get(f.localPath);
+                File matchingFile = criteria.getFileByLocalPath(f.localPath);
                 Pair<SubmittedFile, File> pair = new Pair<>(f, matchingFile);
                 list.add(pair);
             }

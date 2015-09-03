@@ -1,8 +1,7 @@
 package io.breen.socrates.controller;
 
-import io.breen.socrates.constructor.InvalidCriteriaException;
-import io.breen.socrates.constructor.MissingResourceException;
 import io.breen.socrates.immutable.criteria.Criteria;
+import io.breen.socrates.immutable.criteria.InvalidCriteriaException;
 import io.breen.socrates.immutable.hooks.HookManager;
 import io.breen.socrates.immutable.hooks.triggers.Hook;
 import io.breen.socrates.immutable.submission.*;

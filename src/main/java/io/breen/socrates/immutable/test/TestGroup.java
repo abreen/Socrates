@@ -1,9 +1,6 @@
 package io.breen.socrates.immutable.test;
 
-import io.breen.socrates.immutable.test.ceiling.AtMost;
-import io.breen.socrates.immutable.test.ceiling.Ceiling;
-import io.breen.socrates.util.Either;
-
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -24,38 +21,23 @@ import java.util.List;
  */
 public class TestGroup {
 
-    public final List<Either<Test, TestGroup>> members;
+    public List<Object> members = new LinkedList<>();
 
-    public final Ceiling<Integer> maxNum;
+    public int maxNum;
 
-    public final Ceiling<Double> maxValue;
+    public double maxValue;
 
-    public TestGroup(List<Either<Test, TestGroup>> members, Ceiling<Integer> maxNum,
-                     Ceiling<Double> maxValue)
-    {
-        if (maxNum == null) throw new IllegalArgumentException("maxNum cannot be null");
-
-        if (maxValue == null) throw new IllegalArgumentException("maxValue cannot be null");
-
-        if (maxNum != Ceiling.ANY) {
-            int num = AtMost.getValue(maxNum);
-
-            if (num < 0) throw new IllegalArgumentException("maxNum cannot be negative");
-        }
-
-        if (maxValue != Ceiling.ANY && AtMost.getValue(maxValue) < 0)
-            throw new IllegalArgumentException("maxValue cannot be negative");
-
+    public TestGroup(List<Object> members, int maxNum, double maxValue) {
         this.members = members;
         this.maxNum = maxNum;
         this.maxValue = maxValue;
     }
 
-    public TestGroup(List<Either<Test, TestGroup>> newMembers, TestGroup oldGroup) {
-        this.members = newMembers;
-        this.maxNum = oldGroup.maxNum;
-        this.maxValue = oldGroup.maxValue;
-    }
+    //    public TestGroup(List<Either<Test, TestGroup>> newMembers, TestGroup oldGroup) {
+    //        this.members = newMembers;
+    //        this.maxNum = oldGroup.maxNum;
+    //        this.maxValue = oldGroup.maxValue;
+    //    }
 
     public String toString() {
         return "TestGroup(" +

@@ -62,11 +62,11 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
 
         double totalPoints = 0.0;
         double earnedPoints = 0.0;
-        for (File file : criteria.files.values()) {
+        for (File file : criteria.files) {
             totalPoints += file.pointValue;
             earnedPoints += file.pointValue;
 
-            w.append(file.localPath.toString());
+            w.append(file.path.toString());
             w.append(" (");
             w.append(decFmt.format(file.pointValue));
             if (file.pointValue == 1) w.append(" point)");

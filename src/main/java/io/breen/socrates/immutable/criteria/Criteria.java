@@ -1,12 +1,14 @@
 package io.breen.socrates.immutable.criteria;
 
-import io.breen.socrates.constructor.InvalidCriteriaException;
-import io.breen.socrates.constructor.SocratesConstructor;
 import io.breen.socrates.immutable.file.File;
+import io.breen.socrates.immutable.file.implementation.PythonFile;
+import io.breen.socrates.immutable.test.TestGroup;
+import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.YAMLException;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -27,57 +29,34 @@ public final class Criteria {
     /**
      * Human-readable assignment name (e.g., "Problem Set 1"). Cannot be null.
      */
-    public final String assignmentName;
+    public String assignmentName;
 
     /*
      * Other resources provided by a criteria package
      */
     /**
      * File objects created from the criteria file. These will all be instances of subclasses of
-     * File, since File is abstract. Each File's localPath Path is used as the key in this map.
+     * File, since File is abstract. Each File's path Path is used as the key in this map.
      *
      * @see File
      */
-    public final Map<Path, File> files;
-    public final Map<String, Resource> staticResources;
-    public final Map<String, Resource> scriptResources;
-    public final Map<String, Resource> hookResources;
+    public List<File> files;
 
-    public Criteria(String name, List<File> files, Map<String, Resource> staticResources,
-                    Map<String, Resource> scriptResources, Map<String, Resource> hookResources)
-    {
-        if (name == null) throw new IllegalArgumentException("'name' cannot be null");
-        if (files == null) throw new IllegalArgumentException("'files' cannot be null");
+    public Map<String, Resource> staticResources = new HashMap<>();
+    public Map<String, Resource> scriptResources = new HashMap<>();
+    public Map<String, Resource> hookResources = new HashMap<>();
 
-        if (staticResources == null)
-            throw new IllegalArgumentException("'staticResources' cannot be null");
-        if (scriptResources == null)
-            throw new IllegalArgumentException("'scriptResources' cannot be null");
-        if (hookResources == null)
-            throw new IllegalArgumentException("'hookResources' cannot be null");
+    public Criteria() {}
 
-        this.assignmentName = name;
-
-        this.files = new HashMap<>(files.size());
-        for (File f : files)
-            this.files.put(f.localPath, f);
-
-        this.staticResources = staticResources;
-        this.scriptResources = scriptResources;
-        this.hookResources = hookResources;
-
-        logger.info("constructed a criteria object: " + this);
+    public Criteria(String assignmentName, List<File> files) {
+        this.assignmentName = assignmentName;
+        this.files = files;
     }
 
-    public Criteria(String name, List<File> files) {
-        this(name, files, new HashMap<>(), new HashMap<>(), new HashMap<>());
-    }
-
-    /**
-     * @throws io.breen.socrates.constructor.InvalidCriteriaException
-     */
-    public static Criteria loadFromPath(Path path) throws IOException {
+    public static Criteria loadFromPath(Path path) throws IOException, InvalidCriteriaException {
+        Criteria c = null;
         String fileName = path.getFileName().toString();
+
         if (looksLikeCriteriaFile(fileName)) {
             return loadCriteriaFileFromPath(path);
         } else if (looksLikeCriteriaPackage(fileName)) {
@@ -113,20 +92,14 @@ public final class Criteria {
                 }
             }
 
-            Yaml y = new Yaml(
-                    new SocratesConstructor(
-                            staticResources,
-                            scriptResources,
-                            hookResources
-                    )
-            );
-            Criteria c = (Criteria)y.load(criteriaFile);
-            checkCriteriaObject(c);
-            return c;
+            c = loadCriteriaFileFromReader(new InputStreamReader(criteriaFile));
         } else {
             logger.warning("unable to determine criteria type from extension");
-            return loadCriteriaFileFromPath(path);
+            c = loadCriteriaFileFromPath(path);
         }
+
+        checkCriteriaObject(c);
+        return c;
     }
 
     private static boolean looksLikeStaticResource(String fileName) {
@@ -153,15 +126,42 @@ public final class Criteria {
         return false;
     }
 
-    private static void checkCriteriaObject(Criteria c) {
+    private static void checkCriteriaObject(Criteria c) throws InvalidCriteriaException {
         if (c == null) throw new InvalidCriteriaException("criteria file is empty");
     }
 
-    private static Criteria loadCriteriaFileFromPath(Path path) throws IOException {
-        Yaml y = new Yaml(new SocratesConstructor());
-        Criteria c = (Criteria)y.load(Files.newBufferedReader(path));
-        checkCriteriaObject(c);
-        return c;
+    private static Criteria loadCriteriaFileFromPath(Path path)
+            throws IOException, InvalidCriteriaException
+    {
+        return loadCriteriaFileFromReader(Files.newBufferedReader(path));
+    }
+
+    private static Criteria loadCriteriaFileFromReader(Reader reader)
+            throws IOException, InvalidCriteriaException
+    {
+        Constructor cons = new Constructor(Criteria.class);
+
+        cons.addTypeDescription(new TypeDescription(Criteria.class, "!criteria"));
+
+        cons.addTypeDescription(new TypeDescription(TestGroup.class, "!group"));
+
+        cons.addTypeDescription(new TypeDescription(PythonFile.class, "!file:python"));
+        //        cons.addTypeDescription(new TypeDescription(ReviewTest.class,
+        // "!test:python:review"));
+
+        Yaml yaml = new Yaml(cons);
+        try {
+            return yaml.loadAs(reader, Criteria.class);
+        } catch (YAMLException x) {
+            throw new InvalidCriteriaException(x.toString());
+        }
+    }
+
+    public File getFileByLocalPath(Path path) {
+        for (File f : files)
+            if (f.path.equals(path)) return f;
+
+        return null;
     }
 
     public String toString() {

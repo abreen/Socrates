@@ -60,7 +60,7 @@ public class SubmittedFile {
 
     public String toString() {
         return "SubmittedFile(" +
-                "localPath=" + localPath + ", " +
+                "path=" + localPath + ", " +
                 "receipt=" + receipt +
                 ")";
     }

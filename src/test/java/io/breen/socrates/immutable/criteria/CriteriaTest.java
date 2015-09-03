@@ -1,6 +1,5 @@
 package io.breen.socrates.immutable.criteria;
 
-import io.breen.socrates.constructor.InvalidCriteriaException;
 import org.junit.*;
 
 import java.io.BufferedWriter;

@@ -1,14 +1,9 @@
 package io.breen.socrates.immutable.file;
 
-import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.immutable.test.ceiling.AtMost;
-import io.breen.socrates.immutable.test.ceiling.Ceiling;
 import io.breen.socrates.immutable.test.implementation.any.LateSubmissionTest;
-import io.breen.socrates.util.*;
+import io.breen.socrates.util.Right;
 
-import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -23,19 +18,21 @@ public abstract class File {
      * The relative path from the root of any student's submission directory specifying where the
      * expected file can be found.
      */
-    public final Path localPath;
+    public String path;
 
     /**
      * The number of points that this file contributes to the total value of the assignment being
      * graded.
      */
-    public final double pointValue;
+    public double pointValue;
 
     /**
      * The content type value for this file. This may not be a MIME type; it should be whatever is
      * specified in the JSyntaxPane libraries in order for syntax highlighting to work.
      */
-    public final String contentType;
+    public String contentType;
+
+    public Map<Date, Double> dueDates = new HashMap<>();
 
     /**
      * This file's "test tree" root. The root is a TestGroup object whose maxValue field is equal to
@@ -44,16 +41,18 @@ public abstract class File {
      *
      * @see TestGroup
      */
-    public final TestGroup testRoot;
+    public TestGroup testRoot;
 
-    public File(Path localPath, double pointValue, String contentType,
-                Map<LocalDateTime, Double> dueDates, List<Either<Test, TestGroup>> tests)
-    {
-        this.localPath = localPath;
-        this.contentType = contentType;
-        this.pointValue = pointValue;
-        this.testRoot = createTestRoot(pointValue, dueDates, tests);
-    }
+    public List<Object> tests = new LinkedList<>();
+
+    //    public File(Path localPath, double pointValue, String contentType,
+    //                Map<LocalDateTime, Double> dueDates, List<Either<Test, TestGroup>> tests)
+    //    {
+    //        this.path = localPath;
+    //        this.contentType = contentType;
+    //        this.pointValue = pointValue;
+    //        this.testRoot = createTestRoot(pointValue, dueDates, tests);
+    //    }
 
     /**
      * This method creates this file's test "root". The root is a test group that limits the maximum
@@ -61,14 +60,12 @@ public abstract class File {
      * create a test group of LateSubmissionTest objects, if the criteria file specifies due dates
      * for this file. (That test group would be a child of the root.)
      */
-    private static TestGroup createTestRoot(double fileValue, Map<LocalDateTime, Double> dueDates,
-                                            List<Either<Test, TestGroup>> tests)
-    {
+    private TestGroup createTestRoot() {
         if (dueDates != null) {
-            SortedMap<LocalDateTime, Double> sorted = new TreeMap<>(Collections.reverseOrder());
+            SortedMap<Date, Double> sorted = new TreeMap<>(Collections.reverseOrder());
             sorted.putAll(dueDates);
 
-            List<Either<Test, TestGroup>> lates = new ArrayList<>(sorted.size());
+            List<Object> lateTests = new ArrayList<>(sorted.size());
 
             /*
              * It is *very* important that we process these due dates latest-to-earliest,
@@ -77,12 +74,12 @@ public abstract class File {
              * due dates specifying different late periods, we will want to take the
              * deduction corresponding to the "latest" cutoff timestamp first.
              */
-            for (Map.Entry<LocalDateTime, Double> entry : sorted.entrySet()) {
+            for (Map.Entry<Date, Double> entry : sorted.entrySet()) {
                 LateSubmissionTest lst = new LateSubmissionTest(entry.getValue(), entry.getKey());
-                lates.add(new Left<>(lst));
+                lateTests.add(lst);
             }
 
-            TestGroup lateGroup = new TestGroup(lates, new AtMost<>(1), Ceiling.getAny());
+            TestGroup lateGroup = new TestGroup(lateTests, 1, 0.0);
 
             /*
              * Here we add the late tests before any of the other tests specified from
@@ -93,14 +90,14 @@ public abstract class File {
             tests.add(0, new Right<>(lateGroup));
         }
 
-        return new TestGroup(tests, Ceiling.getAny(), new AtMost<>(fileValue));
+        return new TestGroup(tests, 0, pointValue);
     }
 
     public String toString() {
         return this.getClass().toString() + "(" +
-                "localPath=" + localPath + ", " +
+                "path=" + path + ", " +
                 "pointValue=" + pointValue + ", " +
-                "testRoot=" + testRoot +
+                "tests=" + tests +
                 ")";
     }
 
