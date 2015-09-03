@@ -7,6 +7,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -70,7 +71,13 @@ public final class Criteria {
     }
 
     public Criteria(String name, List<File> files) {
-        this(name, files, new HashMap<>(), new HashMap<>(), new HashMap<>());
+        this(
+                name,
+                files,
+                new HashMap<String, Resource>(),
+                new HashMap<String, Resource>(),
+                new HashMap<String, Resource>()
+        );
     }
 
     /**
@@ -115,9 +122,7 @@ public final class Criteria {
 
             Yaml y = new Yaml(
                     new SocratesConstructor(
-                            staticResources,
-                            scriptResources,
-                            hookResources
+                            staticResources, scriptResources, hookResources
                     )
             );
             Criteria c = (Criteria)y.load(criteriaFile);
@@ -159,7 +164,7 @@ public final class Criteria {
 
     private static Criteria loadCriteriaFileFromPath(Path path) throws IOException {
         Yaml y = new Yaml(new SocratesConstructor());
-        Criteria c = (Criteria)y.load(Files.newBufferedReader(path));
+        Criteria c = (Criteria)y.load(Files.newBufferedReader(path, Charset.defaultCharset()));
         checkCriteriaObject(c);
         return c;
     }

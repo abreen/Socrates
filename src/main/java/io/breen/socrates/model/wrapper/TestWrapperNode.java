@@ -79,7 +79,8 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
         TestResult oldResult = this.result;
         this.result = result;
         ResultChangedEvent e = new ResultChangedEvent(this, oldResult, result);
-        observers.forEach(o -> o.objectChanged(e));
+        for (Observer<TestWrapperNode> o : observers)
+            o.objectChanged(e);
     }
 
     public boolean isConstrained() {
@@ -90,7 +91,8 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
         if (constrained == this.constrained) return;
         this.constrained = constrained;
         ConstraintChangedEvent e = new ConstraintChangedEvent(this, constrained);
-        observers.forEach(o -> o.objectChanged(e));
+        for (Observer<TestWrapperNode> o : observers)
+            o.objectChanged(e);
     }
 
     public AutomationStage getAutomationStage() {
@@ -102,7 +104,8 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
         AutomationStage oldStage = this.stage;
         this.stage = stage;
         StageChangedEvent e = new StageChangedEvent(this, oldStage, stage);
-        observers.forEach(o -> o.objectChanged(e));
+        for (Observer<TestWrapperNode> o : observers)
+            o.objectChanged(e);
     }
 
     @Override

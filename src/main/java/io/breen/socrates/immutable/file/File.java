@@ -8,7 +8,6 @@ import io.breen.socrates.immutable.test.implementation.any.LateSubmissionTest;
 import io.breen.socrates.util.*;
 
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -46,8 +45,8 @@ public abstract class File {
      */
     public final TestGroup testRoot;
 
-    public File(Path localPath, double pointValue, String contentType,
-                Map<LocalDateTime, Double> dueDates, List<Either<Test, TestGroup>> tests)
+    public File(Path localPath, double pointValue, String contentType, Map<Date, Double> dueDates,
+                List<Either<Test, TestGroup>> tests)
     {
         this.localPath = localPath;
         this.contentType = contentType;
@@ -61,11 +60,11 @@ public abstract class File {
      * create a test group of LateSubmissionTest objects, if the criteria file specifies due dates
      * for this file. (That test group would be a child of the root.)
      */
-    private static TestGroup createTestRoot(double fileValue, Map<LocalDateTime, Double> dueDates,
+    private static TestGroup createTestRoot(double fileValue, Map<Date, Double> dueDates,
                                             List<Either<Test, TestGroup>> tests)
     {
         if (dueDates != null) {
-            SortedMap<LocalDateTime, Double> sorted = new TreeMap<>(Collections.reverseOrder());
+            SortedMap<Date, Double> sorted = new TreeMap<>(Collections.reverseOrder());
             sorted.putAll(dueDates);
 
             List<Either<Test, TestGroup>> lates = new ArrayList<>(sorted.size());
@@ -77,12 +76,12 @@ public abstract class File {
              * due dates specifying different late periods, we will want to take the
              * deduction corresponding to the "latest" cutoff timestamp first.
              */
-            for (Map.Entry<LocalDateTime, Double> entry : sorted.entrySet()) {
+            for (Map.Entry<Date, Double> entry : sorted.entrySet()) {
                 LateSubmissionTest lst = new LateSubmissionTest(entry.getValue(), entry.getKey());
-                lates.add(new Left<>(lst));
+                lates.add(new Left<Test, TestGroup>(lst));
             }
 
-            TestGroup lateGroup = new TestGroup(lates, new AtMost<>(1), Ceiling.getAny());
+            TestGroup lateGroup = new TestGroup(lates, new AtMost<>(1), Ceiling.ANY);
 
             /*
              * Here we add the late tests before any of the other tests specified from
@@ -90,10 +89,10 @@ public abstract class File {
              * deductions to be taken first, and therefore appear first in the grade
              * report.
              */
-            tests.add(0, new Right<>(lateGroup));
+            tests.add(0, new Right<Test, TestGroup>(lateGroup));
         }
 
-        return new TestGroup(tests, Ceiling.getAny(), new AtMost<>(fileValue));
+        return new TestGroup(tests, Ceiling.ANY, new AtMost<>(fileValue));
     }
 
     public String toString() {

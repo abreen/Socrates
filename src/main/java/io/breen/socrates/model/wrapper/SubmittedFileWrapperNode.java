@@ -100,10 +100,13 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
         FileCompletedChangeEvent e;
         if (numAfter == 0 && numBefore != 0) {
             e = new FileCompletedChangeEvent(this, true);
-            observers.forEach(o -> o.objectChanged(e));
+            for (Observer<SubmittedFileWrapperNode> o : observers)
+                o.objectChanged(e);
+
         } else if (numAfter > 0 && numBefore == 0) {
             e = new FileCompletedChangeEvent(this, false);
-            observers.forEach(o -> o.objectChanged(e));
+            for (Observer<SubmittedFileWrapperNode> o : observers)
+                o.objectChanged(e);
         }
     }
 
@@ -123,7 +126,8 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
 
     public void resetAllTests() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode)treeModel.getRoot();
-        Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root
+                .depthFirstEnumeration();
         while (dfs.hasMoreElements()) {
             DefaultMutableTreeNode n = dfs.nextElement();
 

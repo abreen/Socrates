@@ -9,7 +9,6 @@ import io.breen.socrates.util.Either;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.*;
 import java.util.*;
 
 /**
@@ -40,7 +39,7 @@ public class FileFactory {
             throw new InvalidFileException(type, "'due_dates' must be a map");
         }
 
-        Map<LocalDateTime, Double> dueDates = null;
+        Map<Date, Double> dueDates = null;
         if (datesMap != null) {
             dueDates = new TreeMap<>();
 
@@ -61,9 +60,7 @@ public class FileFactory {
                     );
                 }
 
-                Instant i = date.toInstant();
-                LocalDateTime ldt = LocalDateTime.ofInstant(i, ZoneOffset.UTC);
-                dueDates.put(ldt, deduction);
+                dueDates.put(date, deduction);
             }
         }
 

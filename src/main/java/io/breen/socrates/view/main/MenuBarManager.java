@@ -3,8 +3,6 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.function.Consumer;
 
 public class MenuBarManager {
 
@@ -164,23 +162,6 @@ public class MenuBarManager {
         testMenu.addSeparator();
         testMenu.add(clearNotes);
         testMenu.add(focusOnNotes);
-    }
-
-    /**
-     * Utility method for easily creating a new Action and immediately assigning the Action to the
-     * specified JMenuItem. For its text property, the new Action will take the text from the
-     * JMenuItem.
-     */
-    public static Action newMenuItemAction(JMenuItem item, Consumer<ActionEvent> lambda) {
-        Action a = new AbstractAction(item.getText()) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                lambda.accept(e);
-            }
-        };
-
-        item.setAction(a);
-        return a;
     }
 
     public void setView(MainView view) {

@@ -28,13 +28,13 @@ public final class HookManager {
         testTasks = new HashMap<>();
 
         for (Hook t : Hook.values())
-            tasks.put(t, new LinkedList<>());
+            tasks.put(t, new LinkedList<Resource>());
 
         for (FileHook t : FileHook.values())
-            fileTasks.put(t, new HashMap<>());
+            fileTasks.put(t, new HashMap<File, List<Resource>>());
 
         for (TestHook t : TestHook.values())
-            testTasks.put(t, new HashMap<>());
+            testTasks.put(t, new HashMap<Test, List<Resource>>());
     }
 
     private HookManager() {}
@@ -70,12 +70,13 @@ public final class HookManager {
     }
 
     public static void runHook(Hook hook) {
-        List<Resource> tasksForHook = tasks.get(hook);
+        List<Resource> tasks = HookManager.tasks.get(hook);
 
-        if (tasksForHook.isEmpty()) return;
+        if (tasks.isEmpty()) return;
 
         logger.info("running hook " + hook);
-        tasksForHook.forEach(h -> run(h, null));
+        for (Resource h : tasks)
+            run(h, null);
     }
 
     public static void runHookForFile(FileHook hook, File file, Path directory) {
@@ -85,7 +86,8 @@ public final class HookManager {
 
         List<Resource> tasksForFile = mapForHook.get(file);
         logger.info("running hook " + hook + " for file " + file);
-        tasksForFile.forEach(h -> run(h, directory));
+        for (Resource h : tasksForFile)
+            run(h, directory);
     }
 
     public static void runHookForTest(TestHook hook, Test test, Path directory) {
@@ -95,7 +97,8 @@ public final class HookManager {
 
         List<Resource> tasksForTest = mapForHook.get(test);
         logger.info("running hook " + hook + " for test " + test);
-        tasksForTest.forEach(h -> run(h, directory));
+        for (Resource h : tasksForTest)
+            run(h, directory);
     }
 
     private static void run(Resource script, Path workingDir) {

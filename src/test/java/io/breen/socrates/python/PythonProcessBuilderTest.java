@@ -4,6 +4,8 @@ import io.breen.socrates.Globals;
 import org.junit.*;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
 import static org.junit.Assert.assertEquals;
@@ -29,7 +31,7 @@ public class PythonProcessBuilderTest {
         {
             // simple program
             Files.createFile(PythonModule.SIMPLE.p);
-            Files.newBufferedWriter(PythonModule.SIMPLE.p)
+            Files.newBufferedWriter(PythonModule.SIMPLE.p, StandardCharsets.UTF_8)
                  .append("foo = 3\n")
                  .append("bar = 5\n")
                  .close();
@@ -38,7 +40,7 @@ public class PythonProcessBuilderTest {
         {
             // simple program sending bytes to the standard out
             Files.createFile(PythonModule.SIMPLE_OUTPUT.p);
-            Files.newBufferedWriter(PythonModule.SIMPLE_OUTPUT.p)
+            Files.newBufferedWriter(PythonModule.SIMPLE_OUTPUT.p, StandardCharsets.UTF_8)
                  .append("print('" + SIMPLE_OUTPUT_STRING + "')\n")
                  .close();
         }
@@ -46,7 +48,7 @@ public class PythonProcessBuilderTest {
         {
             // simple program trying to get input
             Files.createFile(PythonModule.SIMPLE_INPUT.p);
-            Files.newBufferedWriter(PythonModule.SIMPLE_INPUT.p)
+            Files.newBufferedWriter(PythonModule.SIMPLE_INPUT.p, StandardCharsets.UTF_8)
                  .append("input('What is your name?')\n")
                  .close();
         }
@@ -77,7 +79,7 @@ public class PythonProcessBuilderTest {
         builder.redirectOutputTo(ProcessBuilder.Redirect.to(temp.toFile()));
         Process process = builder.start();
         assertEquals(Globals.NORMAL_EXIT_CODE, process.waitFor());
-        String line = Files.newBufferedReader(temp).readLine();
+        String line = Files.newBufferedReader(temp, Charset.defaultCharset()).readLine();
         Files.delete(temp);
         assertEquals(SIMPLE_OUTPUT_STRING, line);
     }

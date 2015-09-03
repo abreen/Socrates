@@ -6,6 +6,7 @@ import io.breen.socrates.immutable.file.implementation.PlainFile;
 import org.junit.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -59,8 +60,12 @@ public class SubmissionTest {
             Files.createFile(receipt1);
             Files.createFile(receipt2);
 
-            Files.newBufferedWriter(receipt1).append("2015-08-14T22:46:00").close();
-            Files.newBufferedWriter(receipt2).append("2015-08-14T20:12:00").close();
+            Files.newBufferedWriter(receipt1, StandardCharsets.UTF_8)
+                 .append("2015-08-14T22:46:00Z")
+                 .close();
+            Files.newBufferedWriter(receipt2, StandardCharsets.UTF_8)
+                 .append("2015-08-14T20:12:00Z")
+                 .close();
         }
 
         {
@@ -73,8 +78,10 @@ public class SubmissionTest {
             Files.createFile(receipt1);
             Files.createFile(receipt2);
 
-            Files.newBufferedWriter(receipt1).append("2015-08-14T22:46:00").close();
-            Files.newBufferedWriter(receipt2).append("foo").close();
+            Files.newBufferedWriter(receipt1, StandardCharsets.UTF_8)
+                 .append("2015-08-14T22:46:00")
+                 .close();
+            Files.newBufferedWriter(receipt2, StandardCharsets.UTF_8).append("foo").close();
         }
 
         {
@@ -86,7 +93,7 @@ public class SubmissionTest {
             // delta: directory with no files, but with an invalid receipt
             Path badReceipt = children[SubDir.DELTA.i].resolve("ps0pr1.txt.receipt");
             Files.createFile(badReceipt);
-            Files.newBufferedWriter(badReceipt).append("boo").close();
+            Files.newBufferedWriter(badReceipt, StandardCharsets.UTF_8).append("boo").close();
         }
 
         // epsilon: directory with no files

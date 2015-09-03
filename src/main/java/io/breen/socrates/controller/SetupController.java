@@ -10,6 +10,8 @@ import io.breen.socrates.view.DetailOptionPane;
 import io.breen.socrates.view.setup.SetupView;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
@@ -31,83 +33,93 @@ public class SetupController {
         this.main = main;
 
         view.addOpenCriteriaButtonActionListener(
-                e -> {
-                    Path path = view.chooseCriteriaFile();
-                    if (path != null) {
-                        try {
-                            criteria = Criteria.loadFromPath(path);
-                            criteriaPath = path;
-                        } catch (IOException | InvalidCriteriaException |
-                                MissingResourceException x) {
-                            DetailOptionPane.showMessageDialog(
-                                    view,
-                                    "There was an error opening the criteria file you " +
-                                            "selected.",
-                                    "Error Opening Criteria",
-                                    JOptionPane.ERROR_MESSAGE,
-                                    x.toString()
-                            );
-                            return;
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Path path = view.chooseCriteriaFile();
+                        if (path != null) {
+                            try {
+                                criteria = Criteria.loadFromPath(path);
+                                criteriaPath = path;
+                            } catch (IOException | InvalidCriteriaException |
+                                    MissingResourceException x) {
+                                DetailOptionPane.showMessageDialog(
+                                        view,
+                                        "There was an error opening the criteria file you " +
+                                                "selected.",
+                                        "Error Opening Criteria",
+                                        JOptionPane.ERROR_MESSAGE,
+                                        x.toString()
+                                );
+                                return;
+                            }
+
+                            // criteria was successfully loaded
+                            logger.info("criteria was successfully loaded");
+                            HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
+
+                            if (submissions == null) view.showSubmissionsCard();
+                            else transferToMain();
                         }
-
-                        // criteria was successfully loaded
-                        logger.info("criteria was successfully loaded");
-                        HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
-
-                        if (submissions == null) view.showSubmissionsCard();
-                        else transferToMain();
                     }
                 }
         );
 
         view.addSubmissionsButtonActionListener(
-                event -> {
-                    List<Path> ps = view.chooseSubmissions();
-                    if (ps != null) {
-                        Map<Path, Exception> errors = new HashMap<>();
-                        submissions = new ArrayList<>(ps.size());
-                        for (Path p : ps) {
-                            try {
-                                submissions.add(Submission.fromDirectory(p));
-                            } catch (IOException x) {
-                                errors.put(p, x);
-                                logger.warning("IOE thrown when adding submission: " + x);
-                            } catch (ReceiptFormatException x) {
-                                errors.put(p, x);
-                                logger.warning("RFE thrown when adding submission: " + x);
-                            } catch (AlreadyGradedException x) {
-                                errors.put(p, x);
-                                logger.info("AGE thrown when adding submission: " + x);
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        List<Path> ps = view.chooseSubmissions();
+                        if (ps != null) {
+                            Map<Path, Exception> errors = new HashMap<>();
+                            submissions = new ArrayList<>(ps.size());
+                            for (Path p : ps) {
+                                try {
+                                    submissions.add(Submission.fromDirectory(p));
+                                } catch (IOException x) {
+                                    errors.put(p, x);
+                                    logger.warning("IOE thrown when adding submission: " + x);
+                                } catch (ReceiptFormatException x) {
+                                    errors.put(p, x);
+                                    logger.warning("RFE thrown when adding submission: " + x);
+                                } catch (AlreadyGradedException x) {
+                                    errors.put(p, x);
+                                    logger.info("AGE thrown when adding submission: " + x);
+                                }
                             }
-                        }
 
-                        int numErrors = errors.size();
-                        int numAdded = submissions.size();
-                        if (numErrors > 0) {
-                            StringBuilder sb = new StringBuilder();
-                            for (Map.Entry<Path, Exception> e : errors.entrySet())
-                                sb.append(e.getValue().getMessage() + ": " + e.getKey() + "\n");
+                            int numErrors = errors.size();
+                            int numAdded = submissions.size();
+                            if (numErrors > 0) {
+                                StringBuilder sb = new StringBuilder();
+                                for (Map.Entry<Path, Exception> x : errors.entrySet())
+                                    sb.append(x.getValue().getMessage() + ": " + x.getKey() + "\n");
 
-                            String msg = "There was a problem opening " + numErrors + "" +
-                                    " submission" + (numErrors == 1 ? "" : "s") + ".";
+                                String msg = "There was a problem opening " + numErrors + "" +
+                                        " submission" + (numErrors == 1 ? "" : "s") + ".";
+                                if (numAdded > 0) {
+                                    msg += " The remaining " + numAdded + " submission" +
+                                            (numAdded == 1 ? " is" : "s are") + " available" +
+                                            " to grade.";
+                                }
+                                String title = (numErrors == 1 ? "Issue" : "Issues") + " " +
+                                        "Opening Submissions";
+
+                                DetailOptionPane.showMessageDialog(
+                                        view,
+                                        msg,
+                                        title,
+                                        JOptionPane.INFORMATION_MESSAGE,
+                                        sb.toString()
+                                );
+                            }
+
                             if (numAdded > 0) {
-                                msg += " The remaining " + numAdded + " submission" +
-                                        (numAdded == 1 ? " is" : "s are") + " available" +
-                                        " to grade.";
+                                HookManager.runHook(Hook.BEFORE_GRADING);
+                                transferToMain();
+                            } else {
+                                logger.warning("no submissions could be added");
                             }
-                            String title = (numErrors == 1 ? "Issue" : "Issues") + " " +
-                                    "Opening Submissions";
-
-                            DetailOptionPane.showMessageDialog(
-                                    view, msg, title, JOptionPane.INFORMATION_MESSAGE, sb.toString()
-                            );
-                        }
-
-                        if (numAdded > 0) {
-                            HookManager.runHook(Hook.BEFORE_GRADING);
-                            transferToMain();
-                        } else {
-                            logger.warning("no submissions could be added");
                         }
                     }
                 }

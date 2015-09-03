@@ -13,11 +13,12 @@ import io.breen.socrates.view.icon.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.*;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.text.DecimalFormat;
 
 public class TestControls implements Observer<TestWrapperNode> {
@@ -77,7 +78,7 @@ public class TestControls implements Observer<TestWrapperNode> {
     private JButton resetButton;
     private TestWrapperNode currentNode;
 
-    public TestControls(MenuBarManager menuBar, TestTree testTree, SubmissionTree submissionTree) {
+    public TestControls(MenuBarManager menuBar, final TestTree testTree, SubmissionTree submissionTree) {
         updateIcon();
         description.setText(NO_TEST_SELECTED_DESC);
 
@@ -85,103 +86,125 @@ public class TestControls implements Observer<TestWrapperNode> {
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
 
-        passTest = MenuBarManager.newMenuItemAction(
-                menuBar.passTest, e -> {
-                    TestWrapperNode node = testTree.getSelectedTestWrapperNode();
-                    Test test = (Test)node.getUserObject();
+        passTest = new AbstractAction(menuBar.passTest.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TestWrapperNode node = testTree.getSelectedTestWrapperNode();
+                Test test = (Test)node.getUserObject();
 
-                    if (test instanceof Automatable) {
-                        AutomationStage stage = node.getAutomationStage();
-                        switch (stage) {
-                        case STARTED:
-                            // cannot change result while test is running
-                            return;
-                        case FINISHED_NORMAL:
-                        case NONE:
-                            if (!userWantsToOverride()) return;
-                        case FINISHED_ERROR:
-                            node.setResult(TestResult.PASSED);
-                        }
-                    } else {
+                if (test instanceof Automatable) {
+                    AutomationStage stage = node.getAutomationStage();
+                    switch (stage) {
+                    case STARTED:
+                        // cannot change result while test is running
+                        return;
+                    case FINISHED_NORMAL:
+                    case NONE:
+                        if (!userWantsToOverride()) return;
+                    case FINISHED_ERROR:
                         node.setResult(TestResult.PASSED);
                     }
+                } else {
+                    node.setResult(TestResult.PASSED);
                 }
-        );
+            }
+        };
         passTest.setEnabled(false);
         passTest.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, ctrl)
         );
+        menuBar.passTest.setAction(passTest);
 
-        failTest = MenuBarManager.newMenuItemAction(
-                menuBar.failTest, e -> {
-                    TestWrapperNode node = testTree.getSelectedTestWrapperNode();
-                    Test test = (Test)node.getUserObject();
+        failTest = new AbstractAction(menuBar.failTest.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TestWrapperNode node = testTree.getSelectedTestWrapperNode();
+                Test test = (Test)node.getUserObject();
 
-                    if (test instanceof Automatable) {
-                        AutomationStage stage = node.getAutomationStage();
-                        switch (stage) {
-                        case STARTED:
-                            // cannot change result while test is running
-                            return;
-                        case FINISHED_NORMAL:
-                        case NONE:
-                            if (!userWantsToOverride()) return;
-                        case FINISHED_ERROR:
-                            node.setResult(TestResult.FAILED);
-                        }
-                    } else {
+                if (test instanceof Automatable) {
+                    AutomationStage stage = node.getAutomationStage();
+                    switch (stage) {
+                    case STARTED:
+                        // cannot change result while test is running
+                        return;
+                    case FINISHED_NORMAL:
+                    case NONE:
+                        if (!userWantsToOverride()) return;
+                    case FINISHED_ERROR:
                         node.setResult(TestResult.FAILED);
                     }
+                } else {
+                    node.setResult(TestResult.FAILED);
                 }
-        );
+            }
+        };
         failTest.setEnabled(false);
         failTest.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ctrl)
         );
+        menuBar.failTest.setAction(failTest);
 
-        resetTest = MenuBarManager.newMenuItemAction(
-                menuBar.resetTest, e -> {
-                    TestWrapperNode node = testTree.getSelectedTestWrapperNode();
-                    Test test = (Test)node.getUserObject();
-                    node.setResult(TestResult.NONE);
-                    if (test instanceof Automatable) node.setAutomationStage(AutomationStage.NONE);
-                }
-        );
+        resetTest = new AbstractAction(menuBar.resetTest.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TestWrapperNode node = testTree.getSelectedTestWrapperNode();
+                Test test = (Test)node.getUserObject();
+                node.setResult(TestResult.NONE);
+                if (test instanceof Automatable) node.setAutomationStage(AutomationStage.NONE);
+            }
+        };
         resetTest.setEnabled(false);
+        menuBar.resetTest.setAction(resetTest);
 
-        clearNotes = MenuBarManager.newMenuItemAction(
-                menuBar.clearNotes, e -> clearNotes()
-        );
+        clearNotes = new AbstractAction(menuBar.clearNotes.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearNotes();
+            }
+        };
         clearNotes.setEnabled(false);
         clearNotes.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, ctrl)
         );
+        menuBar.clearNotes.setAction(clearNotes);
 
-        focusOnNotes = MenuBarManager.newMenuItemAction(
-                menuBar.focusOnNotes, e -> focusOnNotes()
-        );
+        focusOnNotes = new AbstractAction(menuBar.clearNotes.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                focusOnNotes();
+            }
+        };
         focusOnNotes.setEnabled(false);
         focusOnNotes.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, ctrl)
         );
+        menuBar.focusOnNotes.setAction(focusOnNotes);
 
         testTree.addTreeSelectionListener(
-                event -> {
-                    TreePath path = event.getPath();
-                    TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
+                new TreeSelectionListener() {
+                    @Override
+                    public void valueChanged(TreeSelectionEvent e) {
+                        TreePath path = e.getPath();
+                        TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
 
-                    if (node == null) {
-                        clearNotes.setEnabled(false);
-                        focusOnNotes.setEnabled(false);
-                    } else {
-                        update(node);
-                        clearNotes.setEnabled(true);
-                        focusOnNotes.setEnabled(true);
+                        if (node == null) {
+                            clearNotes.setEnabled(false);
+                            focusOnNotes.setEnabled(false);
+                        } else {
+                            update(node);
+                            clearNotes.setEnabled(true);
+                            focusOnNotes.setEnabled(true);
+                        }
                     }
                 }
         );
 
-        submissionTree.addTreeSelectionListener(event -> reset());
+        submissionTree.addTreeSelectionListener(new TreeSelectionListener() {
+                                                    @Override
+                                                    public void valueChanged(TreeSelectionEvent e) {
+                                                        reset();
+                                                    }
+                                                });
 
         passButton.setAction(passTest);
         failButton.setAction(failTest);

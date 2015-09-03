@@ -69,10 +69,12 @@ public class SubmissionWrapperNode extends DefaultMutableTreeNode
         SubmissionCompletedChangeEvent e;
         if (numBefore == 0 && numAfter > 0) {
             e = new SubmissionCompletedChangeEvent(this, false);
-            observers.forEach(o -> o.objectChanged(e));
+            for (Observer<SubmissionWrapperNode> o : observers)
+                o.objectChanged(e);
         } else if (numBefore > 0 && numAfter == 0) {
             e = new SubmissionCompletedChangeEvent(this, true);
-            observers.forEach(o -> o.objectChanged(e));
+            for (Observer<SubmissionWrapperNode> o : observers)
+                o.objectChanged(e);
         }
     }
 
@@ -94,6 +96,7 @@ public class SubmissionWrapperNode extends DefaultMutableTreeNode
         if (saved == this.saved) return;
         this.saved = saved;
         GradeReportSavedEvent e = new GradeReportSavedEvent(this);
-        observers.forEach(o -> o.objectChanged(e));
+        for (Observer<SubmissionWrapperNode> o : observers)
+            o.objectChanged(e);
     }
 }

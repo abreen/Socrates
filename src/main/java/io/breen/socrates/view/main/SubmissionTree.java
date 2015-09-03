@@ -14,6 +14,7 @@ import io.breen.socrates.util.Observer;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -44,7 +45,7 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     private MainView view;
     private List<SubmissionWrapperNode> notSaved;
 
-    public SubmissionTree(MenuBarManager menuBar, MainController main, MainView view) {
+    public SubmissionTree(MenuBarManager menuBar, final MainController main, MainView view) {
         this.view = view;
 
         notSaved = new LinkedList<>();
@@ -53,153 +54,171 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
 
-        resetAllTests = MenuBarManager.newMenuItemAction(
-                menuBar.resetAllTests, e -> {
-                    DefaultMutableTreeNode node = getSelectedNode();
-                    if (node == null || !(node instanceof SubmittedFileWrapperNode)) return;
+        resetAllTests = new AbstractAction(menuBar.resetAllTests.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultMutableTreeNode node = getSelectedNode();
+                if (node == null || !(node instanceof SubmittedFileWrapperNode)) return;
 
-                    ((SubmittedFileWrapperNode)node).resetAllTests();
-                }
-        );
+                ((SubmittedFileWrapperNode)node).resetAllTests();
+            }
+        };
         resetAllTests.setEnabled(false);
+        menuBar.resetAllTests.setAction(resetAllTests);
 
-        saveGradeReport = MenuBarManager.newMenuItemAction(
-                menuBar.saveGradeReport, e -> {
-                    SubmissionWrapperNode node = getCurrentSubmissionNode();
-                    Submission s = (Submission)node.getUserObject();
+        saveGradeReport = new AbstractAction(menuBar.saveGradeReport.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SubmissionWrapperNode node = getCurrentSubmissionNode();
+                Submission s = (Submission)node.getUserObject();
 
-                    Path dest = Paths.get(
-                            s.submissionDir.toString(), Globals.DEFAULT_GRADE_FILE_NAME
-                    );
-                    main.saveGradeReport(node, dest);
-                }
-        );
+                Path dest = Paths.get(
+                        s.submissionDir.toString(), Globals.DEFAULT_GRADE_FILE_NAME
+                );
+                main.saveGradeReport(node, dest);
+            }
+        };
         saveGradeReport.setEnabled(false);
         saveGradeReport.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ctrl)
         );
+        menuBar.saveGradeReport.setAction(saveGradeReport);
 
-        saveGradeReportAs = MenuBarManager.newMenuItemAction(
-                menuBar.saveGradeReportAs, e -> {
-                    SubmissionWrapperNode node = getCurrentSubmissionNode();
-                    Submission s = (Submission)node.getUserObject();
+        saveGradeReportAs = new AbstractAction(menuBar.saveGradeReportAs.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SubmissionWrapperNode node = getCurrentSubmissionNode();
+                Submission s = (Submission)node.getUserObject();
 
-                    Path dest = chooseSaveLocation(s.submissionDir);
-                    if (dest == null) return;
+                Path dest = chooseSaveLocation(s.submissionDir);
+                if (dest == null) return;
 
-                    main.saveGradeReport(node, dest);
-                }
-        );
+                main.saveGradeReport(node, dest);
+            }
+        };
         saveGradeReportAs.setEnabled(false);
         saveGradeReportAs.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ctrl | shift)
         );
+        menuBar.saveGradeReportAs.setAction(saveGradeReportAs);
 
-        nextSubmission = MenuBarManager.newMenuItemAction(
-                menuBar.nextSubmission, e -> {
-                    DefaultMutableTreeNode node = getSelectedNode();
-                    if (node instanceof SubmittedFileWrapperNode || node instanceof
-                            UnrecognizedFileWrapperNode) {
-                        select(getNextSibling(getParent(node)));
-                    } else if (node instanceof SubmissionWrapperNode) {
-                        select(getNextSibling(node));
-                    }
+        nextSubmission = new AbstractAction(menuBar.nextSubmission.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultMutableTreeNode node = getSelectedNode();
+                if (node instanceof SubmittedFileWrapperNode || node instanceof
+                        UnrecognizedFileWrapperNode) {
+                    select(getNextSibling(getParent(node)));
+                } else if (node instanceof SubmissionWrapperNode) {
+                    select(getNextSibling(node));
                 }
-        );
+            }
+        };
         nextSubmission.setEnabled(false);
         nextSubmission.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | shift)
         );
+        menuBar.nextSubmission.setAction(nextSubmission);
 
-        previousSubmission = MenuBarManager.newMenuItemAction(
-                menuBar.previousSubmission, e -> {
-                    DefaultMutableTreeNode node = getSelectedNode();
-                    if (node instanceof SubmittedFileWrapperNode || node instanceof
-                            UnrecognizedFileWrapperNode) {
-                        select(getPreviousSibling(getParent(node)));
-                    } else if (node instanceof SubmissionWrapperNode) {
-                        select(getPreviousSibling(node));
-                    }
+        previousSubmission = new AbstractAction(menuBar.previousSubmission.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultMutableTreeNode node = getSelectedNode();
+                if (node instanceof SubmittedFileWrapperNode || node instanceof
+                        UnrecognizedFileWrapperNode) {
+                    select(getPreviousSibling(getParent(node)));
+                } else if (node instanceof SubmissionWrapperNode) {
+                    select(getPreviousSibling(node));
                 }
-        );
+            }
+        };
         previousSubmission.setEnabled(false);
         previousSubmission.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | shift)
         );
+        menuBar.previousSubmission.setAction(previousSubmission);
 
-        revealSubmission = MenuBarManager.newMenuItemAction(
-                menuBar.revealSubmission, e -> {
-                    SubmissionWrapperNode node = getCurrentSubmissionNode();
-                    Submission s = (Submission)node.getUserObject();
-                    Path path = s.submissionDir;
-                    try {
-                        Desktop.getDesktop().open(path.toFile());
-                    } catch (IOException x) {
-                        logger.warning("got I/O exception revealing submission: " + x);
-                    }
+        revealSubmission = new AbstractAction(menuBar.revealSubmission.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SubmissionWrapperNode node = getCurrentSubmissionNode();
+                Submission s = (Submission)node.getUserObject();
+                Path path = s.submissionDir;
+                try {
+                    Desktop.getDesktop().open(path.toFile());
+                } catch (IOException x) {
+                    logger.warning("got I/O exception revealing submission: " + x);
                 }
-        );
+            }
+        };
         revealSubmission.setEnabled(false);
         revealSubmission.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | shift)
         );
+        menuBar.revealSubmission.setAction(revealSubmission);
 
-        nextFile = MenuBarManager.newMenuItemAction(
-                menuBar.nextFile, e -> {
-                    DefaultMutableTreeNode node = getSelectedNode();
-                    if (node instanceof SubmittedFileWrapperNode || node instanceof
-                            UnrecognizedFileWrapperNode) {
-                        if (isLastSibling(node)) {
-                            select(getFirstChild(getNextNonLeafSibling(getParent(node))));
-                        } else {
-                            select(getNextSibling(node));
-                        }
-                    } else if (node instanceof SubmissionWrapperNode) {
-                        if (isLeaf(node)) {
-                            select(getFirstChild(getNextSibling(node)));
-                        } else {
-                            select(getFirstChild(node));
-                        }
+        nextFile = new AbstractAction(menuBar.nextFile.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultMutableTreeNode node = getSelectedNode();
+                if (node instanceof SubmittedFileWrapperNode || node instanceof
+                        UnrecognizedFileWrapperNode) {
+                    if (isLastSibling(node)) {
+                        select(getFirstChild(getNextNonLeafSibling(getParent(node))));
+                    } else {
+                        select(getNextSibling(node));
+                    }
+                } else if (node instanceof SubmissionWrapperNode) {
+                    if (isLeaf(node)) {
+                        select(getFirstChild(getNextSibling(node)));
+                    } else {
+                        select(getFirstChild(node));
                     }
                 }
-        );
+            }
+        };
         nextFile.setEnabled(false);
         nextFile.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | alt)
         );
+        menuBar.nextFile.setAction(nextFile);
 
-        previousFile = MenuBarManager.newMenuItemAction(
-                menuBar.previousFile, e -> {
-                    DefaultMutableTreeNode node = getSelectedNode();
-                    if (node instanceof SubmittedFileWrapperNode || node instanceof
-                            UnrecognizedFileWrapperNode) {
-                        if (isFirstSibling(node)) {
-                            select(getLastChild(getPreviousNonLeafSibling(getParent(node))));
-                        } else {
-                            select(getPreviousSibling(node));
-                        }
-                    } else if (node instanceof SubmissionWrapperNode) {
-                        select(getLastChild(getPreviousNonLeafSibling(node)));
+        previousFile = new AbstractAction(menuBar.previousFile.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultMutableTreeNode node = getSelectedNode();
+                if (node instanceof SubmittedFileWrapperNode || node instanceof
+                        UnrecognizedFileWrapperNode) {
+                    if (isFirstSibling(node)) {
+                        select(getLastChild(getPreviousNonLeafSibling(getParent(node))));
+                    } else {
+                        select(getPreviousSibling(node));
                     }
+                } else if (node instanceof SubmissionWrapperNode) {
+                    select(getLastChild(getPreviousNonLeafSibling(node)));
                 }
-        );
+            }
+        };
         previousFile.setEnabled(false);
         previousFile.putValue(
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | alt)
         );
+        menuBar.previousFile.setAction(previousFile);
 
-        openFile = MenuBarManager.newMenuItemAction(
-                menuBar.openFile, e -> {
-                    SubmittedFile f = getSelectedSubmittedFile();
-                    Path path = f.fullPath;
-                    try {
-                        Desktop.getDesktop().open(path.toFile());
-                    } catch (IOException x) {
-                        logger.warning("got I/O exception revealing file: " + x);
-                    }
+        openFile = new AbstractAction(menuBar.openFile.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SubmittedFile f = getSelectedSubmittedFile();
+                Path path = f.fullPath;
+                try {
+                    Desktop.getDesktop().open(path.toFile());
+                } catch (IOException x) {
+                    logger.warning("got I/O exception opening file: " + x);
                 }
-        );
+            }
+        };
         openFile.setEnabled(false);
+        menuBar.openFile.setAction(openFile);
     }
 
     private static Path chooseSaveLocation(Path initialDir) {
@@ -245,108 +264,111 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
         };
 
         tree.addTreeSelectionListener(
-                event -> {
-                    TreePath path = event.getPath();
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
-                            .getLastPathComponent();
+                new TreeSelectionListener() {
+                    @Override
+                    public void valueChanged(TreeSelectionEvent e) {
+                        TreePath path = e.getPath();
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                                .getLastPathComponent();
 
-                    if (!event.isAddedPath()) node = null;
+                        if (!e.isAddedPath()) node = null;
 
-                    if (node == null) {
-                        resetAllTests.setEnabled(false);
+                        if (node == null) {
+                            resetAllTests.setEnabled(false);
 
-                        revealSubmission.setEnabled(false);
-                        openFile.setEnabled(false);
-
-                        nextSubmission.setEnabled(false);
-                        previousSubmission.setEnabled(false);
-                        nextFile.setEnabled(false);
-                        previousFile.setEnabled(false);
-
-                        saveGradeReport.setEnabled(false);
-                        saveGradeReportAs.setEnabled(false);
-
-                    } else {
-                        revealSubmission.setEnabled(true);
-
-                        SubmissionWrapperNode submissionNode = getCurrentSubmissionNode();
-
-                        if (submissionNode.isComplete()) {
-                            saveGradeReport.setEnabled(true);
-                            saveGradeReportAs.setEnabled(true);
-                        } else {
-                            saveGradeReport.setEnabled(false);
-                            saveGradeReportAs.setEnabled(false);
-                        }
-
-                        if (node instanceof SubmittedFileWrapperNode || node instanceof
-                                UnrecognizedFileWrapperNode) {
-
-                            openFile.setEnabled(true);
-
-                            if (node instanceof SubmittedFileWrapperNode) {
-                                resetAllTests.setEnabled(true);
-                            } else {
-                                resetAllTests.setEnabled(false);
-                            }
-
-                            if (isLastSibling(node)) {
-                                DefaultMutableTreeNode next = getNextNonLeafSibling(getParent
-                                                                                            (node));
-
-                                if (next == null) nextFile.setEnabled(false);
-                                else nextFile.setEnabled(true);
-                            } else {
-                                nextFile.setEnabled(true);
-                            }
-
-                            if (isFirstSibling(node)) {
-                                DefaultMutableTreeNode next = getPreviousNonLeafSibling(
-                                        getParent(
-                                                node
-                                        )
-                                );
-
-                                if (next == null) previousFile.setEnabled(false);
-                                else previousFile.setEnabled(true);
-                            } else {
-                                previousFile.setEnabled(true);
-                            }
-
-                            if (isLastSibling(getParent(node))) nextSubmission.setEnabled(false);
-                            else nextSubmission.setEnabled(true);
-
-                            if (isFirstSibling(getParent(node)))
-                                previousSubmission.setEnabled(false);
-                            else previousSubmission.setEnabled(true);
-
-                        } else if (node instanceof SubmissionWrapperNode) {
+                            revealSubmission.setEnabled(false);
                             openFile.setEnabled(false);
 
-                            if (isLastSibling(node)) nextSubmission.setEnabled(false);
-                            else nextSubmission.setEnabled(true);
+                            nextSubmission.setEnabled(false);
+                            previousSubmission.setEnabled(false);
+                            nextFile.setEnabled(false);
+                            previousFile.setEnabled(false);
 
-                            if (isFirstSibling(node)) previousSubmission.setEnabled(false);
-                            else previousSubmission.setEnabled(true);
+                            saveGradeReport.setEnabled(false);
+                            saveGradeReportAs.setEnabled(false);
 
-                            if (isLeaf(node)) {
-                                DefaultMutableTreeNode nextNonLeaf = getNextNonLeafSibling(node);
-                                DefaultMutableTreeNode prevNonLeaf = getPreviousNonLeafSibling
-                                        (node);
+                        } else {
+                            revealSubmission.setEnabled(true);
 
-                                if (nextNonLeaf == null) nextFile.setEnabled(false);
-                                else nextFile.setEnabled(true);
+                            SubmissionWrapperNode submissionNode = getCurrentSubmissionNode();
 
-                                if (prevNonLeaf == null) previousFile.setEnabled(false);
-                                else previousFile.setEnabled(true);
+                            if (submissionNode.isComplete()) {
+                                saveGradeReport.setEnabled(true);
+                                saveGradeReportAs.setEnabled(true);
                             } else {
-                                nextFile.setEnabled(true);
+                                saveGradeReport.setEnabled(false);
+                                saveGradeReportAs.setEnabled(false);
+                            }
 
-                                DefaultMutableTreeNode prevNonLeaf = getPreviousNonLeafSibling
-                                        (node);
+                            if (node instanceof SubmittedFileWrapperNode || node instanceof
+                                    UnrecognizedFileWrapperNode) {
 
-                                if (prevNonLeaf == null) previousFile.setEnabled(false);
-                                else previousFile.setEnabled(true);
+                                openFile.setEnabled(true);
+
+                                if (node instanceof SubmittedFileWrapperNode) {
+                                    resetAllTests.setEnabled(true);
+                                } else {
+                                    resetAllTests.setEnabled(false);
+                                }
+
+                                if (isLastSibling(node)) {
+                                    DefaultMutableTreeNode next = getNextNonLeafSibling(getParent
+                                                                                                (node));
+
+                                    if (next == null) nextFile.setEnabled(false);
+                                    else nextFile.setEnabled(true);
+                                } else {
+                                    nextFile.setEnabled(true);
+                                }
+
+                                if (isFirstSibling(node)) {
+                                    DefaultMutableTreeNode next = getPreviousNonLeafSibling(
+                                            getParent(
+                                                    node
+                                            )
+                                    );
+
+                                    if (next == null) previousFile.setEnabled(false);
+                                    else previousFile.setEnabled(true);
+                                } else {
+                                    previousFile.setEnabled(true);
+                                }
+
+                                if (isLastSibling(getParent(node))) nextSubmission.setEnabled(false);
+                                else nextSubmission.setEnabled(true);
+
+                                if (isFirstSibling(getParent(node)))
+                                    previousSubmission.setEnabled(false);
+                                else previousSubmission.setEnabled(true);
+
+                            } else if (node instanceof SubmissionWrapperNode) {
+                                openFile.setEnabled(false);
+
+                                if (isLastSibling(node)) nextSubmission.setEnabled(false);
+                                else nextSubmission.setEnabled(true);
+
+                                if (isFirstSibling(node)) previousSubmission.setEnabled(false);
+                                else previousSubmission.setEnabled(true);
+
+                                if (isLeaf(node)) {
+                                    DefaultMutableTreeNode nextNonLeaf = getNextNonLeafSibling(node);
+                                    DefaultMutableTreeNode prevNonLeaf = getPreviousNonLeafSibling
+                                            (node);
+
+                                    if (nextNonLeaf == null) nextFile.setEnabled(false);
+                                    else nextFile.setEnabled(true);
+
+                                    if (prevNonLeaf == null) previousFile.setEnabled(false);
+                                    else previousFile.setEnabled(true);
+                                } else {
+                                    nextFile.setEnabled(true);
+
+                                    DefaultMutableTreeNode prevNonLeaf = getPreviousNonLeafSibling
+                                            (node);
+
+                                    if (prevNonLeaf == null) previousFile.setEnabled(false);
+                                    else previousFile.setEnabled(true);
+                                }
                             }
                         }
                     }
@@ -485,8 +507,11 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                 else recognized.add(new SubmittedFileWrapperNode(sf, f));
             }
 
-            recognized.forEach(parent::add);
-            unrecognized.forEach(parent::add);
+            for (MutableTreeNode r : recognized)
+                parent.add(r);
+
+            for (MutableTreeNode u : unrecognized)
+                parent.add(u);
 
             /*
              * A submission might be "complete" at this point, if the submission contained no

@@ -16,6 +16,8 @@ import io.breen.socrates.view.main.MainView;
 import io.breen.socrates.view.main.MenuBarManager;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -42,31 +44,34 @@ public class MainController {
          * gets selected. If so, this thread will spawn a new thread to run the test.
          */
         mainView.testTree.addTreeSelectionListener(
-                event -> {
-                    TreePath path = event.getPath();
-                    TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
+                new TreeSelectionListener() {
+                    @Override
+                    public void valueChanged(TreeSelectionEvent e) {
+                        TreePath path = e.getPath();
+                        final TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
 
-                    Test testObj = (Test)node.getUserObject();
-                    if (testObj instanceof Automatable &&
-                            node.getResult() == TestResult.NONE &&
-                            node.getAutomationStage() == AutomationStage.NONE &&
-                            !node.isConstrained())
-                    {
-                        @SuppressWarnings("unchecked") Automatable<File> test =
-                                (Automatable<File>)testObj;
+                        Test testObj = (Test)node.getUserObject();
+                        if (testObj instanceof Automatable &&
+                                node.getResult() == TestResult.NONE &&
+                                node.getAutomationStage() == AutomationStage.NONE &&
+                                !node.isConstrained())
+                        {
+                            @SuppressWarnings("unchecked") final Automatable<File> test =
+                                    (Automatable<File>)testObj;
 
-                        SubmittedFile submitted = mainView.submissionTree
-                                .getSelectedSubmittedFile();
-                        File file = criteria.files.get(submitted.localPath);
+                            final SubmittedFile submitted = mainView.submissionTree
+                                    .getSelectedSubmittedFile();
+                            final File file = criteria.files.get(submitted.localPath);
 
-                        if (file == null) return;
+                            if (file == null) return;
 
-                        SubmissionWrapperNode swn = mainView.submissionTree
-                                .getCurrentSubmissionNode();
-                        Submission submission = (Submission)swn.getUserObject();
+                            SubmissionWrapperNode swn = mainView.submissionTree
+                                    .getCurrentSubmissionNode();
+                            final Submission submission = (Submission)swn.getUserObject();
 
-                        (new Thread(
-                                () -> {
+                            (new Thread() {
+                                @Override
+                                public void run() {
                                     node.setAutomationStage(AutomationStage.STARTED);
                                     try {
                                         boolean passed = test.shouldPass(
@@ -86,7 +91,8 @@ public class MainController {
                                         );
                                     }
                                 }
-                        )).start();
+                            }).start();
+                        }
                     }
                 }
         );

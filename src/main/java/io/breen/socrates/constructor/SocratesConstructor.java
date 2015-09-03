@@ -50,9 +50,12 @@ public class SocratesConstructor extends SafeConstructor {
         this.yamlMultiConstructors.put(FILE_PREFIX, new FileConstruct(this));
         this.yamlMultiConstructors.put(TEST_PREFIX, new TestConstruct(this));
 
-        this.staticResources = staticResources != null ? staticResources : new HashMap<>();
-        this.scriptResources = scriptResources != null ? scriptResources : new HashMap<>();
-        this.hookResources = hookResources != null ? hookResources : new HashMap<>();
+        this.staticResources = staticResources != null ? staticResources : new HashMap<String,
+                Resource>();
+        this.scriptResources = scriptResources != null ? scriptResources : new HashMap<String,
+                Resource>();
+        this.hookResources = hookResources != null ? hookResources : new HashMap<String,
+                Resource>();
     }
 
     private static String getSuffix(String prefix, Node n) {
@@ -88,7 +91,7 @@ public class SocratesConstructor extends SafeConstructor {
                         g.members, fileType, node
                 );
 
-                newList.add(new Right<>(new TestGroup(newMembers, g)));
+                newList.add(new Right<Test, TestGroup>(new TestGroup(newMembers, g)));
 
             } else if (o instanceof TestWithoutFileType) {
                 TestWithoutFileType t = (TestWithoutFileType)o;
@@ -123,7 +126,7 @@ public class SocratesConstructor extends SafeConstructor {
                         }
                     }
 
-                    newList.add(new Left<>(builtTest));
+                    newList.add(new Left<Test, TestGroup>(builtTest));
                 } catch (InvalidTestException e) {
                     throw new InvalidCriteriaException(node.getStartMark(), e.toString());
                 }
@@ -363,10 +366,12 @@ public class SocratesConstructor extends SafeConstructor {
              * expect. In this case, we can throw an InvalidCriteriaException.
              */
             if (map.size() != 0) {
-                StringJoiner joiner = new StringJoiner(", ");
-                map.forEach((k, v) -> joiner.add(k.toString()));
+                StringBuilder builder = new StringBuilder();
+                for (Object key : map.keySet())
+                    builder.append(key.toString());
+
                 throw new InvalidCriteriaException(
-                        "unexpected top-level key(s): " + joiner.toString()
+                        "unexpected top-level key(s): " + builder.toString()
                 );
             }
 
