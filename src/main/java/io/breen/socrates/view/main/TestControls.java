@@ -168,7 +168,7 @@ public class TestControls implements Observer<TestWrapperNode> {
         );
         menuBar.clearNotes.setAction(clearNotes);
 
-        focusOnNotes = new AbstractAction(menuBar.clearNotes.getText()) {
+        focusOnNotes = new AbstractAction(menuBar.focusOnNotes.getText()) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 focusOnNotes();
