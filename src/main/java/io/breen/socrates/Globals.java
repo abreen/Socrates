@@ -28,6 +28,7 @@ public class Globals {
     public static final Color RED = new Color(189, 12, 13);
     public static final Color GREEN = new Color(49, 141, 34);
     public static final Color BLUE = new Color(37, 123, 210);
+    public static final SimpleDateFormat ISO8601_UTC;
     public static final SimpleDateFormat ISO8601;
     public static final String DEFAULT_GRADE_FILE_NAME = "grade.txt";
     public static Properties properties;
@@ -40,8 +41,10 @@ public class Globals {
     private static Logger logger = Logger.getLogger(Globals.class.getName());
 
     static {
-        ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-        ISO8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+        ISO8601_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        ISO8601_UTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US);
 
         if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_MAC_OSX) {
             operatingSystem = OS.OSX;
