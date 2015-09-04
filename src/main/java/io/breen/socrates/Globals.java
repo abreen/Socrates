@@ -44,7 +44,7 @@ public class Globals {
         ISO8601_UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         ISO8601_UTC.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US);
+        ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US);
 
         if (SystemUtils.IS_OS_MAC || SystemUtils.IS_OS_MAC_OSX) {
             operatingSystem = OS.OSX;
