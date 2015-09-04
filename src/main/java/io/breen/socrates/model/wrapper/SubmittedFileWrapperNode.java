@@ -32,7 +32,7 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
     public final DefaultTreeModel treeModel;
     public final ConstraintUpdater updater;
 
-    private final Set<TestWrapperNode> unfinishedTests;
+    private final Map<TestWrapperNode, Boolean> finished;
     private final List<Observer<SubmittedFileWrapperNode>> observers;
 
     public SubmittedFileWrapperNode(SubmittedFile submittedFile, File matchingFile) {
@@ -45,7 +45,7 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
 
         this.matchingFile = matchingFile;
 
-        unfinishedTests = new HashSet<>();
+        finished = new HashMap<>();
         observers = new LinkedList<>();
 
         treeModel = new DefaultTreeModel(null);
@@ -63,7 +63,7 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
                 TestWrapperNode child = new TestWrapperNode(test);
                 child.addObserver(updater);
                 child.addObserver(this);
-                unfinishedTests.add(child);
+                finished.put(child, false);
                 parent.add(child);
 
             } else if (member instanceof TestGroup) {
@@ -77,33 +77,37 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
 
     @Override
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> event) {
-        int numBefore = unfinishedTests.size();
+        boolean unfinishedBefore = finished.containsValue(false);
 
         if (event instanceof ResultChangedEvent) {
             ResultChangedEvent e = (ResultChangedEvent)event;
             switch (e.newResult) {
             case PASSED:
             case FAILED:
-                unfinishedTests.remove(e.source);
+                finished.put(e.source, true);
                 break;
             case NONE:
-                unfinishedTests.add(e.source);
+                finished.put(e.source, false);
             }
+
         } else if (event instanceof ConstraintChangedEvent) {
             ConstraintChangedEvent e = (ConstraintChangedEvent)event;
-            if (e.isNowConstrained) unfinishedTests.remove(e.source);
-            else unfinishedTests.add(e.source);
+            if (e.isNowConstrained) {
+                finished.put(e.source, true);
+            } else if (e.source.getResult() == TestResult.NONE) {
+                finished.put(e.source, false);
+            }
         }
 
-        int numAfter = unfinishedTests.size();
+        boolean unfinishedAfter = finished.containsValue(false);
 
         FileCompletedChangeEvent e;
-        if (numAfter == 0 && numBefore != 0) {
+        if (unfinishedBefore && !unfinishedAfter) {
             e = new FileCompletedChangeEvent(this, true);
             for (Observer<SubmittedFileWrapperNode> o : observers)
                 o.objectChanged(e);
 
-        } else if (numAfter > 0 && numBefore == 0) {
+        } else if (!unfinishedBefore && unfinishedAfter) {
             e = new FileCompletedChangeEvent(this, false);
             for (Observer<SubmittedFileWrapperNode> o : observers)
                 o.objectChanged(e);
@@ -121,7 +125,7 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
     }
 
     public boolean isComplete() {
-        return unfinishedTests.isEmpty();
+        return !finished.containsValue(false);
     }
 
     public void resetAllTests() {
