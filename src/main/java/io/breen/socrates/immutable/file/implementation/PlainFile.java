@@ -18,7 +18,7 @@ public final class PlainFile extends File {
     public PlainFile(String path, double pointValue, Map<Date, Double> dueDates,
                      List<Object> tests)
     {
-        super(path, pointValue, "text/plain", dueDates, tests);
+        super(path, pointValue, dueDates, tests);
     }
 
     @Override

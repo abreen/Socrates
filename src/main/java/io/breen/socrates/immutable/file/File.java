@@ -2,9 +2,10 @@ package io.breen.socrates.immutable.file;
 
 import io.breen.socrates.immutable.PostConstructionAction;
 import io.breen.socrates.immutable.Verifiable;
+import io.breen.socrates.immutable.file.implementation.PlainFile;
+import io.breen.socrates.immutable.file.implementation.PythonFile;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.implementation.any.LateSubmissionTest;
-import io.breen.socrates.util.Right;
 
 import java.util.*;
 
@@ -34,7 +35,7 @@ public abstract class File implements Verifiable, PostConstructionAction {
      */
     public String contentType;
 
-    public Map<Date, Double> dueDates = new HashMap<>();
+    public Map<Date, Double> dueDates;
 
     /**
      * This file's "test tree" root. The root is a TestGroup object whose maxValue field is equal to
@@ -52,20 +53,23 @@ public abstract class File implements Verifiable, PostConstructionAction {
      */
     public File() {}
 
-    public File(String path, double pointValue, String contentType, Map<Date, Double> dueDates,
-                List<Object> tests)
-    {
+    public File(String path, double pointValue, Map<Date, Double> dueDates, List<Object> tests) {
         this.path = path;
-        this.contentType = contentType;
         this.pointValue = pointValue;
         this.dueDates = dueDates;
         this.tests = tests;
-        testRoot = createTestRoot();
+        afterConstruction();
     }
 
     @Override
     public void afterConstruction() {
         testRoot = createTestRoot();
+
+        if (this instanceof PlainFile) {
+            contentType = "text/plain";
+        } else if (this instanceof PythonFile) {
+            contentType = "text/python";
+        }
     }
 
     @Override
@@ -107,7 +111,7 @@ public abstract class File implements Verifiable, PostConstructionAction {
              * deductions to be taken first, and therefore appear first in the grade
              * report.
              */
-            tests.add(0, new Right<>(lateGroup));
+            tests.add(0, lateGroup);
         }
 
         return new TestGroup(tests, 0, pointValue);

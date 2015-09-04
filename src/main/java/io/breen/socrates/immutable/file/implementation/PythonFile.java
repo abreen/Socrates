@@ -15,8 +15,7 @@ public final class PythonFile extends File {
     public PythonFile(String path, double pointValue, Map<Date, Double> dueDates,
                       List<Object> tests)
     {
-        super(path, pointValue, "text/python", dueDates, tests);
-        // TODO add more parameters and fields
+        super(path, pointValue, dueDates, tests);
     }
 
     @Override
