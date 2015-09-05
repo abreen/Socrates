@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 public class PythonInspector implements AutoCloseable {
 
     private enum RPCMethod {
+        HELLO("hello"),
         MODULE_OPEN("module.open"),
         MODULE_HASCLASS("module.hasClass"),
         MODULE_HASFUNCTION("module.hasFunction"),
@@ -49,9 +50,10 @@ public class PythonInspector implements AutoCloseable {
 
     static {
         URL serverURL = PythonInspector.class.getResource("server.py");
-        if (serverURL != null) {
-            logger.severe("cannot find XML-RPC server");
+        if (serverURL == null) {
+            logger.severe("cannot find XML-RPC server Python module");
 
+        } else {
             try {
                 URI uri = serverURL.toURI();
                 XMLRPCServerCode = Paths.get(uri);
@@ -84,6 +86,31 @@ public class PythonInspector implements AutoCloseable {
 
         client = new XmlRpcClient();
         client.setConfig(config);
+
+        int ms = 0;
+        for (int i = 1; i <= 1024; i *= 2) {
+            try {
+                Thread.sleep(i);
+                ms += i;
+            } catch (InterruptedException x) {
+                return;
+            }
+
+            try {
+                if (hello().equals(Boolean.TRUE)) { // connected
+                    break;
+                } else {
+                    logger.warning("did not get true from hello() call");
+                    return;
+                }
+            } catch (XmlRpcException ignored) {     // server may not be up yet
+            } catch (PythonError x) {
+                logger.warning("got PythonError with hello() call");
+                return;
+            }
+        }
+
+        logger.info("waited " + ms + " ms for XML-RPC server");
     }
 
     private static Object getResult(Object response) throws PythonError {
@@ -99,8 +126,16 @@ public class PythonInspector implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         process.destroy();
+    }
+
+    public Object hello() throws XmlRpcException, PythonError {
+        Object response = client.execute(
+                RPCMethod.HELLO.methodString, new Object[] {}
+        );
+
+        return getResult(response);
     }
 
     public void openModule(String moduleName) throws XmlRpcException, PythonError {
@@ -109,5 +144,13 @@ public class PythonInspector implements AutoCloseable {
         );
 
         Object result = getResult(response);
+    }
+
+    public Object variableEval(String variableName) throws XmlRpcException, PythonError {
+        Object response = client.execute(
+                RPCMethod.VARIABLE_EVAL.methodString, new Object[] {variableName}
+        );
+
+        return getResult(response);
     }
 }

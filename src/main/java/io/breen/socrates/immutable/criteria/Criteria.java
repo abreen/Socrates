@@ -1,9 +1,10 @@
 package io.breen.socrates.immutable.criteria;
 
 import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.file.implementation.PlainFile;
-import io.breen.socrates.immutable.file.implementation.PythonFile;
+import io.breen.socrates.immutable.file.plain.PlainFile;
+import io.breen.socrates.immutable.file.python.PythonFile;
 import io.breen.socrates.immutable.test.TestGroup;
+import io.breen.socrates.immutable.test.implementation.python.VariableEvalTest;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -146,19 +147,30 @@ public final class Criteria {
         cons.addTypeDescription(new TypeDescription(Criteria.class, "!criteria"));
         cons.addTypeDescription(new TypeDescription(TestGroup.class, "!group"));
 
+        /*
+         * Plain text file type and supported tests
+         */
         cons.addTypeDescription(new TypeDescription(PlainFile.class, "!file:plain"));
-        cons.addTypeDescription(new TypeDescription(PythonFile.class, "!file:python"));
-
         cons.addTypeDescription(
                 new TypeDescription(
                         io.breen.socrates.immutable.test.implementation.plain.ReviewTest.class,
                         "!test:plain:review"
                 )
         );
+
+        /*
+         * Python source code file type and supported tests
+         */
+        cons.addTypeDescription(new TypeDescription(PythonFile.class, "!file:python"));
         cons.addTypeDescription(
                 new TypeDescription(
                         io.breen.socrates.immutable.test.implementation.python.ReviewTest.class,
                         "!test:python:review"
+                )
+        );
+        cons.addTypeDescription(
+                new TypeDescription(
+                        VariableEvalTest.class, "!test:python:eval:variable"
                 )
         );
 

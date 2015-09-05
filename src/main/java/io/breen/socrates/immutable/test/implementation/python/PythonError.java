@@ -12,6 +12,7 @@ public class PythonError extends Exception {
     public final String errorMessage;
 
     public PythonError(String errorType, String errorMessage) {
+        super("Python error: " + errorType + ": " + errorMessage);
         this.errorType = errorType;
         this.errorMessage = errorMessage;
     }

@@ -36,7 +36,17 @@ public class PythonProcessBuilder {
 
         Map<String, String> env = pb.environment();
         env.put(
-                "PYTHONPATH", PythonAPIManager.getPythonPathDirectory().toAbsolutePath().toString()
+                "PYTHONPATH",
+
+                /*
+                 * Note: this leading path separator is very important! It ensures that PYTHONPATH
+                 * has the empty string as an entry, which tells the Python interpreter to look
+                 * in the current working directory of the Python process to find modules. This
+                 * is required for PythonInspector to work.
+                 */
+                System.getProperty("path.separator") + PythonAPIManager.getPythonPathDirectory()
+                                                                       .toAbsolutePath()
+                                                                       .toString()
         );
 
         switch (Globals.operatingSystem) {

@@ -1,4 +1,4 @@
-package io.breen.socrates.immutable.file.implementation;
+package io.breen.socrates.immutable.file.plain;
 
 import io.breen.socrates.immutable.file.File;
 
@@ -13,6 +13,9 @@ import java.util.*;
  */
 public final class PlainFile extends File {
 
+    /**
+     * This empty constructor is used by SnakeYAML.
+     */
     public PlainFile() {}
 
     public PlainFile(String path, double pointValue, Map<Date, Double> dueDates,

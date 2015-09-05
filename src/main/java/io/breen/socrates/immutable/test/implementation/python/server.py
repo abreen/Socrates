@@ -1,9 +1,10 @@
+import os
+import importlib
+import inspect
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 
-import importlib
-import inspect
-
+LOG_FILE = open('server.log', 'a')
 PORT = 45003
 PATH = '/xmlrpc'
 
@@ -17,18 +18,30 @@ globalz = {}  # globals() "inside" the imported module
 objects = {}
 
 
+def log(str):
+    return
+    import datetime
+
+    LOG_FILE.write(datetime.datetime.now().isoformat() + ': ' + str + '\n')
+    LOG_FILE.flush()
+
 def _wrap(func):
     def inner(*args, **kwargs):
-        # print('function:', func.__name__)
-        # print('args:', args)
-        # print('kwargs:', kwargs)
+        log('function: ' + func.__name__)
+        log('args: ' + str(args))
+        log('kwargs: ' + str(kwargs))
 
         try:
             return {'error': False, 'result': func(*args, **kwargs)}
         except BaseException as e:
+            log('exception: ' + str(e))
             return {'error': True, 'errorType': str(type(e).__name__), 'errorMessage': str(e)}
 
     return inner
+
+
+def hello():
+    return True
 
 
 def module_open(name):
@@ -129,4 +142,5 @@ for name, value in d.items():
         server.register_function(_wrap(value), name.replace('_', '.'))
         # server.register_function(_wrap(value), name)
 
+log('XML-RPC server started in ' + os.getcwd())
 server.serve_forever()
