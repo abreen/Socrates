@@ -153,4 +153,12 @@ public class PythonInspector implements AutoCloseable {
 
         return getResult(response);
     }
+
+    public boolean moduleHasVariable(String variableName) throws XmlRpcException, PythonError {
+        Object response = client.execute(
+                RPCMethod.MODULE_HASVARIABLE.methodString, new Object[] {variableName}
+        );
+
+        return (boolean)getResult(response);
+    }
 }

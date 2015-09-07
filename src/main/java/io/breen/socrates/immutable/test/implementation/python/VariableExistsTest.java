@@ -9,38 +9,27 @@ import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
 
-public class VariableEvalTest extends VariableTest implements Automatable<PythonFile> {
+public class VariableExistsTest extends VariableTest implements Automatable<PythonFile> {
 
-    /**
-     * The expected value of the variable.
-     */
-    public Object value;
+    private final Variable variable;
 
-    /**
-     * This empty constructor is used by SnakeYAML.
-     */
-    public VariableEvalTest() {}
-
-    public VariableEvalTest(double deduction, String description) {
-        super(deduction, description);
+    public VariableExistsTest(Variable variable) {
+        super(variable.pointValue, "variable '" + variable.name + "' is missing");
+        this.variable = variable;
     }
 
     @Override
     public String getTestTypeName() {
-        return "Python evaluation test";
+        return "check whether variable exists";
     }
 
     @Override
     public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission)
             throws CannotBeAutomatedException, AutomationFailureException
     {
-        Variable var = parent.getVariableForTest(this);
-        if (var == null) throw new IllegalArgumentException();
-
         try (PythonInspector inspector = new PythonInspector(target.fullPath)) {
             inspector.openModule(parent.getModuleName());
-            Object value = inspector.variableEval(var.name);
-            return this.value.equals(value);
+            return inspector.moduleHasVariable(this.variable.name);
 
         } catch (IOException | XmlRpcException x) {
             throw new AutomationFailureException(x);

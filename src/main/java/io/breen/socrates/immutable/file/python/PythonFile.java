@@ -2,7 +2,8 @@ package io.breen.socrates.immutable.file.python;
 
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.immutable.test.implementation.python.VariableEvalTest;
+import io.breen.socrates.immutable.test.implementation.python.VariableExistsTest;
+import io.breen.socrates.immutable.test.implementation.python.VariableTest;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,8 +36,22 @@ public final class PythonFile extends File {
          * We must now add tests specified by the variables, functions and classes/methods in
          * the criteria file.
          */
-        for (Variable v : variables)
-            root.members.addAll(v.tests);
+        for (Variable v : variables) {
+            /*
+             * We will put this test in a group containing the rest of the tests specified in
+             * the criteria file, and limit the new group to fail at most 1. This means the
+             * tests in the criteria file will be skipped if the variable does not exist.
+             */
+            VariableExistsTest t = new VariableExistsTest(v);
+
+            List<Object> members = new LinkedList<>();
+            members.add(t);
+            members.add(new TestGroup(v.tests, 0, 0.0));
+
+            TestGroup group = new TestGroup(members, 1, 0.0);
+
+            root.members.add(group);
+        }
 
         return root;
     }
@@ -46,7 +61,7 @@ public final class PythonFile extends File {
         return "Python source code";
     }
 
-    public Variable getVariableForTest(VariableEvalTest test) {
+    public Variable getVariableForTest(VariableTest test) {
         for (Variable v : variables)
             if (v.tests.contains(test)) return v;
 
