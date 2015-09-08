@@ -189,7 +189,10 @@ public class TestControls implements Observer<TestWrapperNode> {
                         TreePath path = e.getPath();
                         TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
 
+                        if (!e.isAddedPath()) node = null;
+
                         if (node == null) {
+                            update(null);
                             clearNotes.setEnabled(false);
                             focusOnNotes.setEnabled(false);
                         } else {
