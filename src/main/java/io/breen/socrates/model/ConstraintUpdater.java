@@ -70,12 +70,12 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
         switch (result) {
         case FAILED:
             // test was just failed from being none or passed
-            updateRelevantSubtrees(parent, 1, test.deduction, initialState);
+            update(parent, 1, test.deduction, initialState);
             break;
         case PASSED:
         case NONE:
             // test was just passed or reset from being failed
-            updateRelevantSubtrees(parent, -1, -test.deduction, initialState);
+            update(parent, -1, -test.deduction, initialState);
         }
 
         for (Map.Entry<TestWrapperNode, Boolean> entry : initialState.entrySet()) {
@@ -86,128 +86,82 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
         }
     }
 
-    private void updateRelevantSubtrees(TestGroupWrapperNode parent, int deltaFailed,
-                                        double deltaPoints,
-                                        Map<TestWrapperNode, Boolean> initialState)
+    private void update(TestGroupWrapperNode parent, int deltaFailed, double deltaPoints,
+                        Map<TestWrapperNode, Boolean> initialState)
     {
-        Deque<TestGroupWrapperNode> parents = new LinkedList<>();
+        TestGroupWrapperNode root = (TestGroupWrapperNode)parent.getRoot();
+
+        parent.updatedPointsTaken(deltaPoints);
+
+        int numFailedBefore = parent.getNumFailed();
+        parent.updateNumFailed(deltaFailed);
+        int numFailedAfter = parent.getNumFailed();
+
+        parent = getParent(parent);
 
         while (parent != null) {
-            parents.addFirst(parent);
+            parent.updatedPointsTaken(deltaPoints);
+
+            if (numFailedBefore == 0 && numFailedAfter > 0) {
+                numFailedBefore = parent.getNumFailed();
+                parent.updateNumFailed(1);
+                numFailedAfter = parent.getNumFailed();
+            } else if (numFailedBefore > 0 && numFailedAfter == 0) {
+                numFailedBefore = parent.getNumFailed();
+                parent.updateNumFailed(-1);
+                numFailedAfter = parent.getNumFailed();
+            }
+
             parent = getParent(parent);
         }
 
-        /*
-         * Starting from the root of this tree, visit each TestGroupWrapperNode root
-         * of a subtree that was just modified. As soon as we find a root of a subtree
-         * that should be constrained due to a new change, we constrain the entire subtree
-         * and stop. If we find a root of a subtree that becomes un-constrained due to a
-         * new change, we un-constrain the entire subtree and add that subtree to list
-         * of trees we must check for constraints that may need to be applied that are
-         * not relevant to this change.
-         */
-        List<TestGroupWrapperNode> needsCheck = new LinkedList<>();
+        reset(root, initialState);
+    }
 
-        for (TestGroupWrapperNode root : parents) {
-            TestGroup group = (TestGroup)root.getUserObject();
-            int maxNum = group.maxNum;
-            double maxValue = group.maxValue;
-            boolean subtreeShouldBeConstrained = false;
-            boolean subtreeShouldBeUnConstrained = false;
+    private void reset(TestGroupWrapperNode root, Map<TestWrapperNode, Boolean> initialState) {
+        unconstrainSubtree(root, initialState);
 
-            if (maxNum != 0) {
-                boolean alreadyConstrained = root.getNumFailed() >= maxNum;
-                if (alreadyConstrained && root.getNumFailed() + deltaFailed < maxNum) {
-                    // this subtree must be un-constrained due to a new change in number
-                    subtreeShouldBeUnConstrained = true;
-                } else if (root.getNumFailed() + deltaFailed >= maxNum) {
-                    // this subtree must be constrained due to a new change in number
-                    subtreeShouldBeConstrained = true;
-                }
-            }
+        Stack<TestGroupWrapperNode> stack = new Stack<>();
 
-            if (maxValue != 0.0) {
-                boolean alreadyConstrained = root.getPointsTaken() >= maxValue;
-                if (alreadyConstrained && root.getPointsTaken() + deltaPoints < maxValue) {
-                    // this subtree must be un-constrained due to a new change in points
-                    subtreeShouldBeUnConstrained |= true;
-                } else if (root.getPointsTaken() + deltaPoints >= maxValue) {
-                    // this subtree must be constrained due to a new change in points
-                    subtreeShouldBeConstrained |= true;
-                }
-            }
-
-            root.updateNumFailed(deltaFailed);
-            root.updatedPointsTaken(deltaPoints);
-
-            if (subtreeShouldBeConstrained) {
-                constrainTree(root, initialState);
-            } else if (subtreeShouldBeUnConstrained) {
-                unconstrainTree(root, initialState);
-
-                @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> children =
-                        root.children();
-                while (children.hasMoreElements()) {
-                    DefaultMutableTreeNode child = children.nextElement();
-                    if (child instanceof TestGroupWrapperNode && !parents.contains(child))
-                        needsCheck.add((TestGroupWrapperNode)child);
-                }
-            }
+        Enumeration<DefaultMutableTreeNode> bfs = root.breadthFirstEnumeration();
+        while (bfs.hasMoreElements()) {
+            DefaultMutableTreeNode dmtn = bfs.nextElement();
+            if (dmtn instanceof TestGroupWrapperNode) stack.push((TestGroupWrapperNode)dmtn);
         }
 
-        /*
-         * We now must check trees that have just become un-constrained due to a change.
-         * These trees' leaves were marked un-constrained because an ancestor in the
-         * tree became un-constrained. However, an old constraint on these roots may
-         * still be in effect. If they are, we will re-constrain the leaves of these
-         * trees.
-         */
-        while (true) {
-            List<TestGroupWrapperNode> checkAfter = new LinkedList<>();
+        for (TestGroupWrapperNode node : stack) {
+            TestGroup group = (TestGroup)node.getUserObject();
 
-            for (TestGroupWrapperNode root : needsCheck) {
-                TestGroup group = (TestGroup)root.getUserObject();
-                int maxNum = group.maxNum;
-                double maxValue = group.maxValue;
-                boolean needsReConstraining = false;
+            if (group.maxValue > 0 && node.getPointsTaken() >= group.maxValue) {
+                constrainSubtree(node, initialState);
+                continue;
+            }
 
-                if (maxNum != 0) {
-                    if (root.getNumFailed() >= maxNum) {
-                        needsReConstraining = true;
-                    }
-                }
+            if (group.maxNum > 0 && node.getNumFailed() >= group.maxNum) {
+                Enumeration<DefaultMutableTreeNode> children = node.children();
+                while (children.hasMoreElements()) {
+                    DefaultMutableTreeNode child = children.nextElement();
+                    if (child instanceof TestWrapperNode) {
+                        TestWrapperNode c = (TestWrapperNode)child;
+                        c.setConstrained(true);
 
-                if (maxValue != 0.0) {
-                    if (root.getPointsTaken() >= maxValue) {
-                        needsReConstraining = true;
-                    }
-                }
+                    } else if (child instanceof TestGroupWrapperNode) {
+                        TestGroupWrapperNode c = (TestGroupWrapperNode)child;
+                        if (c.getNumFailed() == 0) constrainSubtree(c, initialState);
 
-                if (needsReConstraining) {
-                    constrainTree(root, initialState);
-                } else {
-                    @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> children =
-                            root
-                            .children();
-                    while (children.hasMoreElements()) {
-                        DefaultMutableTreeNode child = children.nextElement();
-                        if (child instanceof TestGroupWrapperNode)
-                            checkAfter.add((TestGroupWrapperNode)child);
                     }
                 }
             }
-
-            if (checkAfter.isEmpty()) break;
-            else needsCheck = checkAfter;
         }
     }
 
-    private void constrainTree(TestGroupWrapperNode root,
-                               Map<TestWrapperNode, Boolean> initialState)
+    private void constrainSubtree(TestGroupWrapperNode root,
+                                  Map<TestWrapperNode, Boolean> initialState)
     {
         logger.fine("constraining tree with root: " + root);
 
-        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root
+                .depthFirstEnumeration();
         while (dfs.hasMoreElements()) {
             DefaultMutableTreeNode dfsNode = dfs.nextElement();
             if (dfsNode instanceof TestGroupWrapperNode) continue;
@@ -221,12 +175,13 @@ public class ConstraintUpdater implements Observer<TestWrapperNode> {
         }
     }
 
-    private void unconstrainTree(TestGroupWrapperNode root,
-                                 Map<TestWrapperNode, Boolean> initialState)
+    private void unconstrainSubtree(TestGroupWrapperNode root,
+                                    Map<TestWrapperNode, Boolean> initialState)
     {
         logger.fine("un-constraining tree with root: " + root);
 
-        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        @SuppressWarnings("unchecked") Enumeration<DefaultMutableTreeNode> dfs = root
+                .depthFirstEnumeration();
         while (dfs.hasMoreElements()) {
             DefaultMutableTreeNode dfsNode = dfs.nextElement();
             if (dfsNode instanceof TestGroupWrapperNode) continue;
