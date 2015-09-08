@@ -1,5 +1,6 @@
 package io.breen.socrates.immutable.file.plain;
 
+import io.breen.socrates.immutable.PostConstructionAction;
 import io.breen.socrates.immutable.file.File;
 
 import java.util.*;
@@ -11,7 +12,7 @@ import java.util.*;
  *
  * @see File
  */
-public final class PlainFile extends File {
+public final class PlainFile extends File implements PostConstructionAction {
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -22,6 +23,12 @@ public final class PlainFile extends File {
                      List<Object> tests)
     {
         super(path, pointValue, dueDates, tests);
+    }
+
+    @Override
+    public void afterConstruction() {
+        super.afterConstruction();
+        contentType = "text/plain";
     }
 
     @Override

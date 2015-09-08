@@ -1,5 +1,6 @@
 package io.breen.socrates.immutable.file.python;
 
+import io.breen.socrates.immutable.PostConstructionAction;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.implementation.python.VariableExistsTest;
@@ -13,7 +14,7 @@ import java.util.*;
  * A PythonFile is a representation of a Python module (a file ending in .py containing valid Python
  * code) containing source code.
  */
-public final class PythonFile extends File {
+public final class PythonFile extends File implements PostConstructionAction {
 
     public List<Variable> variables;
 
@@ -26,6 +27,12 @@ public final class PythonFile extends File {
                       List<Object> tests)
     {
         super(path, pointValue, dueDates, tests);
+    }
+
+    @Override
+    public void afterConstruction() {
+        super.afterConstruction();
+        contentType = "text/python";
     }
 
     @Override

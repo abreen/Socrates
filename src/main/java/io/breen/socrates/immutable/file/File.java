@@ -2,8 +2,6 @@ package io.breen.socrates.immutable.file;
 
 import io.breen.socrates.immutable.PostConstructionAction;
 import io.breen.socrates.immutable.Verifiable;
-import io.breen.socrates.immutable.file.plain.PlainFile;
-import io.breen.socrates.immutable.file.python.PythonFile;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.implementation.any.LateSubmissionTest;
 
@@ -64,12 +62,6 @@ public abstract class File implements Verifiable, PostConstructionAction {
     @Override
     public void afterConstruction() {
         testRoot = createTestRoot();
-
-        if (this instanceof PlainFile) {
-            contentType = "text/plain";
-        } else if (this instanceof PythonFile) {
-            contentType = "text/python";
-        }
     }
 
     @Override
