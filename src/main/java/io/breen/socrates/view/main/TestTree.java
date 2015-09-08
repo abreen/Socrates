@@ -280,7 +280,7 @@ public class TestTree implements Observer<TestWrapperNode> {
             }
         }
 
-        expandFirstTest();
+        expandTree();
     }
 
     public void reset() {
@@ -411,6 +411,23 @@ public class TestTree implements Observer<TestWrapperNode> {
     public void expandFirstTest() {
         DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode)getRoot().getFirstChild();
         tree.expandPath(new TreePath(firstChild.getPath()));
+    }
+
+    private void expandTree(TreePath parent) {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode)parent.getLastPathComponent();
+
+        Enumeration<DefaultMutableTreeNode> children = root.children();
+        while (children.hasMoreElements()) {
+            DefaultMutableTreeNode child = children.nextElement();
+            expandTree(parent.pathByAddingChild(child));
+        }
+        tree.expandPath(parent);
+    }
+
+    private void expandTree() {
+        DefaultMutableTreeNode root = getRoot();
+        if (root == null) return;
+        expandTree(new TreePath(root.getPath()));
     }
 
     private DefaultMutableTreeNode getRoot() {
