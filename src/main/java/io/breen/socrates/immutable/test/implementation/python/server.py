@@ -4,7 +4,8 @@ import inspect
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 
-LOG_FILE = open('server.log', 'a')
+LOGGING = False
+LOG_FILE = open('server.log', 'a') if LOGGING else None
 PORT = 45003
 PATH = '/xmlrpc'
 
@@ -19,7 +20,9 @@ objects = {}
 
 
 def log(str):
-    return
+    if not LOGGING:
+        return
+
     import datetime
 
     LOG_FILE.write(datetime.datetime.now().isoformat() + ': ' + str + '\n')
