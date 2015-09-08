@@ -349,7 +349,9 @@ public class TestTree implements Observer<TestWrapperNode> {
         }
 
         if (next != null) {
-            tree.setSelectionPath(new TreePath(next.getPath()));
+            TreePath path = new TreePath(next.getPath());
+            tree.setSelectionPath(path);
+            tree.scrollPathToVisible(path);
         } else {
             tree.clearSelection();
         }
@@ -373,7 +375,9 @@ public class TestTree implements Observer<TestWrapperNode> {
         }
 
         if (prev != null) {
-            tree.setSelectionPath(new TreePath(prev.getPath()));
+            TreePath path = new TreePath(prev.getPath());
+            tree.setSelectionPath(path);
+            tree.scrollPathToVisible(path);
         } else {
             tree.clearSelection();
         }

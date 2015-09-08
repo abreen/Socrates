@@ -543,7 +543,9 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     }
 
     public void select(DefaultMutableTreeNode node) {
-        tree.setSelectionPath(new TreePath(node.getPath()));
+        TreePath path = new TreePath(node.getPath());
+        tree.setSelectionPath(path);
+        tree.scrollPathToVisible(path);
     }
 
     public DefaultMutableTreeNode getParent(DefaultMutableTreeNode node) {
