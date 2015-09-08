@@ -3,6 +3,7 @@ package io.breen.socrates.view.main;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
+import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import io.breen.socrates.model.wrapper.TestWrapperNode;
 import io.breen.socrates.util.ObservableChangedEvent;
@@ -70,9 +71,12 @@ public class TestTree implements Observer<TestWrapperNode> {
                         if (node != null) {
                             if (node instanceof SubmittedFileWrapperNode) {
                                 SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)node;
-                                int n = sfwn.matchingFile.testRoot.members.size();
-                                if (n > 0) nextTest.setEnabled(true);
+
                                 update(sfwn.treeModel);
+
+                                if (atLeastOneTestSelectable()) nextTest.setEnabled(true);
+                                else nextTest.setEnabled(false);
+
                             } else {
                                 nextTest.setEnabled(false);
                                 previousTest.setEnabled(false);
@@ -151,7 +155,9 @@ public class TestTree implements Observer<TestWrapperNode> {
                         if (!e.isAddedPath()) node = null;
 
                         if (node == null) {
-                            nextTest.setEnabled(true);
+                            if (atLeastOneTestSelectable()) nextTest.setEnabled(true);
+                            else nextTest.setEnabled(false);
+
                             previousTest.setEnabled(false);
                         } else {
                             if (lastTestForFileSelected()) nextTest.setEnabled(false);
@@ -313,19 +319,38 @@ public class TestTree implements Observer<TestWrapperNode> {
         return getRoot().getFirstLeaf() == tree.getLastSelectedPathComponent();
     }
 
-    public void selectFirstTest() {
+    private TestWrapperNode getFirstSelectableTest() {
         DefaultMutableTreeNode root = getRoot();
+        if (root == null) return null;
 
-        if (root == null) {
-            // no file selected
-            return;
+        Enumeration<DefaultMutableTreeNode> dfs = root.depthFirstEnumeration();
+        while (dfs.hasMoreElements()) {
+            DefaultMutableTreeNode node = dfs.nextElement();
+
+            if (node instanceof TestWrapperNode) {
+                TestWrapperNode n = (TestWrapperNode)node;
+                if (!n.isConstrained()) {
+                    if (n.getResult() == TestResult.NONE) return n;
+                }
+            }
         }
 
-        DefaultMutableTreeNode first = root.getFirstLeaf();
+        return null;
+    }
 
-        if (first == null) return;
+    public boolean atLeastOneTestSelectable() {
+        DefaultMutableTreeNode root = getRoot();
+        if (root == null) return false;
+        return getFirstSelectableTest() != null;
+    }
 
-        tree.setSelectionPath(new TreePath(first.getPath()));
+    public void selectFirstTest() {
+        DefaultMutableTreeNode root = getRoot();
+        if (root == null) return;
+
+        TestWrapperNode node = getFirstSelectableTest();
+        if (node == null) return;
+        tree.setSelectionPath(new TreePath(node.getPath()));
     }
 
     /**
