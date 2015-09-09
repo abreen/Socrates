@@ -1,0 +1,29 @@
+assignmentName: Problem Set 0
+
+files:
+  - !file:plain
+    path: ps0pr0.txt
+    pointValue: 10
+    dueDates:
+      2015-08-24T22:10:00-04: 0.10
+      2015-08-25T22:10:00-04: 0.20
+      2015-08-26T22:10:00-04: 1.00
+
+    tests:
+      - !test:plain:review
+        description: "should contain response for problem #1"
+        deduction: 2
+
+      - !test:plain:review
+        description: "should contain response for problem #2"
+        deduction: 2
+
+      - !group
+        maxNum: 1
+        members:
+          - !test:plain:review
+            description: "answer for #3 is incorrect"
+            deduction: 6
+          - !test:plain:review
+            description: "answer for #3 is missing explanation"
+            deduction: 3

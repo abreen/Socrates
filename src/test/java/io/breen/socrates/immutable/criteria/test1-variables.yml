@@ -1,0 +1,30 @@
+assignmentName: Problem Set 0
+
+files:
+  - !file:python
+    path: ps0pr1.py
+    pointValue: 20
+
+    # expected variables
+    variables:
+      - name: foo
+        pointValue: 5
+        tests:
+          - !test:python:eval:variable
+            description: "variable 'foo' should be 3"
+            deduction: 4
+            value: 3            # expected value of the variable
+
+      - name: bar
+        pointValue: 5
+        tests:
+          - !test:python:eval:variable
+            description: "variable 'bar' should be 0"
+            deduction: 4
+            value: 0
+
+    # tests of the Python module
+    tests:
+      - !test:python:review
+        description: "should have header comment"
+        deduction: 2
