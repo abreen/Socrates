@@ -59,7 +59,7 @@ public class CriteriaTest {
             // basic working criteria file
             Files.createFile(InputFile.BASIC.p);
             BufferedWriter w = Files.newBufferedWriter(InputFile.BASIC.p, StandardCharsets.UTF_8);
-            w.append("assignment_name: " + TEST_ASSIGNMENT_NAME + "\n");
+            w.append("assignmentName: " + TEST_ASSIGNMENT_NAME + "\n");
             w.append("files: []");
             w.close();
         }
@@ -70,7 +70,7 @@ public class CriteriaTest {
             BufferedWriter w = Files.newBufferedWriter(
                     InputFile.BASIC_UNRECOGNIZED.p, StandardCharsets.UTF_8
             );
-            w.append("assignment_name: " + TEST_ASSIGNMENT_NAME + "\n");
+            w.append("assignmentName: " + TEST_ASSIGNMENT_NAME + "\n");
             w.append("foo: bar\n");
             w.append("files: []");
             w.close();
@@ -82,7 +82,7 @@ public class CriteriaTest {
             BufferedWriter w = Files.newBufferedWriter(
                     InputFile.FILE_NONMAPPING.p, StandardCharsets.UTF_8
             );
-            w.append("assignment_name: " + TEST_ASSIGNMENT_NAME + "\n");
+            w.append("assignmentName: " + TEST_ASSIGNMENT_NAME + "\n");
             w.append("files:\n");
             w.append("  - !file:plain 123\n");
             w.close();

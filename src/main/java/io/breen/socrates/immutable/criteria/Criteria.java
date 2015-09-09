@@ -178,6 +178,8 @@ public final class Criteria {
         Criteria c = null;
         try {
             c = yaml.loadAs(reader, Criteria.class);
+            if (c == null) throw new InvalidCriteriaException("criteria file is empty");
+
         } catch (YAMLException x) {
             throw new InvalidCriteriaException(x.toString());
         }
