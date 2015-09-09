@@ -90,7 +90,7 @@ public class VariableEvalTest extends VariableTest implements Automatable<Python
         } catch (IOException | XmlRpcException x) {
             throw new AutomationFailureException(x);
         } catch (PythonError x) {
-            return false;
+            throw new CannotBeAutomatedException();
         }
     }
 }

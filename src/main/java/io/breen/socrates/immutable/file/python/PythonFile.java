@@ -2,9 +2,9 @@ package io.breen.socrates.immutable.file.python;
 
 import io.breen.socrates.immutable.PostConstructionAction;
 import io.breen.socrates.immutable.file.File;
+import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.immutable.test.implementation.python.VariableExistsTest;
-import io.breen.socrates.immutable.test.implementation.python.VariableTest;
+import io.breen.socrates.immutable.test.implementation.python.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,6 +15,8 @@ import java.util.*;
  * code) containing source code.
  */
 public final class PythonFile extends File implements PostConstructionAction {
+
+    public double importFailureDeduction;
 
     public List<Variable> variables;
 
@@ -37,28 +39,36 @@ public final class PythonFile extends File implements PostConstructionAction {
 
     @Override
     protected TestGroup createTestRoot() {
-        TestGroup root = super.createTestRoot();
+        List<Object> tests = new LinkedList<>();
 
-        /*
-         * We must now add tests specified by the variables, functions and classes/methods in
-         * the criteria file.
-         */
         for (Variable v : variables) {
             /*
              * We will put this test in a group containing the rest of the tests specified in
              * the criteria file, and limit the new group to fail at most 1. This means the
              * tests in the criteria file will be skipped if the variable does not exist.
              */
-            VariableExistsTest t = new VariableExistsTest(v);
+            Test test = new VariableExistsTest(v);
 
             List<Object> members = new LinkedList<>();
-            members.add(t);
+            members.add(test);
             members.add(new TestGroup(v.tests, 0, 0.0));
 
             TestGroup group = new TestGroup(members, 1, 0.0);
 
-            root.members.add(group);
+            tests.add(group);
         }
+
+        TestGroup root = super.createTestRoot();
+
+        Test test = new ImportTest(this);
+
+        List<Object> members = new LinkedList<>();
+        members.add(test);
+        members.add(new TestGroup(tests, 0, 0.0));
+
+        TestGroup group = new TestGroup(members, 1, 0.0);
+
+        root.members.add(group);
 
         return root;
     }
