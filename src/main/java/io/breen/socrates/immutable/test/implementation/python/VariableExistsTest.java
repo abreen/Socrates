@@ -20,7 +20,7 @@ public class VariableExistsTest extends VariableTest implements Automatable<Pyth
 
     @Override
     public String getTestTypeName() {
-        return "check whether variable exists";
+        return "variable check";
     }
 
     @Override
