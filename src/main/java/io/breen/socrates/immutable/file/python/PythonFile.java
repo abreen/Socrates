@@ -18,7 +18,7 @@ public final class PythonFile extends File implements PostConstructionAction {
 
     public double importFailureDeduction;
 
-    public List<Variable> variables;
+    public List<Variable> variables = new ArrayList<>(0);
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -64,7 +64,8 @@ public final class PythonFile extends File implements PostConstructionAction {
 
         List<Object> members = new LinkedList<>();
         members.add(test);
-        members.add(new TestGroup(tests, 0, 0.0));
+
+        if (!tests.isEmpty()) members.add(new TestGroup(tests, 0, 0.0));
 
         TestGroup group = new TestGroup(members, 1, 0.0);
 
