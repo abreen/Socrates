@@ -1,13 +1,17 @@
 package io.breen.socrates.immutable.test.implementation.python;
 
+import io.breen.socrates.Globals;
+import io.breen.socrates.python.PythonManager;
 import io.breen.socrates.python.PythonProcessBuilder;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import java.io.IOException;
-import java.net.*;
-import java.nio.file.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -46,26 +50,12 @@ public class PythonInspector implements AutoCloseable {
     private static String XMLRPCPath = "/xmlrpc";
     private static int XMLRPCPort = 45003;
     private static URL XMLRPCURL = null;
-    private static Path XMLRPCServerCode = null;
 
     static {
-        URL serverURL = PythonInspector.class.getResource("server.py");
-        if (serverURL == null) {
-            logger.severe("cannot find XML-RPC server Python module");
-
-        } else {
-            try {
-                URI uri = serverURL.toURI();
-                XMLRPCServerCode = Paths.get(uri);
-            } catch (Exception e) {
-                logger.severe("error setting up path to XML-RPC server:" + e);
-            }
-        }
-
         try {
             XMLRPCURL = new URL("http://127.0.0.1:" + XMLRPCPort + XMLRPCPath);
         } catch (MalformedURLException e) {
-            logger.severe("bad URL for XML-RPC server:" + e);
+            logger.severe("bad URL for XML-RPC server: " + e);
         }
     }
 
@@ -77,7 +67,7 @@ public class PythonInspector implements AutoCloseable {
         if (!Files.isRegularFile(targetModulePath))
             throw new IllegalArgumentException("module path must be a path to a file");
 
-        builder = new PythonProcessBuilder(XMLRPCServerCode);
+        builder = new PythonProcessBuilder(PythonManager.XMLRPCServer);
         builder.setDirectory(targetModulePath.getParent());
         process = builder.start();
 
@@ -97,16 +87,25 @@ public class PythonInspector implements AutoCloseable {
             }
 
             try {
+                int status = process.exitValue();
+                if (status != Globals.NORMAL_EXIT_CODE) {
+                    String msg = "Python process exited with code " + status;
+                    throw new IOException(msg);
+                }
+
+            } catch (IllegalThreadStateException ignored) {}
+
+            try {
                 if (hello().equals(Boolean.TRUE)) { // connected
                     break;
                 } else {
-                    logger.warning("did not get true from hello() call");
-                    return;
+                    logger.severe("did not get true from hello() call");
+                    throw new IOException();
                 }
             } catch (XmlRpcException ignored) {     // server may not be up yet
             } catch (PythonError x) {
-                logger.warning("got PythonError with hello() call");
-                return;
+                logger.severe("got PythonError with hello() call");
+                throw new IOException();
             }
         }
 

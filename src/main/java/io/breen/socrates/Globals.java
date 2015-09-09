@@ -3,12 +3,8 @@ package io.breen.socrates;
 import org.apache.commons.lang.SystemUtils;
 
 import java.awt.*;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -33,11 +29,6 @@ public class Globals {
     public static final String DEFAULT_GRADE_FILE_NAME = "grade.txt";
     public static Properties properties;
     public static OS operatingSystem;
-    /**
-     * A working path to the Python 3 interpreter, usable by (for example) ProcessBuilder to run
-     * Python 3 programs.
-     */
-    public static Path python3Command;
     private static Logger logger = Logger.getLogger(Globals.class.getName());
 
     static {
@@ -54,80 +45,6 @@ public class Globals {
             operatingSystem = OS.LINUX;
         } else {
             operatingSystem = OS.OTHER;
-        }
-
-        List<Path> paths = new LinkedList<>();
-
-        Map<String, String> env = System.getenv();
-        if (env.containsKey("PATH")) {
-            String path = env.get("PATH");
-
-            String pathSep = System.getProperty("path.separator");
-            String[] dirs = path.split(pathSep);
-
-            for (String dir : dirs) {
-                paths.add(Paths.get(dir, "python"));
-                paths.add(Paths.get(dir, "python3"));
-            }
-        }
-
-        switch (Globals.operatingSystem) {
-        case WINDOWS:
-            paths.add(Paths.get("C:\\Python34\\python.exe"));
-            paths.add(Paths.get("C:\\Python33\\python.exe"));
-            paths.add(Paths.get("C:\\Python32\\python.exe"));
-            paths.add(Paths.get("C:\\Python31\\python.exe"));
-            break;
-        case OSX:
-        case LINUX:
-            paths.add(Paths.get("/usr/local/bin/python"));
-            paths.add(Paths.get("/usr/local/bin/python3"));
-            paths.add(Paths.get("/usr/bin/python"));
-            paths.add(Paths.get("/usr/bin/python3"));
-        }
-
-        for (Path p : paths) {
-            try {
-                if (isValidPython3InterpreterPath(p)) {
-                    python3Command = p;
-                    break;
-                }
-            } catch (InterruptedException x) {
-                logger.warning(
-                        "interrupted trying to test Python command " + p + ": " + x
-                );
-            } catch (IOException ignored) {}
-        }
-
-        if (python3Command == null) {
-            logger.severe("cannot find the Python 3 interpreter");
-            System.exit(5);
-        }
-    }
-
-    private static boolean isValidPython3InterpreterPath(Path path)
-            throws IOException, InterruptedException
-    {
-        String pathStr = path.toString();
-
-        ProcessBuilder builder = new ProcessBuilder(
-                pathStr, "-c", "def f(): pass"
-        );
-
-        if (builder.start().waitFor() == NORMAL_EXIT_CODE) {
-            // this path is probably valid for a Python interpreter
-
-            // but is it Python >= 3.3?
-            ProcessBuilder builder2 = new ProcessBuilder(
-                    pathStr,
-                    "-c",
-                    "import sys; v = sys.version_info; sys.exit(v.major * 10 + v.minor)"
-            );
-
-            int exitCode = builder2.start().waitFor();
-            return exitCode >= 33 && exitCode < 40;
-        } else {
-            return false;
         }
     }
 

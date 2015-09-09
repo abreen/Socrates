@@ -27,12 +27,13 @@ public class PythonProcessBuilder {
      */
     public PythonProcessBuilder(Path pythonModule, String... args) {
         List<String> cmd = new LinkedList<>();
-        cmd.add(Globals.python3Command.toString());
+        cmd.add(PythonManager.python3Command.toString());
         cmd.add("-B");                      // turns off writing bytecode files (.py[co])
         cmd.add(pythonModule.toAbsolutePath().toString());
         cmd.addAll(Arrays.asList(args));
 
         pb = new ProcessBuilder(cmd);
+        pb.inheritIO();
 
         Map<String, String> env = pb.environment();
         env.put(
@@ -44,7 +45,7 @@ public class PythonProcessBuilder {
                  * in the current working directory of the Python process to find modules. This
                  * is required for PythonInspector to work.
                  */
-                System.getProperty("path.separator") + PythonAPIManager.getPythonPathDirectory()
+                System.getProperty("path.separator") + PythonManager.getPythonPathDirectory()
                                                                        .toAbsolutePath()
                                                                        .toString()
         );
