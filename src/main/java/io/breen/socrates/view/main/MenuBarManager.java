@@ -26,7 +26,7 @@ public class MenuBarManager {
 
     public final JMenuItem nextFile;
     public final JMenuItem previousFile;
-    public final JMenuItem renameFile;          // TODO
+    //    public final JMenuItem renameFile;          // TODO
     public final JMenuItem openFile;
     public final JMenuItem defaultTheme;
     public final JMenuItem base16Light;
@@ -103,7 +103,7 @@ public class MenuBarManager {
         nextFile = new JMenuItem("Next File");
         previousFile = new JMenuItem("Previous File");
 
-        renameFile = new JMenuItem("Rename File...");
+        //        renameFile = new JMenuItem("Rename File...");
 
         openFile = new JMenuItem();
         switch (Globals.operatingSystem) {
@@ -126,8 +126,8 @@ public class MenuBarManager {
         fileMenu.add(nextFile);
         fileMenu.add(previousFile);
         fileMenu.addSeparator();
-        fileMenu.add(renameFile);
-        fileMenu.addSeparator();
+        //        fileMenu.add(renameFile);
+        //        fileMenu.addSeparator();
         fileMenu.add(openFile);
         fileMenu.addSeparator();
         fileMenu.add(defaultTheme);
