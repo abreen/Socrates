@@ -101,11 +101,12 @@ public class TestTree implements Observer<TestWrapperNode> {
         if (maxNum == 0 && maxValue == 0.0) {
             return "fail any";
         } else if (maxNum != 0 && maxValue == 0.0) {
-            return "fail ≤ " + maxNum;
+            return "fail at most " + maxNum;
         } else if (maxNum == 0 && maxValue != 0.0) {
-            return "take ≤ " + fmt.format(maxValue) + " points";
+            return "take at most " + fmt.format(maxValue) + " points";
         } else {
-            return "fail ≤ " + maxNum + " and take ≤ " + fmt.format(maxValue) + " points";
+            return "fail at most " + maxNum + ", taking at most " + fmt.format(maxValue) + " " +
+                    "points";
         }
     }
 
