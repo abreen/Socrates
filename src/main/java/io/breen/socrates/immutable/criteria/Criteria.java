@@ -5,6 +5,7 @@ import io.breen.socrates.immutable.file.plain.PlainFile;
 import io.breen.socrates.immutable.file.python.PythonFile;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.implementation.any.ReviewTest;
+import io.breen.socrates.immutable.test.implementation.python.FunctionEvalTest;
 import io.breen.socrates.immutable.test.implementation.python.VariableEvalTest;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
@@ -162,6 +163,11 @@ public final class Criteria {
         cons.addTypeDescription(
                 new TypeDescription(
                         VariableEvalTest.class, "!test:python:eval:variable"
+                )
+        );
+        cons.addTypeDescription(
+                new TypeDescription(
+                        FunctionEvalTest.class, "!test:python:eval:function"
                 )
         );
 

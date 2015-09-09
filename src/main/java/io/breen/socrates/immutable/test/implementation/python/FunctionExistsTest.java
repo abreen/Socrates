@@ -1,7 +1,7 @@
 package io.breen.socrates.immutable.test.implementation.python;
 
+import io.breen.socrates.immutable.file.python.Function;
 import io.breen.socrates.immutable.file.python.PythonFile;
-import io.breen.socrates.immutable.file.python.Variable;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
@@ -9,42 +9,31 @@ import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
 
-public class VariableEvalTest extends VariableTest implements Automatable<PythonFile> {
+public class FunctionExistsTest extends FunctionTest implements Automatable<PythonFile> {
 
-    /**
-     * The expected value of the variable.
-     */
-    public Object value;
+    private final Function function;
 
-    /**
-     * This empty constructor is used by SnakeYAML.
-     */
-    public VariableEvalTest() {}
-
-    public VariableEvalTest(double deduction, String description) {
-        super(deduction, description);
+    public FunctionExistsTest(Function function) {
+        super(function.pointValue, "function '" + function.name + "' is missing");
+        this.function = function;
     }
 
     @Override
     public String getTestTypeName() {
-        return "variable evaluation";
+        return "function check";
     }
 
     @Override
     public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission)
             throws CannotBeAutomatedException, AutomationFailureException
     {
-        Variable var = parent.getVariableForTest(this);
-        if (var == null) throw new IllegalArgumentException();
-
         try (PythonInspector inspector = new PythonInspector(target.fullPath)) {
             inspector.openModule(parent.getModuleName());
-            Object value = inspector.variableEval(var.name);
-            return PythonInspector.equals(this.value, value);
+            return inspector.moduleHasFunction(this.function.name);
 
         } catch (IOException | XmlRpcException x) {
             throw new AutomationFailureException(x);
-        } catch (IllegalArgumentException | PythonError x) {
+        } catch (PythonError x) {
             throw new CannotBeAutomatedException();
         }
     }

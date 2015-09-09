@@ -19,6 +19,7 @@ public final class PythonFile extends File implements PostConstructionAction {
     public double importFailureDeduction;
 
     public List<Variable> variables = new ArrayList<>(0);
+    public List<Function> functions = new ArrayList<>(0);
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -29,6 +30,14 @@ public final class PythonFile extends File implements PostConstructionAction {
                       List<Object> tests)
     {
         super(path, pointValue, dueDates, tests);
+    }
+
+    private static boolean hasTest(List<Object> list, Test test) {
+        for (Object o : list)
+            if (o instanceof Test && o == test) return true;
+            else if (o instanceof TestGroup) return hasTest(((TestGroup)o).members, test);
+
+        return false;
     }
 
     @Override
@@ -42,20 +51,35 @@ public final class PythonFile extends File implements PostConstructionAction {
         List<Object> tests = new LinkedList<>();
 
         for (Variable v : variables) {
-            /*
-             * We will put this test in a group containing the rest of the tests specified in
-             * the criteria file, and limit the new group to fail at most 1. This means the
-             * tests in the criteria file will be skipped if the variable does not exist.
-             */
             Test test = new VariableExistsTest(v);
 
-            List<Object> members = new LinkedList<>();
-            members.add(test);
-            members.add(new TestGroup(v.tests, 0, 0.0));
+            if (!v.tests.isEmpty()) {
+                List<Object> members = new LinkedList<>();
+                members.add(test);
+                members.add(new TestGroup(v.tests, 0, 0.0));
 
-            TestGroup group = new TestGroup(members, 1, 0.0);
+                TestGroup group = new TestGroup(members, 1, 0.0);
 
-            tests.add(group);
+                tests.add(group);
+            } else {
+                tests.add(test);
+            }
+        }
+
+        for (Function f : functions) {
+            Test test = new FunctionExistsTest(f);
+
+            if (!f.tests.isEmpty()) {
+                List<Object> members = new LinkedList<>();
+                members.add(test);
+                members.add(new TestGroup(f.tests, 0, 0.0));
+
+                TestGroup group = new TestGroup(members, 1, 0.0);
+
+                tests.add(group);
+            } else {
+                tests.add(test);
+            }
         }
 
         TestGroup root = super.createTestRoot();
@@ -81,7 +105,14 @@ public final class PythonFile extends File implements PostConstructionAction {
 
     public Variable getVariableForTest(VariableTest test) {
         for (Variable v : variables)
-            if (v.tests.contains(test)) return v;
+            if (hasTest(v.tests, test)) return v;
+
+        return null;
+    }
+
+    public Function getFunctionForTest(FunctionTest test) {
+        for (Function f : functions)
+            if (hasTest(f.tests, test)) return f;
 
         return null;
     }

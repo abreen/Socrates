@@ -1,46 +1,69 @@
 package io.breen.socrates.immutable.test.implementation.python;
 
+import io.breen.socrates.immutable.file.python.Function;
 import io.breen.socrates.immutable.file.python.PythonFile;
-import io.breen.socrates.immutable.file.python.Variable;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 import org.apache.xmlrpc.XmlRpcException;
 
 import java.io.IOException;
+import java.util.*;
 
-public class VariableEvalTest extends VariableTest implements Automatable<PythonFile> {
+public class FunctionEvalTest extends FunctionTest implements Automatable<PythonFile> {
 
     /**
-     * The expected value of the variable.
+     * The expected return value of the function.
      */
     public Object value;
 
     /**
+     * The expected output of the function.
+     */
+    public String output;
+
+    /**
+     * The characters that should be sent to the function after invoking it.
+     */
+    public String input;
+
+    /**
+     * For each parameter, the actual value of the argument to give the function.
+     */
+    public Map<String, Object> arguments;
+
+    /**
      * This empty constructor is used by SnakeYAML.
      */
-    public VariableEvalTest() {}
+    public FunctionEvalTest() {}
 
-    public VariableEvalTest(double deduction, String description) {
+    public FunctionEvalTest(double deduction, String description) {
         super(deduction, description);
     }
 
     @Override
     public String getTestTypeName() {
-        return "variable evaluation";
+        return "function evaluation";
     }
 
     @Override
     public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission)
             throws CannotBeAutomatedException, AutomationFailureException
     {
-        Variable var = parent.getVariableForTest(this);
-        if (var == null) throw new IllegalArgumentException();
+        Function func = parent.getFunctionForTest(this);
+        if (func == null) throw new IllegalArgumentException();
 
         try (PythonInspector inspector = new PythonInspector(target.fullPath)) {
             inspector.openModule(parent.getModuleName());
-            Object value = inspector.variableEval(var.name);
-            return PythonInspector.equals(this.value, value);
+
+            List<Object> args = new LinkedList<>();
+
+            for (String parameter : func.parameters)
+                args.add(arguments.get(parameter));
+
+            Object returnValue = inspector.functionEval(func.name, args);
+
+            return PythonInspector.equals(this.value, returnValue);
 
         } catch (IOException | XmlRpcException x) {
             throw new AutomationFailureException(x);

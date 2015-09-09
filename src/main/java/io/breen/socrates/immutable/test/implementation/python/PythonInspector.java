@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -124,6 +124,46 @@ public class PythonInspector implements AutoCloseable {
         return map.get("result");
     }
 
+    public static boolean equals(Object expected, Object other) throws IllegalArgumentException {
+        if (expected == null) {
+            return other == null;
+
+        } else if (expected instanceof Number) {
+            Number n = (Number)expected;
+            if (other == null || !(other instanceof Number)) return false;
+
+            Number o = (Number)other;
+            return n.doubleValue() == o.doubleValue();
+
+        } else if (expected instanceof String) {
+            String s = (String)expected;
+            if (other == null || !(other instanceof String)) return false;
+            return s.equals(other);
+
+        } else if (expected instanceof List) {
+            List list = (List)expected;
+            if (other == null) return false;
+
+            if (other instanceof Object[]) {
+                Object[] objArr = (Object[])other;
+                for (int i = 0; i < objArr.length; i++) {
+                    if (!list.get(i).equals(objArr[i])) return false;
+                }
+                return true;
+            }
+
+            return list.equals(other);
+
+        } else if (expected instanceof Map) {
+            Map map = (Map)expected;
+            if (other == null || !(other instanceof Map)) return false;
+            return map.equals(other);
+
+        }
+
+        throw new IllegalArgumentException();
+    }
+
     @Override
     public void close() {
         process.destroy();
@@ -159,5 +199,24 @@ public class PythonInspector implements AutoCloseable {
         );
 
         return (boolean)getResult(response);
+    }
+
+    public boolean moduleHasFunction(String functionName) throws XmlRpcException, PythonError {
+        Object response = client.execute(
+                RPCMethod.MODULE_HASFUNCTION.methodString, new Object[] {functionName}
+        );
+
+        return (boolean)getResult(response);
+    }
+
+    public Object functionEval(String functionName, List<Object> args)
+            throws XmlRpcException, PythonError
+    {
+        Object response = client.execute(
+                RPCMethod.FUNCTION_EVAL.methodString,
+                new Object[] {functionName, args, new HashMap<>()}
+        );
+
+        return getResult(response);
     }
 }
