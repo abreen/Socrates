@@ -82,7 +82,8 @@ public class FileView {
                             try {
                                 update(sf, matchingFile);
                             } catch (IOException x) {
-                                logger.warning("encountered I/O exception updating view");
+                                reset();
+                                logger.warning("encountered I/O exception updating view: " + x);
                             }
                         } else {
                             reset();

@@ -1,8 +1,9 @@
 package io.breen.socrates.immutable.submission;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Logger;
@@ -66,9 +67,32 @@ public class SubmittedFile {
                 ")";
     }
 
-    public String getContents() throws IOException {
-        BufferedReader reader = Files.newBufferedReader(fullPath, Charset.defaultCharset());
+    public String getContentsMixedUTF8() throws IOException {
+        FileInputStream inStream = new FileInputStream(fullPath.toFile());
         StringBuilder builder = new StringBuilder();
+
+        CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+        byte[] buffer = new byte[1];
+        ByteBuffer wrapped = ByteBuffer.wrap(buffer);
+
+        while (true) {
+            if (inStream.read(buffer) == -1) break;
+            wrapped.rewind();
+
+            try {
+                CharBuffer cbuf = decoder.decode(wrapped);
+                builder.append(cbuf.charAt(0));
+            } catch (MalformedInputException | UnmappableCharacterException x) {
+                builder.append("�");
+            }
+        }
+
+        return builder.toString();
+    }
+
+    public String getContentsUTF8() throws IOException {
+        StringBuilder builder = new StringBuilder();
+        BufferedReader reader = Files.newBufferedReader(fullPath, StandardCharsets.UTF_8);
 
         String line;
         while ((line = reader.readLine()) != null) {
@@ -76,7 +100,14 @@ public class SubmittedFile {
             builder.append('\n');
         }
 
-        reader.close();
         return builder.toString();
+    }
+
+    public String getContents() throws IOException {
+        try {
+            return getContentsUTF8();
+        } catch (IOException ignored) {}
+
+        return getContentsMixedUTF8();
     }
 }
