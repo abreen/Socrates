@@ -1,5 +1,6 @@
 package io.breen.socrates.immutable.test.implementation.plain;
 
+import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.plain.PlainFile;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
@@ -18,7 +19,9 @@ public class AlwaysPassingTest extends Test implements Automatable<PlainFile> {
     }
 
     @Override
-    public boolean shouldPass(PlainFile parent, SubmittedFile target, Submission submission) {
+    public boolean shouldPass(PlainFile parent, SubmittedFile target, Submission submission,
+                              Criteria criteria)
+    {
         return true;
     }
 

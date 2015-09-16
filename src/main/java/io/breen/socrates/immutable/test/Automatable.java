@@ -1,5 +1,6 @@
 package io.breen.socrates.immutable.test;
 
+import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
@@ -21,6 +22,8 @@ public interface Automatable<T extends File> {
      * @param target A SubmittedFile object representing the actual submission on the file system,
      * or null if the file could not be found
      * @param submission The Submission object containing the target
+     * @param criteria The Criteria object that specifies the parent file (may be used to obtain
+     * resources loaded from a criteria package)
      *
      * @return Whether this test should pass (i.e. whether the target file is "correct")
      *
@@ -29,6 +32,6 @@ public interface Automatable<T extends File> {
      * @throws AutomationFailureException If, while running the test automatically, a fatal error
      * occurs
      */
-    boolean shouldPass(T parent, SubmittedFile target, Submission submission)
+    boolean shouldPass(T parent, SubmittedFile target, Submission submission, Criteria criteria)
             throws CannotBeAutomatedException, AutomationFailureException;
 }

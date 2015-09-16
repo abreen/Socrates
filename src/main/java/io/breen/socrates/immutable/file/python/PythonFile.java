@@ -16,6 +16,10 @@ import java.util.*;
  */
 public final class PythonFile extends File implements PostConstructionAction {
 
+    /**
+     * The deduction taken when the Python module cannot be imported due to a serious error (e.g., a
+     * syntax error).
+     */
     public double importFailureDeduction;
 
     public List<Variable> variables = new ArrayList<>(0);

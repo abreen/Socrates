@@ -1,6 +1,7 @@
 package io.breen.socrates.immutable.test.implementation.any.script;
 
 import io.breen.socrates.Globals;
+import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.criteria.Resource;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
@@ -51,7 +52,7 @@ public class ScriptTest extends Test implements Automatable {
      * @throws ScriptTestRuntimeException
      */
     @Override
-    public boolean shouldPass(File parent, SubmittedFile target, Submission submission)
+    public boolean shouldPass(File parent, SubmittedFile target, Submission submission, Criteria criteria)
             throws CannotBeAutomatedException
     {
         logger.info("running ScriptTest: " + this);

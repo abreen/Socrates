@@ -1,5 +1,6 @@
 package io.breen.socrates.immutable.test.implementation.python;
 
+import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.python.Function;
 import io.breen.socrates.immutable.file.python.PythonFile;
 import io.breen.socrates.immutable.submission.Submission;
@@ -47,7 +48,7 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
     }
 
     @Override
-    public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission)
+    public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission, Criteria criteria)
             throws CannotBeAutomatedException, AutomationFailureException
     {
         Function func = parent.getFunctionForTest(this);

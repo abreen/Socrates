@@ -75,7 +75,7 @@ public class MainController {
                                     node.setAutomationStage(AutomationStage.STARTED);
                                     try {
                                         boolean passed = test.shouldPass(
-                                                file, submitted, submission
+                                                file, submitted, submission, criteria
                                         );
 
                                         if (passed) node.setResult(TestResult.PASSED);

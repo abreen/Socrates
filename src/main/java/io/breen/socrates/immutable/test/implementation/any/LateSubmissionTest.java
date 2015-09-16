@@ -1,5 +1,6 @@
 package io.breen.socrates.immutable.test.implementation.any;
 
+import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
@@ -27,7 +28,8 @@ public class LateSubmissionTest extends Test implements Automatable {
     }
 
     @Override
-    public boolean shouldPass(File parent, SubmittedFile target, Submission submission)
+    public boolean shouldPass(File parent, SubmittedFile target, Submission submission,
+                              Criteria criteria)
             throws CannotBeAutomatedException
     {
         if (target.receipt == null) throw new CannotBeAutomatedException();

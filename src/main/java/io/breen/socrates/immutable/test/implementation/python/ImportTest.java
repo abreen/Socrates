@@ -1,5 +1,6 @@
 package io.breen.socrates.immutable.test.implementation.python;
 
+import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.file.python.PythonFile;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
@@ -20,7 +21,8 @@ public class ImportTest extends Test implements Automatable<PythonFile> {
     }
 
     @Override
-    public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission)
+    public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission,
+                              Criteria criteria)
             throws CannotBeAutomatedException, AutomationFailureException
     {
         try (PythonInspector inspector = new PythonInspector(target.fullPath)) {
