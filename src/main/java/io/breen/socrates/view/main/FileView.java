@@ -5,7 +5,6 @@ import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import io.breen.socrates.model.wrapper.UnrecognizedFileWrapperNode;
-import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.util.Configuration;
 
 import javax.swing.*;
@@ -16,7 +15,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -30,9 +28,9 @@ public class FileView {
     }
 
     private static Logger logger = Logger.getLogger(FileView.class.getName());
-    public final Action defaultTheme;
-    public final Action base16Light;
-    public final Action base16Dark;
+    //    public final Action defaultTheme;
+    //    public final Action base16Light;
+    //    public final Action base16Dark;
     private Configuration config;
     private SubmittedFile currentFile;
     private JEditorPane editor;
@@ -40,29 +38,29 @@ public class FileView {
     private JScrollPane scrollPane;
 
     public FileView(MenuBarManager menuBar, SubmissionTree submissionTree) {
-        defaultTheme = new AbstractAction(menuBar.defaultTheme.getText()) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeTheme(ThemeType.DEFAULT);
-            }
-        };
-        menuBar.defaultTheme.setAction(defaultTheme);
-
-        base16Light = new AbstractAction(menuBar.base16Light.getText()) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeTheme(ThemeType.BASE16_LIGHT);
-            }
-        };
-        menuBar.base16Light.setAction(base16Light);
-
-        base16Dark = new AbstractAction(menuBar.base16Dark.getText()) {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                changeTheme(ThemeType.BASE16_DARK);
-            }
-        };
-        menuBar.base16Dark.setAction(base16Dark);
+        //        defaultTheme = new AbstractAction(menuBar.defaultTheme.getText()) {
+        //            @Override
+        //            public void actionPerformed(ActionEvent e) {
+        //                changeTheme(ThemeType.DEFAULT);
+        //            }
+        //        };
+        //        menuBar.defaultTheme.setAction(defaultTheme);
+        //
+        //        base16Light = new AbstractAction(menuBar.base16Light.getText()) {
+        //            @Override
+        //            public void actionPerformed(ActionEvent e) {
+        //                changeTheme(ThemeType.BASE16_LIGHT);
+        //            }
+        //        };
+        //        menuBar.base16Light.setAction(base16Light);
+        //
+        //        base16Dark = new AbstractAction(menuBar.base16Dark.getText()) {
+        //            @Override
+        //            public void actionPerformed(ActionEvent e) {
+        //                changeTheme(ThemeType.BASE16_DARK);
+        //            }
+        //        };
+        //        menuBar.base16Dark.setAction(base16Dark);
 
         submissionTree.addTreeSelectionListener(
                 new TreeSelectionListener() {
@@ -95,12 +93,12 @@ public class FileView {
     }
 
     private void createUIComponents() {
-        DefaultSyntaxKit.initKit();
+        //        DefaultSyntaxKit.initKit();
 
-        config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
+        //        config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
         editor = new JEditorPane();
 
-        changeTheme(ThemeType.DEFAULT);
+        //        changeTheme(ThemeType.DEFAULT);
 
         scrollPane = new JScrollPane(editor);
         if (Globals.operatingSystem == Globals.OS.OSX) {

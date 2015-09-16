@@ -18,6 +18,7 @@
             <constraints/>
             <properties>
               <editable value="false"/>
+              <font name="Monospaced"/>
               <minimumSize width="300" height="-1"/>
             </properties>
           </component>
