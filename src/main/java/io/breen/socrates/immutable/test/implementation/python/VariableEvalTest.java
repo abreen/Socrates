@@ -41,7 +41,7 @@ public class VariableEvalTest extends VariableTest implements Automatable<Python
 
         try (PythonInspector inspector = new PythonInspector(target.fullPath)) {
             inspector.openModule(parent.getModuleName());
-            Object value = inspector.variableEval(var.name);
+            PythonInspector.PythonObject value = inspector.variableEval(var.name);
             return PythonInspector.equals(this.value, value);
 
         } catch (IOException | XmlRpcException x) {

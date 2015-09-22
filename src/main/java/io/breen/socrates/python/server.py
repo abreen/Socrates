@@ -35,10 +35,11 @@ def _wrap(func):
         log('kwargs: ' + str(kwargs))
 
         try:
-            return {'error': False, 'result': func(*args, **kwargs)}
+            result = func(*args, **kwargs)
+            return {'error': False, 'result': result, 'type': type(result).__name__}
         except BaseException as e:
             log('exception: ' + str(e))
-            return {'error': True, 'errorType': str(type(e).__name__), 'errorMessage': str(e)}
+            return {'error': True, 'errorType': type(e).__name__, 'errorMessage': str(e)}
 
     return inner
 

@@ -96,7 +96,7 @@ public class PythonInspector implements AutoCloseable {
             } catch (IllegalThreadStateException ignored) {}
 
             try {
-                if (hello().equals(Boolean.TRUE)) { // connected
+                if (hello()) { // connected
                     break;
                 } else {
                     logger.severe("did not get true from hello() call");
@@ -112,7 +112,7 @@ public class PythonInspector implements AutoCloseable {
         logger.info("waited " + ms + " ms for XML-RPC server");
     }
 
-    private static Object getResult(Object response) throws PythonError {
+    private static PythonObject getPythonObject(Object response) throws PythonError {
         Map<String, Object> map = (Map<String, Object>)response;
         boolean error = (boolean)map.get("error");
         if (error) {
@@ -121,44 +121,52 @@ public class PythonInspector implements AutoCloseable {
             throw new PythonError(type, message);
         }
 
-        return map.get("result");
+        Object value = map.get("result");
+        String type = (String)map.get("type");
+        return new PythonObject(value, type);
     }
 
-    public static boolean equals(Object expected, Object other) throws IllegalArgumentException {
+    public static boolean equals(Object expected, PythonObject other) {
         if (expected == null) {
-            return other == null;
+            return other.value == null;
 
         } else if (expected instanceof Number) {
             Number n = (Number)expected;
-            if (other == null || !(other instanceof Number)) return false;
 
-            Number o = (Number)other;
-            return n.doubleValue() == o.doubleValue();
+            if (other == null || !other.type.equals("int") && !other.type.equals("float"))
+                return false;
+
+            return n.doubleValue() == other.value;
 
         } else if (expected instanceof String) {
             String s = (String)expected;
-            if (other == null || !(other instanceof String)) return false;
-            return s.equals(other);
+
+            if (other == null || !other.type.equals("str")) return false;
+
+            return s.equals(other.value);
 
         } else if (expected instanceof List) {
             List list = (List)expected;
-            if (other == null) return false;
 
-            if (other instanceof Object[]) {
-                Object[] objArr = (Object[])other;
-                for (int i = 0; i < objArr.length; i++) {
-                    if (!list.get(i).equals(objArr[i])) return false;
-                }
-                return true;
+            if (other == null || !other.type.equals("list")) return false;
+
+            if (!(other.value instanceof Object[])) return false;
+
+            Object[] objArr = (Object[])other.value;
+            for (int i = 0; i < objArr.length; i++) {
+                if (!list.get(i).equals(objArr[i])) return false;
             }
 
-            return list.equals(other);
+            return true;
 
         } else if (expected instanceof Map) {
             Map map = (Map)expected;
-            if (other == null || !(other instanceof Map)) return false;
-            return map.equals(other);
 
+            if (other == null || !other.type.equals("dict")) return false;
+
+            if (!(other.value instanceof Map)) return false;
+
+            return map.equals(other);
         }
 
         throw new IllegalArgumentException();
@@ -169,12 +177,12 @@ public class PythonInspector implements AutoCloseable {
         process.destroy();
     }
 
-    public Object hello() throws XmlRpcException, PythonError {
+    public boolean hello() throws XmlRpcException, PythonError {
         Object response = client.execute(
                 RPCMethod.HELLO.methodString, new Object[] {}
         );
 
-        return getResult(response);
+        return (boolean)getPythonObject(response).value;
     }
 
     public void openModule(String moduleName) throws XmlRpcException, PythonError {
@@ -182,15 +190,15 @@ public class PythonInspector implements AutoCloseable {
                 RPCMethod.MODULE_OPEN.methodString, new Object[] {moduleName}
         );
 
-        Object result = getResult(response);
+        getPythonObject(response);
     }
 
-    public Object variableEval(String variableName) throws XmlRpcException, PythonError {
+    public PythonObject variableEval(String variableName) throws XmlRpcException, PythonError {
         Object response = client.execute(
                 RPCMethod.VARIABLE_EVAL.methodString, new Object[] {variableName}
         );
 
-        return getResult(response);
+        return getPythonObject(response);
     }
 
     public boolean moduleHasVariable(String variableName) throws XmlRpcException, PythonError {
@@ -198,7 +206,7 @@ public class PythonInspector implements AutoCloseable {
                 RPCMethod.MODULE_HASVARIABLE.methodString, new Object[] {variableName}
         );
 
-        return (boolean)getResult(response);
+        return (boolean)getPythonObject(response).value;
     }
 
     public boolean moduleHasFunction(String functionName) throws XmlRpcException, PythonError {
@@ -206,10 +214,10 @@ public class PythonInspector implements AutoCloseable {
                 RPCMethod.MODULE_HASFUNCTION.methodString, new Object[] {functionName}
         );
 
-        return (boolean)getResult(response);
+        return (boolean)getPythonObject(response).value;
     }
 
-    public Object functionEval(String functionName, List<Object> args)
+    public PythonObject functionEval(String functionName, List<Object> args)
             throws XmlRpcException, PythonError
     {
         Object response = client.execute(
@@ -217,6 +225,17 @@ public class PythonInspector implements AutoCloseable {
                 new Object[] {functionName, args, new HashMap<>()}
         );
 
-        return getResult(response);
+        return getPythonObject(response);
+    }
+
+    public static class PythonObject {
+
+        public final Object value;
+        public final String type;
+
+        public PythonObject(Object value, String type) {
+            this.value = value;
+            this.type = type;
+        }
     }
 }

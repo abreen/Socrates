@@ -62,7 +62,7 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
             for (String parameter : func.parameters)
                 args.add(arguments.get(parameter));
 
-            Object returnValue = inspector.functionEval(func.name, args);
+            PythonInspector.PythonObject returnValue = inspector.functionEval(func.name, args);
 
             return PythonInspector.equals(this.value, returnValue);
 
