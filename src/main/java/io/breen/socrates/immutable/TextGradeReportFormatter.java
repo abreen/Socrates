@@ -64,7 +64,8 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
         double earnedPoints = 0.0;
         for (File file : criteria.files) {
             totalPoints += file.pointValue;
-            earnedPoints += file.pointValue;
+
+            double earnedThisFile = file.pointValue;
 
             w.append(file.path);
             w.append(" (");
@@ -75,11 +76,11 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
 
             SubmittedFileWrapperNode sfwn = map.get(file);
             if (sfwn == null) {
-                earnedPoints -= file.pointValue;
                 w.append("not submitted");
                 line(w);
                 line(w);
                 line(w);
+                // don't add to earnedPoints
                 continue;
             }
 
@@ -95,13 +96,38 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
 
             List<Deduction> ds = getDeductions((TestGroupWrapperNode)sfwn.treeModel.getRoot());
             for (Deduction d : ds) {
-                earnedPoints -= d.points;
-                w.append(d.toString());
+                double thisDeduction = d.points;
+
+                if (d.points > earnedThisFile) {
+                    thisDeduction = earnedThisFile;
+                    earnedThisFile = 0.0;
+                } else if (d.points == earnedThisFile) {
+                    thisDeduction = 0.0;
+                    earnedThisFile = 0.0;
+                } else {
+                    earnedThisFile -= d.points;
+                }
+
+                StringBuilder builder = new StringBuilder();
+                builder.append("-");
+                builder.append(thisDeduction);
+                builder.append("\t");
+                builder.append(d.description);
+
+                if (d.notes.length() > 0) {
+                    builder.append("\n\n\tGrader notes: ");
+                    builder.append(d.notes);
+                    builder.append("\n");
+                }
+
+                w.append(builder.toString());
                 line(w);
             }
 
             line(w);
             line(w);
+
+            earnedPoints += earnedThisFile;
         }
 
         w.append("total: ");
