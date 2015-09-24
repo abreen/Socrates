@@ -77,7 +77,7 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
 
     @Override
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> event) {
-        boolean unfinishedBefore = finished.containsValue(false);
+        boolean notCompleteBefore = !isComplete();
 
         if (event instanceof ResultChangedEvent) {
             ResultChangedEvent e = (ResultChangedEvent)event;
@@ -99,15 +99,15 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
             }
         }
 
-        boolean unfinishedAfter = finished.containsValue(false);
+        boolean notCompleteAfter = !isComplete();
 
         FileCompletedChangeEvent e;
-        if (unfinishedBefore && !unfinishedAfter) {
+        if (notCompleteBefore && !notCompleteAfter) {
             e = new FileCompletedChangeEvent(this, true);
             for (Observer<SubmittedFileWrapperNode> o : observers)
                 o.objectChanged(e);
 
-        } else if (!unfinishedBefore && unfinishedAfter) {
+        } else if (!notCompleteBefore && notCompleteAfter) {
             e = new FileCompletedChangeEvent(this, false);
             for (Observer<SubmittedFileWrapperNode> o : observers)
                 o.objectChanged(e);
@@ -125,7 +125,7 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
     }
 
     public boolean isComplete() {
-        return !finished.containsValue(false);
+        return finished.isEmpty() || !finished.containsValue(false);
     }
 
     public void resetAllTests() {

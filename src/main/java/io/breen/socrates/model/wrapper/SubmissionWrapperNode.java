@@ -41,11 +41,17 @@ public class SubmissionWrapperNode extends DefaultMutableTreeNode
     @Override
     public void add(MutableTreeNode newChild) {
         if (newChild instanceof SubmittedFileWrapperNode) {
+            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)newChild;
+
             super.add(newChild);
-            unfinishedFiles.add((SubmittedFileWrapperNode)newChild);
-            ((SubmittedFileWrapperNode)newChild).addObserver(this);
+
+            if (!sfwn.isComplete()) unfinishedFiles.add(sfwn);
+
+            sfwn.addObserver(this);
+
         } else if (newChild instanceof UnrecognizedFileWrapperNode) {
             super.add(newChild);
+
         } else {
             throw new IllegalArgumentException();
         }
