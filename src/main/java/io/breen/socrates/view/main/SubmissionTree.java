@@ -466,7 +466,7 @@ public class SubmissionTree implements Observer {
                                     setText(
                                             "<html>" + text + " <font color=\"" + statusHex +
                                                     "\">" +
-                                                    "(complete, unsaved)</font></html>"
+                                                    "(complete, <b>unsaved</b>)</font></html>"
                                     );
                                 }
 
