@@ -20,6 +20,25 @@
           </component>
         </children>
       </scrollpane>
+      <grid id="940dd" binding="navPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="c5f7b" class="javax.swing.JButton" binding="previousButton">
+            <constraints/>
+            <properties>
+              <text value="Previous"/>
+            </properties>
+          </component>
+          <component id="3b35c" class="javax.swing.JButton" binding="nextButton">
+            <constraints/>
+            <properties>
+              <text value="Next"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
 </form>

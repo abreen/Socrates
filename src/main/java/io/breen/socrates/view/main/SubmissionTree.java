@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class SubmissionTree implements Observer<SubmissionWrapperNode> {
+public class SubmissionTree implements Observer {
 
     private static Logger logger = Logger.getLogger(SubmissionTree.class.getName());
     public final Action resetAllTests;
@@ -422,30 +422,54 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                                 tree, value, selected, expanded, isLeaf, row, focused
                         );
 
-                        Font normal = Font.decode("Dialog");
-                        Font italic = Font.decode("Dialog-ITALIC");
-                        Color inactive = UIManager.getColor("textInactiveText");
+                        final Color selectedText = UIManager.getColor("textHighlight");
+                        final Color inactive = UIManager.getColor("textInactiveText");
 
-                        setFont(normal);
-
-                        if (!selected) {
-                            if (value instanceof UnrecognizedFileWrapperNode) {
-                                setForeground(inactive);
-
-                            } else if (value instanceof SubmittedFileWrapperNode) {
-                                SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
-
-                                if (sfwn.isComplete()) setForeground(Globals.GREEN);
-
-                            } else if (value instanceof SubmissionWrapperNode) {
-                                SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
-                                if (swn.isComplete()) setForeground(Globals.GREEN);
-                            }
+                        String statusHex;
+                        if (selected) {
+                            statusHex = DefaultTheme.toHex(selectedText);
+                        } else {
+                            statusHex = DefaultTheme.toHex(inactive);
                         }
 
-                        if (value instanceof SubmissionWrapperNode) {
+                        if (value instanceof UnrecognizedFileWrapperNode) {
+                            setForeground(inactive);
+
+                        } else if (value instanceof SubmittedFileWrapperNode) {
+                            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
+
+                            String text = getText();
+                            if (sfwn.isComplete()) {
+                                setText(
+                                        "<html>" + text + " <font color=\"" + statusHex + "\">" +
+                                                "(complete)</font></html>"
+                                );
+                            } else {
+                                setText(text);
+                            }
+
+                        } else if (value instanceof SubmissionWrapperNode) {
                             SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
-                            if (swn.isComplete() && !swn.isSaved()) setFont(italic);
+
+                            String text = getText();
+                            if (swn.isComplete()) {
+                                if (swn.isSaved()) {
+                                    setText(
+                                            "<html>" + text + " <font color=\"" + statusHex +
+                                                    "\">" +
+                                                    "(complete)</font></html>"
+                                    );
+                                } else {
+                                    setText(
+                                            "<html>" + text + " <font color=\"" + statusHex +
+                                                    "\">" +
+                                                    "(complete, unsaved)</font></html>"
+                                    );
+                                }
+
+                            } else {
+                                setText(text);
+                            }
                         }
 
                         return this;
@@ -508,8 +532,13 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
                 SubmittedFile sf = p.first;
                 File f = p.second;
 
-                if (f == null) unrecognized.add(new UnrecognizedFileWrapperNode(sf));
-                else recognized.add(new SubmittedFileWrapperNode(sf, f));
+                if (f == null) {
+                    unrecognized.add(new UnrecognizedFileWrapperNode(sf));
+                } else {
+                    SubmittedFileWrapperNode newSFWN = new SubmittedFileWrapperNode(sf, f);
+                    newSFWN.addObserver(this);
+                    recognized.add(newSFWN);
+                }
             }
 
             for (MutableTreeNode r : recognized)
@@ -611,8 +640,16 @@ public class SubmissionTree implements Observer<SubmissionWrapperNode> {
     }
 
     @Override
-    public void objectChanged(ObservableChangedEvent<SubmissionWrapperNode> event) {
-        getModel().nodeChanged(event.source);
+    public void objectChanged(ObservableChangedEvent event) {
+        if (event.source instanceof SubmissionWrapperNode) {
+            SubmissionWrapperNode swn = (SubmissionWrapperNode)event.source;
+            getModel().nodeChanged(swn);
+
+        } else if (event.source instanceof SubmittedFileWrapperNode) {
+            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)event.source;
+            getModel().nodeChanged(sfwn);
+
+        }
 
         if (event instanceof SubmissionCompletedChangeEvent) {
             SubmissionCompletedChangeEvent e = (SubmissionCompletedChangeEvent)event;

@@ -219,11 +219,23 @@ public class TestControls implements Observer<TestWrapperNode> {
 
         /*
          * The menu item text for the menu item Actions are too long for our buttons, so we
-         * override the text from each Action here.
+         * override the text from each Action here. To emphasize use of shortcuts, we will also
+         * show the accelerator key shortcuts for passing and failing tests on the buttons.
          */
-        passButton.setText("Pass");
-        failButton.setText("Fail");
         resetButton.setText("Reset");
+
+        if (Globals.operatingSystem == Globals.OS.OSX) {
+            passButton.setText("Pass (⌘↑)");
+            failButton.setText("Fail (⌘↓)");
+
+        } else if (Globals.operatingSystem == Globals.OS.WINDOWS) {
+            passButton.setText("Pass (Ctrl + ↑)");
+            failButton.setText("Fail (Ctrl + ↓)");
+
+        } else {
+            passButton.setText("Pass");
+            failButton.setText("Fail");
+        }
     }
 
     public static TestIcon newIcon(TestWrapperNode node) {

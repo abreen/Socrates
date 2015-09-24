@@ -28,6 +28,9 @@ public class TestTree implements Observer<TestWrapperNode> {
     private JPanel rootPanel;
     private JScrollPane scrollPane;
     private JTree tree;
+    private JPanel navPanel;
+    private JButton previousButton;
+    private JButton nextButton;
 
     public TestTree(MenuBarManager menuBar, SubmissionTree submissionTree) {
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -45,6 +48,7 @@ public class TestTree implements Observer<TestWrapperNode> {
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl)
         );
         menuBar.nextTest.setAction(nextTest);
+        nextButton.setAction(nextTest);
 
         previousTest = new AbstractAction(menuBar.previousTest.getText()) {
             @Override
@@ -57,6 +61,25 @@ public class TestTree implements Observer<TestWrapperNode> {
                 Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl)
         );
         menuBar.previousTest.setAction(previousTest);
+        previousButton.setAction(previousTest);
+
+        /*
+         * By default, the nextButton and previousButton labels will be set to the Action's text
+         * when we use setAction(), but we just want "Next" and "Previous" here. We also want
+         * to append the accelerator key shortcut to emphasize use of the shortcuts.
+         */
+        if (Globals.operatingSystem == Globals.OS.OSX) {
+            nextButton.setText("Next (⌘→)");
+            previousButton.setText("Previous (⌘←)");
+
+        } else if (Globals.operatingSystem == Globals.OS.WINDOWS) {
+            nextButton.setText("Next (Ctrl + →)");
+            previousButton.setText("Previous (Ctrl + ←)");
+
+        } else {
+            nextButton.setText("Next");
+            previousButton.setText("Previous");
+        }
 
         submissionTree.addTreeSelectionListener(
                 new TreeSelectionListener() {
