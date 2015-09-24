@@ -26,6 +26,9 @@ import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * Note: this class observes both SubmittedFileWrapperNodes and SubmissionWrapperNodes.
+ */
 public class SubmissionTree implements Observer {
 
     private static Logger logger = Logger.getLogger(SubmissionTree.class.getName());
