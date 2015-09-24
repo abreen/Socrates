@@ -17,4 +17,10 @@ public class SubmissionCompletedChangeEvent extends ObservableChangedEvent<Submi
         super(source);
         this.isNowComplete = isNowComplete;
     }
+
+    @Override
+    public String toString() {
+        return "SubmissionCompletedChangeEvent(source=" + source + ", isNowComplete=" +
+                isNowComplete + ")";
+    }
 }

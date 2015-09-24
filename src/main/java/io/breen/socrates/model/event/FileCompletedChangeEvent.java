@@ -15,4 +15,10 @@ public class FileCompletedChangeEvent extends ObservableChangedEvent<SubmittedFi
         super(source);
         this.isNowComplete = isNowComplete;
     }
+
+    @Override
+    public String toString() {
+        return "FileCompletedChangeEvent(source=" + source + ", isNowComplete=" + isNowComplete +
+                ")";
+    }
 }
