@@ -130,13 +130,23 @@ public class PythonInspector implements AutoCloseable {
         if (expected == null) {
             return other.value == null;
 
-        } else if (expected instanceof Number) {
-            Number n = (Number)expected;
+        } else if (expected instanceof Boolean) {
+            Boolean b = (Boolean)expected;
 
-            if (other == null || !other.type.equals("int") && !other.type.equals("float"))
+            if (other == null || !other.type.equals("bool")) return false;
+
+            return b.equals(other.value);
+
+        } else if (expected instanceof Number) {
+            Double expectedDouble = ((Number)expected).doubleValue();
+
+            if (other == null || (!other.type.equals("int") && !other.type.equals("float")))
                 return false;
 
-            return n.doubleValue() == other.value;
+            Number otherNumber = (Number)other.value;
+            Double otherDouble = otherNumber.doubleValue();
+
+            return expectedDouble.equals(otherDouble);
 
         } else if (expected instanceof String) {
             String s = (String)expected;
