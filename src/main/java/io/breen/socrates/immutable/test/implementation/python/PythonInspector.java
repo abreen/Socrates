@@ -73,6 +73,7 @@ public class PythonInspector implements AutoCloseable {
 
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(XMLRPCURL);
+        config.setEnabledForExtensions(true);
 
         client = new XmlRpcClient();
         client.setConfig(config);

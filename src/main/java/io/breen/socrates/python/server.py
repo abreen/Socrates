@@ -1,4 +1,5 @@
 import os
+import re
 import importlib
 import inspect
 from xmlrpc.server import SimpleXMLRPCServer
@@ -8,6 +9,8 @@ LOGGING = False
 LOG_FILE = open('server.log', 'a') if LOGGING else None
 PORT = 45003
 PATH = '/xmlrpc'
+NIL_PATTERN = re.compile(r'<nil ?/>')
+NIL_ELEMENT = r'<ex:nil xmlns:ex="http://ws.apache.org/xmlrpc/namespaces/extensions" />'
 
 module_name = None
 module = None
@@ -134,11 +137,19 @@ def method_eval(object_identifier, method_name, args, kwargs):
     return method(*args, **kwargs)
 
 
-class RequestHandler(SimpleXMLRPCRequestHandler):
+class MyRequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = (PATH,)
 
 
-server = SimpleXMLRPCServer(('127.0.0.1', PORT), requestHandler=RequestHandler)
+class MyXMLRPCServer(SimpleXMLRPCServer):
+    def _marshaled_dispatch(self, data, dispatch_method=None, path=None):
+        marshaled = super()._marshaled_dispatch(data, dispatch_method, path)
+        marshaled_str = marshaled.decode(self.encoding)
+        marshaled_str = re.sub(NIL_PATTERN, NIL_ELEMENT, marshaled_str)
+        return marshaled_str.encode(self.encoding)
+
+
+server = MyXMLRPCServer(('127.0.0.1', PORT), requestHandler=MyRequestHandler, allow_none=True)
 
 d = dict(globals(), **locals())
 for name, value in d.items():
