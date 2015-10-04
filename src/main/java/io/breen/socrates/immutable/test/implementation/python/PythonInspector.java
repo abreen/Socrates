@@ -164,6 +164,9 @@ public class PythonInspector implements AutoCloseable {
             if (!(other.value instanceof Object[])) return false;
 
             Object[] objArr = (Object[])other.value;
+
+            if (list.size() != objArr.length) return false;
+
             for (int i = 0; i < objArr.length; i++) {
                 if (!list.get(i).equals(objArr[i])) return false;
             }
