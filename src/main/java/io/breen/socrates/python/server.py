@@ -7,7 +7,7 @@ import inspect
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 
-LOGGING = True
+LOGGING = False
 LOG_FILE = open('server.log', 'a') if LOGGING else None
 PATH = '/xmlrpc'
 NIL_PATTERN = re.compile(r'<nil ?/>')
