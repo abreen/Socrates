@@ -49,7 +49,13 @@ def _wrap(func):
 
 
 def hello():
+    log('got hello message')
     return True
+
+
+def goodbye():
+    log('got goodbye message')
+    sys.exit(0)
 
 
 def module_open(name):

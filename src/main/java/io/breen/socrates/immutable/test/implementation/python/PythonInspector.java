@@ -28,6 +28,7 @@ public class PythonInspector implements AutoCloseable {
 
     private enum RPCMethod {
         HELLO("hello"),
+        GOODBYE("goodbye"),
         MODULE_OPEN("module.open"),
         MODULE_HASCLASS("module.hasClass"),
         MODULE_HASFUNCTION("module.hasFunction"),
@@ -70,6 +71,15 @@ public class PythonInspector implements AutoCloseable {
         builder = new PythonProcessBuilder(PythonManager.XMLRPCServer, Integer.toString(port));
         builder.setDirectory(targetModulePath.getParent());
         process = builder.start();
+
+        try {
+            int exitValue = process.exitValue();
+            logger.severe("XMLRPC process exited with code " + exitValue);
+            throw new IOException("XMLRPC process exited");
+
+        } catch (IllegalThreadStateException ignored) {
+            // a good sign: the process is running
+        }
 
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         config.setServerURL(url);
@@ -188,6 +198,12 @@ public class PythonInspector implements AutoCloseable {
 
     @Override
     public void close() {
+        try {
+            goodbye();
+        } catch (XmlRpcException x) {
+            logger.severe("XMLRPC error sending goodbye message");
+        }
+
         process.destroy();
     }
 
@@ -197,6 +213,12 @@ public class PythonInspector implements AutoCloseable {
         );
 
         return (boolean)getPythonObject(response).value;
+    }
+
+    public void goodbye() throws XmlRpcException {
+        client.execute(
+                RPCMethod.GOODBYE.methodString, new Object[] {}
+        );
     }
 
     public void openModule(String moduleName) throws XmlRpcException, PythonError {
