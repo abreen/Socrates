@@ -58,7 +58,7 @@ public class PythonInspector implements AutoCloseable {
         if (!Files.isRegularFile(targetModulePath))
             throw new IllegalArgumentException("module path must be a path to a file");
 
-        int port = 45000;
+        int port = 45000 + (int)(Math.random() * 1000);
 
         URL url;
         try {
@@ -200,9 +200,7 @@ public class PythonInspector implements AutoCloseable {
     public void close() {
         try {
             goodbye();
-        } catch (XmlRpcException x) {
-            logger.severe("XMLRPC error sending goodbye message");
-        }
+        } catch (XmlRpcException ignored) {}
 
         process.destroy();
     }

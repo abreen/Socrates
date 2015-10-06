@@ -7,7 +7,7 @@ import inspect
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
 
-LOGGING = False
+LOGGING = True
 LOG_FILE = open('server.log', 'a') if LOGGING else None
 PATH = '/xmlrpc'
 NIL_PATTERN = re.compile(r'<nil ?/>')
@@ -41,6 +41,9 @@ def _wrap(func):
         try:
             result = func(*args, **kwargs)
             return {'error': False, 'result': result, 'type': type(result).__name__}
+        except SystemExit:
+            log('exiting')
+            sys.exit(0)
         except BaseException as e:
             log('exception: ' + str(e))
             return {'error': True, 'errorType': type(e).__name__, 'errorMessage': str(e)}
@@ -49,13 +52,11 @@ def _wrap(func):
 
 
 def hello():
-    log('got hello message')
     return True
 
 
 def goodbye():
-    log('got goodbye message')
-    sys.exit(0)
+    raise SystemExit
 
 
 def module_open(name):
