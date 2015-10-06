@@ -43,6 +43,15 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
     }
 
     @Override
+    public String toString() {
+        return "FunctionEvalTest(" +
+                "value=" + value + ", " +
+                "output=" + output + ", " +
+                "input=" + input + ", " +
+                "arguments=" + arguments + ")";
+    }
+
+    @Override
     public String getTestTypeName() {
         return "function evaluation";
     }

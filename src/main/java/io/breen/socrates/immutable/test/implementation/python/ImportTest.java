@@ -16,6 +16,11 @@ public class ImportTest extends Test implements Automatable<PythonFile> {
     }
 
     @Override
+    public String toString() {
+        return "ImportTest()";
+    }
+
+    @Override
     public String getTestTypeName() {
         return "import check";
     }

@@ -27,6 +27,12 @@ public class VariableEvalTest extends VariableTest implements Automatable<Python
     }
 
     @Override
+    public String toString() {
+        return "FunctionEvalTest(" +
+                "value=" + value + ")";
+    }
+
+    @Override
     public String getTestTypeName() {
         return "variable evaluation";
     }

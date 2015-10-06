@@ -20,6 +20,11 @@ public class FunctionExistsTest extends FunctionTest implements Automatable<Pyth
     }
 
     @Override
+    public String toString() {
+        return "FunctionExistsTest(function=" + function + ")";
+    }
+
+    @Override
     public String getTestTypeName() {
         return "function check";
     }
