@@ -1,3 +1,5 @@
+import sys
+
 import os
 import re
 import importlib
@@ -7,7 +9,6 @@ from xmlrpc.server import SimpleXMLRPCRequestHandler
 
 LOGGING = False
 LOG_FILE = open('server.log', 'a') if LOGGING else None
-PORT = 45003
 PATH = '/xmlrpc'
 NIL_PATTERN = re.compile(r'<nil ?/>')
 NIL_ELEMENT = r'<ex:nil xmlns:ex="http://ws.apache.org/xmlrpc/namespaces/extensions" />'
@@ -148,8 +149,17 @@ class MyXMLRPCServer(SimpleXMLRPCServer):
         marshaled_str = re.sub(NIL_PATTERN, NIL_ELEMENT, marshaled_str)
         return marshaled_str.encode(self.encoding)
 
+#
+# start of script
+#
 
-server = MyXMLRPCServer(('127.0.0.1', PORT), requestHandler=MyRequestHandler, allow_none=True)
+if len(sys.argv) != 2:
+    print('server port must be specified', file=sys.stderr)
+    sys.exit(1)
+
+port = int(sys.argv[1])
+
+server = MyXMLRPCServer(('127.0.0.1', port), requestHandler=MyRequestHandler, allow_none=True)
 
 d = dict(globals(), **locals())
 for name, value in d.items():
@@ -157,5 +167,5 @@ for name, value in d.items():
         server.register_function(_wrap(value), name.replace('_', '.'))
         # server.register_function(_wrap(value), name)
 
-log('XML-RPC server started in ' + os.getcwd())
+log('XML-RPC server started in ' + os.getcwd() + ' on port ' + str(port))
 server.serve_forever()

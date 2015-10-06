@@ -48,16 +48,6 @@ public class PythonInspector implements AutoCloseable {
 
     private static Logger logger = Logger.getLogger(PythonInspector.class.getName());
     private static String XMLRPCPath = "/xmlrpc";
-    private static int XMLRPCPort = 45003;
-    private static URL XMLRPCURL = null;
-
-    static {
-        try {
-            XMLRPCURL = new URL("http://127.0.0.1:" + XMLRPCPort + XMLRPCPath);
-        } catch (MalformedURLException e) {
-            logger.severe("bad URL for XML-RPC server: " + e);
-        }
-    }
 
     private final PythonProcessBuilder builder;
     private final Process process;
@@ -67,12 +57,22 @@ public class PythonInspector implements AutoCloseable {
         if (!Files.isRegularFile(targetModulePath))
             throw new IllegalArgumentException("module path must be a path to a file");
 
-        builder = new PythonProcessBuilder(PythonManager.XMLRPCServer);
+        int port = 45000;
+
+        URL url;
+        try {
+            url = new URL("http://127.0.0.1:" + port + XMLRPCPath);
+        } catch (MalformedURLException e) {
+            logger.severe("could not form URL for XML-RPC server: " + e);
+            throw e;
+        }
+
+        builder = new PythonProcessBuilder(PythonManager.XMLRPCServer, Integer.toString(port));
         builder.setDirectory(targetModulePath.getParent());
         process = builder.start();
 
         XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-        config.setServerURL(XMLRPCURL);
+        config.setServerURL(url);
         config.setEnabledForExtensions(true);
 
         client = new XmlRpcClient();
