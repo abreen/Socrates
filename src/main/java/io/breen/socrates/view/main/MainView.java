@@ -56,6 +56,7 @@ public class MainView extends JFrame {
                         }
 
                         dispose();
+                        System.exit(0);
                     }
                 }
         );

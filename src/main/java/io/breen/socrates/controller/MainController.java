@@ -22,6 +22,8 @@ import javax.swing.tree.TreePath;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 public class MainController {
@@ -31,6 +33,8 @@ public class MainController {
     private Criteria criteria;
     private List<Submission> submissions;
 
+    private BlockingQueue<TestTask> tasks;
+
     private MainView mainView;
     private MenuBarManager menuBar;
 
@@ -39,16 +43,19 @@ public class MainController {
         mainView = new MainView(this, menuBar);
         menuBar.setView(mainView);
 
+        tasks = new LinkedBlockingQueue<>();
+
         /*
          * The MainController will listen to the TestTree to see if an automated test
-         * gets selected. If so, this thread will spawn a new thread to run the test.
+         * gets selected. If so, this thread will queue the test in the TestRunner's queue for
+         * execution.
          */
         mainView.testTree.addTreeSelectionListener(
                 new TreeSelectionListener() {
                     @Override
                     public void valueChanged(TreeSelectionEvent e) {
                         TreePath path = e.getPath();
-                        final TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
+                        TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
 
                         Test testObj = (Test)node.getUserObject();
                         if (testObj instanceof Automatable &&
@@ -59,51 +66,72 @@ public class MainController {
                             @SuppressWarnings("unchecked") final Automatable<File> test =
                                     (Automatable<File>)testObj;
 
-                            final SubmittedFile submitted = mainView.submissionTree
+                            SubmittedFile submittedFile = mainView.submissionTree
                                     .getSelectedSubmittedFile();
-                            final File file = criteria.getFileByLocalPath(submitted.localPath);
+                            File file = criteria.getFileByLocalPath(submittedFile.localPath);
 
                             if (file == null) return;
 
                             SubmissionWrapperNode swn = mainView.submissionTree
                                     .getCurrentSubmissionNode();
-                            final Submission submission = (Submission)swn.getUserObject();
+                            Submission submission = (Submission)swn.getUserObject();
 
-                            (new Thread() {
-                                @Override
-                                public void run() {
-                                    node.setAutomationStage(AutomationStage.STARTED);
-                                    try {
-                                        boolean passed = test.shouldPass(
-                                                file, submitted, submission, criteria
-                                        );
+                            tasks.add(
+                                    new TestTask(
+                                            node, test, file, submittedFile, submission
+                                    )
+                            );
 
-                                        if (passed) node.setResult(TestResult.PASSED);
-                                        else node.setResult(TestResult.FAILED);
-
-                                        node.setAutomationStage(
-                                                AutomationStage.FINISHED_NORMAL
-                                        );
-
-                                    } catch (CannotBeAutomatedException x) {
-                                        logger.warning("test cannot be automated: " + test);
-
-                                        node.setAutomationStage(
-                                                AutomationStage.FINISHED_ERROR
-                                        );
-                                    } catch (AutomationFailureException x) {
-                                        logger.warning("failure automating test: " + x.e);
-
-                                        node.setAutomationStage(
-                                                AutomationStage.FINISHED_ERROR
-                                        );
-                                    }
-                                }
-                            }).start();
+                            logger.info("added test task");
                         }
                     }
                 }
         );
+
+        /*
+         * Schedule a thread that runs TestTasks in the queue whenever they appear.
+         */
+        (new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    TestTask t;
+
+                    try {
+                        t = tasks.take();
+                    } catch (InterruptedException x) {
+                        return;
+                    }
+
+                    t.node.setAutomationStage(AutomationStage.STARTED);
+                    try {
+                        boolean passed = t.test.shouldPass(
+                                t.file, t.submittedFile, t.submission, criteria
+                        );
+
+                        if (passed) t.node.setResult(TestResult.PASSED);
+                        else t.node.setResult(TestResult.FAILED);
+
+                        t.node.setAutomationStage(
+                                AutomationStage.FINISHED_NORMAL
+                        );
+
+                    } catch (CannotBeAutomatedException x) {
+                        logger.warning("test cannot be automated: " + t.test);
+
+                        t.node.setAutomationStage(
+                                AutomationStage.FINISHED_ERROR
+                        );
+                    } catch (AutomationFailureException x) {
+                        logger.warning("failure automating test: " + x.e);
+
+                        t.node.setAutomationStage(
+                                AutomationStage.FINISHED_ERROR
+                        );
+                    }
+                }
+            }
+        }).start();
     }
 
     public void start(Path criteriaPath, Criteria criteria, List<Submission> submissions) {
@@ -148,5 +176,24 @@ public class MainController {
             logger.warning("could not save grade report: " + x);
         }
         mainView.setEnabled(true);
+    }
+
+    private class TestTask<T> {
+
+        public final TestWrapperNode node;
+        public final Automatable test;
+        public final File file;
+        public final SubmittedFile submittedFile;
+        public final Submission submission;
+
+        public TestTask(TestWrapperNode node, Automatable test, File file,
+                        SubmittedFile submittedFile, Submission submission)
+        {
+            this.node = node;
+            this.test = test;
+            this.file = file;
+            this.submittedFile = submittedFile;
+            this.submission = submission;
+        }
     }
 }

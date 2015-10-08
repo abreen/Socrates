@@ -79,8 +79,11 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
         TestResult oldResult = this.result;
         this.result = result;
         ResultChangedEvent e = new ResultChangedEvent(this, oldResult, result);
-        for (Observer<TestWrapperNode> o : observers)
-            o.objectChanged(e);
+
+        synchronized (this) {
+            for (Observer<TestWrapperNode> o : observers)
+                o.objectChanged(e);
+        }
     }
 
     public boolean isConstrained() {
@@ -91,8 +94,11 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
         if (constrained == this.constrained) return;
         this.constrained = constrained;
         ConstraintChangedEvent e = new ConstraintChangedEvent(this, constrained);
-        for (Observer<TestWrapperNode> o : observers)
-            o.objectChanged(e);
+
+        synchronized (this) {
+            for (Observer<TestWrapperNode> o : observers)
+                o.objectChanged(e);
+        }
     }
 
     public AutomationStage getAutomationStage() {
@@ -104,17 +110,20 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
         AutomationStage oldStage = this.stage;
         this.stage = stage;
         StageChangedEvent e = new StageChangedEvent(this, oldStage, stage);
-        for (Observer<TestWrapperNode> o : observers)
-            o.objectChanged(e);
+
+        synchronized (this) {
+            for (Observer<TestWrapperNode> o : observers)
+                o.objectChanged(e);
+        }
     }
 
     @Override
-    public void addObserver(Observer<TestWrapperNode> observer) {
+    public synchronized void addObserver(Observer<TestWrapperNode> observer) {
         observers.add(observer);
     }
 
     @Override
-    public void removeObserver(Observer<TestWrapperNode> observer) {
+    public synchronized void removeObserver(Observer<TestWrapperNode> observer) {
         observers.remove(observer);
     }
 }
