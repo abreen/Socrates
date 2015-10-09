@@ -1,8 +1,7 @@
 package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
-import io.breen.socrates.immutable.test.Test;
-import io.breen.socrates.immutable.test.TestGroup;
+import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import io.breen.socrates.model.wrapper.TestWrapperNode;
@@ -23,6 +22,7 @@ import java.util.Enumeration;
 
 public class TestTree implements Observer<TestWrapperNode> {
 
+    public final Action passAllNonAutomated;
     public final Action nextTest;
     public final Action previousTest;
     private JPanel rootPanel;
@@ -36,6 +36,31 @@ public class TestTree implements Observer<TestWrapperNode> {
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
+
+        passAllNonAutomated = new AbstractAction(menuBar.passAllNonAutomated.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DefaultMutableTreeNode root = getRoot();
+                if (root == null) return;
+
+                Enumeration<DefaultMutableTreeNode> bfs = root.breadthFirstEnumeration();
+                while (bfs.hasMoreElements()) {
+                    DefaultMutableTreeNode dmtn = bfs.nextElement();
+                    if (dmtn instanceof TestWrapperNode) {
+                        TestWrapperNode twn = (TestWrapperNode)dmtn;
+                        if (twn.getResult() != TestResult.NONE) continue;
+                        Test t = (Test)twn.getUserObject();
+                        if (!(t instanceof Automatable)) twn.setResult(TestResult.PASSED);
+
+                    }
+                }
+            }
+        };
+        passAllNonAutomated.setEnabled(false);
+        passAllNonAutomated.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_D, ctrl | shift)
+        );
+        menuBar.passAllNonAutomated.setAction(passAllNonAutomated);
 
         nextTest = new AbstractAction(menuBar.nextTest.getText()) {
             @Override
@@ -99,15 +124,21 @@ public class TestTree implements Observer<TestWrapperNode> {
 
                                 update(sfwn.treeModel);
 
-                                if (atLeastOneTestSelectable()) nextTest.setEnabled(true);
-                                else nextTest.setEnabled(false);
+                                if (atLeastOneTestSelectable()) {
+                                    passAllNonAutomated.setEnabled(true);
+                                    nextTest.setEnabled(true);
+                                } else {
+                                    nextTest.setEnabled(false);
+                                }
 
                             } else {
+                                passAllNonAutomated.setEnabled(false);
                                 nextTest.setEnabled(false);
                                 previousTest.setEnabled(false);
                                 reset();
                             }
                         } else {
+                            passAllNonAutomated.setEnabled(false);
                             nextTest.setEnabled(false);
                             previousTest.setEnabled(false);
                             reset();

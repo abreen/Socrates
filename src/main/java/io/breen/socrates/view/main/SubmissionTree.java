@@ -68,7 +68,7 @@ public class SubmissionTree implements Observer {
         };
         resetAllTests.setEnabled(false);
         resetAllTests.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | alt)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | shift)
         );
         menuBar.resetAllTests.setAction(resetAllTests);
 

@@ -30,6 +30,7 @@ public class MenuBarManager {
     public final JMenuItem openFile;
 
     public final JMenuItem passTest;
+    public final JMenuItem passAllNonAutomated;
     public final JMenuItem failTest;
     public final JMenuItem resetTest;
     public final JMenuItem resetAllTests;
@@ -126,6 +127,7 @@ public class MenuBarManager {
         testMenu = new JMenu("Test");
 
         passTest = new JMenuItem("Pass Test");
+        passAllNonAutomated = new JMenuItem("Pass All Non-Automated");
         failTest = new JMenuItem("Fail Test");
         resetTest = new JMenuItem("Reset Test");
         resetAllTests = new JMenuItem("Reset All Tests");
@@ -137,6 +139,7 @@ public class MenuBarManager {
         focusOnNotes = new JMenuItem("Focus on Notes");
 
         testMenu.add(passTest);
+        testMenu.add(passAllNonAutomated);
         testMenu.add(failTest);
         testMenu.add(resetTest);
         testMenu.add(resetAllTests);
