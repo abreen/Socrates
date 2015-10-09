@@ -67,6 +67,9 @@ public class SubmissionTree implements Observer {
             }
         };
         resetAllTests.setEnabled(false);
+        resetAllTests.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | alt)
+        );
         menuBar.resetAllTests.setAction(resetAllTests);
 
         saveGradeReport = new AbstractAction(menuBar.saveGradeReport.getText()) {
@@ -119,7 +122,7 @@ public class SubmissionTree implements Observer {
         };
         nextSubmission.setEnabled(false);
         nextSubmission.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | shift)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_J, ctrl | shift)
         );
         menuBar.nextSubmission.setAction(nextSubmission);
 
@@ -137,7 +140,7 @@ public class SubmissionTree implements Observer {
         };
         previousSubmission.setEnabled(false);
         previousSubmission.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | shift)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, ctrl | shift)
         );
         menuBar.previousSubmission.setAction(previousSubmission);
 
@@ -156,7 +159,7 @@ public class SubmissionTree implements Observer {
         };
         revealSubmission.setEnabled(false);
         revealSubmission.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl | shift)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_V, ctrl | shift)
         );
         menuBar.revealSubmission.setAction(revealSubmission);
 
@@ -182,7 +185,7 @@ public class SubmissionTree implements Observer {
         };
         nextFile.setEnabled(false);
         nextFile.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl | alt)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_J, ctrl | alt)
         );
         menuBar.nextFile.setAction(nextFile);
 
@@ -204,7 +207,7 @@ public class SubmissionTree implements Observer {
         };
         previousFile.setEnabled(false);
         previousFile.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl | alt)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, ctrl | alt)
         );
         menuBar.previousFile.setAction(previousFile);
 

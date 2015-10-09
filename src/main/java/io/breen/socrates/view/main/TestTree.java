@@ -45,7 +45,7 @@ public class TestTree implements Observer<TestWrapperNode> {
         };
         nextTest.setEnabled(false);
         nextTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrl)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_J, ctrl)
         );
         menuBar.nextTest.setAction(nextTest);
         nextButton.setAction(nextTest);
@@ -58,7 +58,7 @@ public class TestTree implements Observer<TestWrapperNode> {
         };
         previousTest.setEnabled(false);
         previousTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrl)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, ctrl)
         );
         menuBar.previousTest.setAction(previousTest);
         previousButton.setAction(previousTest);
@@ -68,15 +68,17 @@ public class TestTree implements Observer<TestWrapperNode> {
          * when we use setAction(), but we just want "Next" and "Previous" here. We also want
          * to append the accelerator key shortcut to emphasize use of the shortcuts.
          */
-        if (Globals.operatingSystem == Globals.OS.OSX) {
-            nextButton.setText("Next (⌘→)");
-            previousButton.setText("Previous (⌘←)");
-
-        } else if (Globals.operatingSystem == Globals.OS.WINDOWS) {
-            nextButton.setText("Next (Ctrl + →)");
-            previousButton.setText("Previous (Ctrl + ←)");
-
-        } else {
+        switch (Globals.operatingSystem) {
+        case OSX:
+            nextButton.setText("Next (⌘J)");
+            previousButton.setText("Previous (⌘K)");
+            break;
+        case WINDOWS:
+        case LINUX:
+            nextButton.setText("Next (Ctrl + J)");
+            previousButton.setText("Previous (Ctrl + K)");
+            break;
+        default:
             nextButton.setText("Next");
             previousButton.setText("Previous");
         }

@@ -113,7 +113,7 @@ public class TestControls implements Observer<TestWrapperNode> {
         };
         passTest.setEnabled(false);
         passTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, ctrl)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_D, ctrl)
         );
         menuBar.passTest.setAction(passTest);
 
@@ -142,7 +142,7 @@ public class TestControls implements Observer<TestWrapperNode> {
         };
         failTest.setEnabled(false);
         failTest.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ctrl)
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_F, ctrl)
         );
         menuBar.failTest.setAction(failTest);
 
@@ -156,6 +156,9 @@ public class TestControls implements Observer<TestWrapperNode> {
             }
         };
         resetTest.setEnabled(false);
+        resetTest.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_R, ctrl)
+        );
         menuBar.resetTest.setAction(resetTest);
 
         clearNotes = new AbstractAction(menuBar.clearNotes.getText()) {
@@ -165,9 +168,6 @@ public class TestControls implements Observer<TestWrapperNode> {
             }
         };
         clearNotes.setEnabled(false);
-        clearNotes.putValue(
-                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_K, ctrl)
-        );
         menuBar.clearNotes.setAction(clearNotes);
 
         focusOnNotes = new AbstractAction(menuBar.focusOnNotes.getText()) {
@@ -224,15 +224,17 @@ public class TestControls implements Observer<TestWrapperNode> {
          */
         resetButton.setText("Reset");
 
-        if (Globals.operatingSystem == Globals.OS.OSX) {
-            passButton.setText("Pass (⌘↑)");
-            failButton.setText("Fail (⌘↓)");
-
-        } else if (Globals.operatingSystem == Globals.OS.WINDOWS) {
-            passButton.setText("Pass (Ctrl + ↑)");
-            failButton.setText("Fail (Ctrl + ↓)");
-
-        } else {
+        switch (Globals.operatingSystem) {
+        case OSX:
+            passButton.setText("Pass (⌘D)");
+            failButton.setText("Fail (⌘F)");
+            break;
+        case WINDOWS:
+        case LINUX:
+            passButton.setText("Pass (Ctrl + D)");
+            failButton.setText("Fail (Ctrl + F)");
+            break;
+        default:
             passButton.setText("Pass");
             failButton.setText("Fail");
         }
