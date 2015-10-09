@@ -3,6 +3,8 @@
     <output-path>$PROJECT_DIR$/out/artifacts/socrates_jar</output-path>
     <root id="archive" name="socrates.jar">
       <element id="module-output" name="socrates" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/lib/jygments.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/lib/jackson-annotations.jar" path-in-jar="/" />
       <element id="extracted-dir" path="/usr/local/lib/python3.4/site-packages/setuptools-12.2-py3.4.egg" path-in-jar="/" />
       <element id="dir-copy" path="/usr/local/lib/python3.4/site-packages" />
       <element id="dir-copy" path="$APPLICATION_PLUGINS_DIR$/python/helpers/python-skeletons" />
@@ -17,6 +19,7 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-httpclient/commons-httpclient/3.0.1/commons-httpclient-3.0.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.0.3/commons-logging-1.0.3.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.2/commons-codec-1.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/lib/jackson.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-cli/commons-cli/1.3.1/commons-cli-1.3.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/reflections/reflections/0.9.10/reflections-0.9.10.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/guava/guava/15.0/guava-15.0.jar" path-in-jar="/" />
@@ -25,6 +28,7 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/yaml/snakeyaml/1.15/snakeyaml-1.15.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/lib/jackson-databind.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
