@@ -28,9 +28,6 @@ public class MenuBarManager {
     public final JMenuItem previousFile;
     //    public final JMenuItem renameFile;          // TODO
     public final JMenuItem openFile;
-    public final JMenuItem defaultTheme;
-    public final JMenuItem base16Light;
-    public final JMenuItem base16Dark;
 
     public final JMenuItem passTest;
     public final JMenuItem failTest;
@@ -114,25 +111,12 @@ public class MenuBarManager {
             openFile.setText("Open with Default Program");
         }
 
-        defaultTheme = new JRadioButtonMenuItem("Default Theme");
-        base16Light = new JRadioButtonMenuItem("Base16 Light Theme");
-        base16Dark = new JRadioButtonMenuItem("Base16 Dark Theme");
-        ButtonGroup themeGroup = new ButtonGroup();
-        themeGroup.add(defaultTheme);
-        themeGroup.add(base16Light);
-        themeGroup.add(base16Dark);
-        themeGroup.setSelected(defaultTheme.getModel(), true);
-
         fileMenu.add(nextFile);
         fileMenu.add(previousFile);
         fileMenu.addSeparator();
         //        fileMenu.add(renameFile);
         //        fileMenu.addSeparator();
         fileMenu.add(openFile);
-        fileMenu.addSeparator();
-        fileMenu.add(defaultTheme);
-        fileMenu.add(base16Light);
-        fileMenu.add(base16Dark);
 
 
         /*

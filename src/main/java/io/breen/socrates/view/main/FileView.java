@@ -1,11 +1,13 @@
 package io.breen.socrates.view.main;
 
+import com.threecrickets.jygments.ResolutionException;
+import com.threecrickets.jygments.format.Formatter;
+import com.threecrickets.jygments.grammar.Lexer;
 import io.breen.socrates.Globals;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import io.breen.socrates.model.wrapper.UnrecognizedFileWrapperNode;
-import jsyntaxpane.util.Configuration;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -15,52 +17,34 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.io.CharArrayWriter;
 import java.io.IOException;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public class FileView {
 
-    public enum ThemeType {
-        DEFAULT,
-        BASE16_LIGHT,
-        BASE16_DARK
-    }
-
     private static Logger logger = Logger.getLogger(FileView.class.getName());
-    //    public final Action defaultTheme;
-    //    public final Action base16Light;
-    //    public final Action base16Dark;
-    private Configuration config;
     private SubmittedFile currentFile;
-    private JEditorPane editor;
+    private Formatter htmlFormatter;
+    private JTextPane textPane;
     private JPanel rootPanel;
     private JScrollPane scrollPane;
 
     public FileView(MenuBarManager menuBar, SubmissionTree submissionTree) {
-        //        defaultTheme = new AbstractAction(menuBar.defaultTheme.getText()) {
-        //            @Override
-        //            public void actionPerformed(ActionEvent e) {
-        //                changeTheme(ThemeType.DEFAULT);
-        //            }
-        //        };
-        //        menuBar.defaultTheme.setAction(defaultTheme);
-        //
-        //        base16Light = new AbstractAction(menuBar.base16Light.getText()) {
-        //            @Override
-        //            public void actionPerformed(ActionEvent e) {
-        //                changeTheme(ThemeType.BASE16_LIGHT);
-        //            }
-        //        };
-        //        menuBar.base16Light.setAction(base16Light);
-        //
-        //        base16Dark = new AbstractAction(menuBar.base16Dark.getText()) {
-        //            @Override
-        //            public void actionPerformed(ActionEvent e) {
-        //                changeTheme(ThemeType.BASE16_DARK);
-        //            }
-        //        };
-        //        menuBar.base16Dark.setAction(base16Dark);
+        textPane.setContentType("text/html");
+
+        /*
+         * See http://elliotth.blogspot.com/2007/10/why-is-my-html-jtextpane-beeping-at-me.html
+         */
+        textPane.getDocument().putProperty("IgnoreCharsetDirective", true);
+
+        scrollPane.setViewportView(textPane);
+
+        try {
+            htmlFormatter = Formatter.getByName("html");
+        } catch (ResolutionException x) {
+            logger.severe("cannot get HTML formatter");
+        }
 
         submissionTree.addTreeSelectionListener(
                 new TreeSelectionListener() {
@@ -94,14 +78,7 @@ public class FileView {
     }
 
     private void createUIComponents() {
-        //        DefaultSyntaxKit.initKit();
-
-        //        config = DefaultSyntaxKit.getConfig(DefaultSyntaxKit.class);
-        editor = new JEditorPane();
-
-        //        changeTheme(ThemeType.DEFAULT);
-
-        scrollPane = new JScrollPane(editor);
+        scrollPane = new JScrollPane();
         if (Globals.operatingSystem == Globals.OS.OSX) {
             Border border = new LineBorder(new Color(197, 197, 197));
             scrollPane.setBorder(border);
@@ -110,18 +87,23 @@ public class FileView {
 
     /**
      * Update the FileView and show the contents of the current file to the user. If the second
-     * parameter is null, the content type of the file will be set to plain text.
+     * parameter is null, the file will not be syntax highlighted.
      */
     public void update(SubmittedFile submittedFile, File matchingFile) throws IOException {
         if (submittedFile == currentFile) return;
 
-        if (matchingFile == null) {
-            editor.setContentType("text/plain");
-        } else {
-            editor.setContentType(matchingFile.contentType);
-        }
-        editor.setText(submittedFile.getContents());
-        editor.setCaretPosition(0);
+        String contents = submittedFile.getContents(), text = contents;
+
+        try {
+            Lexer lexer = Lexer.getByName(matchingFile != null ? matchingFile.language : null);
+            CharArrayWriter w = new CharArrayWriter();
+            htmlFormatter.format(lexer.getTokens(contents), w);
+            text = w.toString();
+
+        } catch (ResolutionException ignored) {}
+
+        textPane.setText(text);
+        textPane.setCaretPosition(0);
 
         currentFile = submittedFile;
     }
@@ -132,31 +114,6 @@ public class FileView {
 
     public void reset() {
         currentFile = null;
-        editor.setText(null);
-    }
-
-    public void changeTheme(ThemeType t) {
-        Map<String, String> themeEntries;
-
-        switch (t) {
-        case BASE16_LIGHT:
-            editor.setBackground(Base16LightTheme.backgroundColor);
-            editor.setForeground(Base16LightTheme.foregroundColor);
-            themeEntries = Base16LightTheme.map;
-            break;
-        case BASE16_DARK:
-            editor.setBackground(Base16DarkTheme.backgroundColor);
-            editor.setForeground(Base16DarkTheme.foregroundColor);
-            themeEntries = Base16DarkTheme.map;
-            break;
-        case DEFAULT:
-        default:
-            editor.setBackground(DefaultTheme.backgroundColor);
-            editor.setForeground(DefaultTheme.foregroundColor);
-            themeEntries = DefaultTheme.map;
-        }
-
-        for (Map.Entry<String, String> entry : themeEntries.entrySet())
-            config.put(entry.getKey(), entry.getValue());
+        textPane.setText(null);
     }
 }

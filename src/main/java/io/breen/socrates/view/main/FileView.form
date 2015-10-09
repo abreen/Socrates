@@ -9,17 +9,14 @@
     <children>
       <scrollpane id="58b74" binding="scrollPane" custom-create="true">
         <constraints border-constraint="Center"/>
-        <properties>
-          <verticalScrollBarPolicy value="22"/>
-        </properties>
+        <properties/>
         <border type="none"/>
         <children>
-          <component id="1ff80" class="javax.swing.JEditorPane" binding="editor" custom-create="true">
+          <component id="9ecc0" class="javax.swing.JTextPane" binding="textPane">
             <constraints/>
             <properties>
               <editable value="false"/>
-              <font name="Monospaced"/>
-              <minimumSize width="300" height="-1"/>
+              <margin top="0" left="3" bottom="3" right="3"/>
             </properties>
           </component>
         </children>

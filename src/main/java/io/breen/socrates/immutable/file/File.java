@@ -28,10 +28,11 @@ public abstract class File implements Verifiable, PostConstructionAction {
     public double pointValue;
 
     /**
-     * The content type value for this file. This may not be a MIME type; it should be whatever is
-     * specified in the JSyntaxPane libraries in order for syntax highlighting to work.
+     * The "language" (i.e., programming language) this file is written in. This string must
+     * correspond to a lexer implementation in the Jygments library. null is allowed, and it
+     * forces any syntax highlighting to be turned off.
      */
-    public String contentType;
+    public String language;
 
     public Map<Date, Double> dueDates;
 
@@ -66,7 +67,7 @@ public abstract class File implements Verifiable, PostConstructionAction {
 
     @Override
     public void verify() {
-        if (path == null || contentType == null || tests == null)
+        if (path == null || language == null || tests == null)
             throw new IllegalArgumentException();
     }
 

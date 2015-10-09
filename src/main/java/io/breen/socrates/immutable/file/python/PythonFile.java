@@ -47,7 +47,7 @@ public final class PythonFile extends File implements PostConstructionAction {
     @Override
     public void afterConstruction() {
         super.afterConstruction();
-        contentType = "text/python";
+        language = "python";
     }
 
     @Override

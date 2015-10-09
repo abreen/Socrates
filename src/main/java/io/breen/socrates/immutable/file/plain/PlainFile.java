@@ -28,7 +28,7 @@ public final class PlainFile extends File implements PostConstructionAction {
     @Override
     public void afterConstruction() {
         super.afterConstruction();
-        contentType = "text/plain";
+        language = null;
     }
 
     @Override
