@@ -120,7 +120,7 @@ public class PythonInspector implements AutoCloseable {
             }
         }
 
-        logger.info("waited " + ms + " ms for XML-RPC server");
+        logger.fine("waited " + ms + " ms for XML-RPC server");
     }
 
     private static PythonObject getPythonObject(Object response) throws PythonError {

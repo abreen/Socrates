@@ -81,8 +81,6 @@ public class MainController {
                                             node, test, file, submittedFile, submission
                                     )
                             );
-
-                            logger.info("added test task");
                         }
                     }
                 }
@@ -162,8 +160,6 @@ public class MainController {
         mainView.submissionTree.expandFirstSubmission();
 
         mainView.setVisible(true);
-
-        logger.info("started MainView");
     }
 
     public void saveGradeReport(SubmissionWrapperNode completed, Path dest) {
