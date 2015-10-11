@@ -17,7 +17,7 @@ import java.util.List;
  * the contents of
  * these objects.
  */
-public class Submission {
+public class Submission implements Comparable<Submission> {
 
     /**
      * The name of the student who made this submission. This could be a proper name or a user name.
@@ -127,6 +127,11 @@ public class Submission {
                 "\tstudentName=" + studentName + "\n" +
                 "\tsubmissionDir=" + submissionDir + "\n" +
                 "\tfiles=" + files;
+    }
+
+    @Override
+    public int compareTo(Submission o) {
+        return studentName.compareTo(o.studentName);
     }
 
     /**

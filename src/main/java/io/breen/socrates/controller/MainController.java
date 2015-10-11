@@ -136,7 +136,7 @@ public class MainController {
         this.criteria = criteria;
         this.submissions = submissions;
 
-        Map<Submission, List<Pair<SubmittedFile, File>>> map = new HashMap<>();
+        Map<Submission, List<Pair<SubmittedFile, File>>> map = new TreeMap<>();
 
         for (Submission s : submissions) {
             List<Pair<SubmittedFile, File>> list = new ArrayList<>(s.files.size());
