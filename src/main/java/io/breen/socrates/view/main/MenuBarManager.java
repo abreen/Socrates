@@ -8,15 +8,9 @@ public class MenuBarManager {
 
     public final JMenuBar menuBar;
 
-    //public final JMenu sessionMenu;
     public final JMenu submissionMenu;
     public final JMenu fileMenu;
     public final JMenu testMenu;
-
-    /*
-    public final JMenuItem openSession;         // TODO
-    public final JMenuItem saveSession;         // TODO
-    */
 
     public final JMenuItem nextSubmission;
     public final JMenuItem previousSubmission;
@@ -42,21 +36,6 @@ public class MenuBarManager {
 
     public MenuBarManager() {
         menuBar = new JMenuBar();
-
-        /*
-         * The Session menu contains options for saving the current session or
-         * opening a previously saved session.
-         */
-        /*
-        sessionMenu = new JMenu("Session");
-
-        openSession = new JMenuItem("Open Saved Session...");
-        saveSession = new JMenuItem("Save Current Session...");
-
-        sessionMenu.add(openSession);
-        sessionMenu.add(saveSession);
-        */
-
 
         /*
          * The Submission menu contains items for moving between submissions,
@@ -152,7 +131,6 @@ public class MenuBarManager {
     }
 
     public void setView(MainView view) {
-        //menuBar.add(sessionMenu);
         menuBar.add(submissionMenu);
         menuBar.add(fileMenu);
         menuBar.add(testMenu);
