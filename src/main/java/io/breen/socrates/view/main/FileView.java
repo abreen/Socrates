@@ -31,40 +31,23 @@ public class FileView {
     private final static String NOT_DISPLAYABLE = "(not displayable)";
 
     private final static String OPEN_SUBTITLE;
-
-    static {
-        String subtitle = "<html><center>";
-
-        switch (Globals.operatingSystem) {
-        case OSX:
-            subtitle += "To open the file in its<br>default application, use ⌘O.";
-            break;
-        default:
-            subtitle += "To open the file with its<br>default program, use Ctrl + O.";
-        }
-
-        subtitle += "</center></html>";
-
-        OPEN_SUBTITLE = subtitle;
-    }
-
-    static {
-        String subtitle = "<html><center>";
-
-        switch (Globals.operatingSystem) {
-        case OSX:
-            subtitle += "To open the file in its<br>default application, use ⌘O.";
-            break;
-        default:
-            subtitle += "To open the file with its<br>default program, use Ctrl + O.";
-        }
-
-        subtitle += "</center></html>";
-
-        OPEN_SUBTITLE = subtitle;
-    }
-
     private static Logger logger = Logger.getLogger(FileView.class.getName());
+
+    static {
+        String subtitle = "<html><center>";
+
+        switch (Globals.operatingSystem) {
+        case OSX:
+            subtitle += "To open the file in its<br>default application, use ⌘O.";
+            break;
+        default:
+            subtitle += "To open the file with its<br>default program, use Ctrl + O.";
+        }
+
+        subtitle += "</center></html>";
+
+        OPEN_SUBTITLE = subtitle;
+    }
 
     private SubmittedFile currentFile;
     private Formatter htmlFormatter;
