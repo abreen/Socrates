@@ -1,6 +1,7 @@
 package io.breen.socrates.immutable.criteria;
 
 import io.breen.socrates.immutable.file.File;
+import io.breen.socrates.immutable.file.PDFFile;
 import io.breen.socrates.immutable.file.java.JavaFile;
 import io.breen.socrates.immutable.file.plain.PlainFile;
 import io.breen.socrates.immutable.file.python.PythonFile;
@@ -176,6 +177,11 @@ public final class Criteria {
          * Java source code file type and supported tests
          */
         cons.addTypeDescription(new TypeDescription(JavaFile.class, "!file:java"));
+
+        /*
+         * PDF file type
+         */
+        cons.addTypeDescription(new TypeDescription(PDFFile.class, "!file:pdf"));
 
         Yaml yaml = new Yaml(cons);
         Criteria c = null;

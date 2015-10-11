@@ -12,6 +12,11 @@ import java.util.*;
 public final class JavaFile extends File implements PostConstructionAction {
 
     /**
+     * The deduction taken when attempting to compile the Java file fails.
+     */
+    public double compileFailureDeduction;
+
+    /**
      * This empty constructor is used by SnakeYAML.
      */
     public JavaFile() {
