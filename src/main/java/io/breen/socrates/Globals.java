@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 /**
  * The single location for a small number (as little as possible!) of global variables and
- * OS-specific methods that are needed anywhere and don't belong anywhere else.
+ * other methods that are needed anywhere and don't belong anywhere else.
  */
 public class Globals {
 
@@ -59,5 +59,10 @@ public class Globals {
             );
             method.invoke(null, window, true);
         } catch (Throwable ignored) {}
+    }
+
+    public static String toHex(Color c) {
+        String hex = Integer.toHexString(c.getRGB());
+        return "#" + hex.substring(2);
     }
 }

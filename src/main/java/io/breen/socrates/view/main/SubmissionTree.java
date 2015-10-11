@@ -433,9 +433,9 @@ public class SubmissionTree implements Observer {
 
                         String statusHex;
                         if (selected) {
-                            statusHex = DefaultTheme.toHex(selectedText);
+                            statusHex = Globals.toHex(selectedText);
                         } else {
-                            statusHex = DefaultTheme.toHex(inactive);
+                            statusHex = Globals.toHex(inactive);
                         }
 
                         if (value instanceof UnrecognizedFileWrapperNode) {
