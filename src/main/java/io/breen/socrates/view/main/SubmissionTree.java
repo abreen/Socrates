@@ -439,7 +439,7 @@ public class SubmissionTree implements Observer {
                         }
 
                         if (value instanceof UnrecognizedFileWrapperNode) {
-                            setForeground(inactive);
+                            if (!selected) setForeground(inactive);
 
                         } else if (value instanceof SubmittedFileWrapperNode) {
                             SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
