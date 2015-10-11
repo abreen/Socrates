@@ -30,16 +30,65 @@ public class FileView {
     private final static String UNKNOWN_FILE_TYPE = "(unknown file type)";
     private final static String NOT_DISPLAYABLE = "(not displayable)";
 
+    private final static String OPEN_SUBTITLE;
+
+    static {
+        String subtitle = "<html><center>";
+
+        switch (Globals.operatingSystem) {
+        case OSX:
+            subtitle += "To open the file in its<br>default application, use ⌘O.";
+            break;
+        default:
+            subtitle += "To open the file with its<br>default program, use Ctrl + O.";
+        }
+
+        subtitle += "</center></html>";
+
+        OPEN_SUBTITLE = subtitle;
+    }
+
+    static {
+        String subtitle = "<html><center>";
+
+        switch (Globals.operatingSystem) {
+        case OSX:
+            subtitle += "To open the file in its<br>default application, use ⌘O.";
+            break;
+        default:
+            subtitle += "To open the file with its<br>default program, use Ctrl + O.";
+        }
+
+        subtitle += "</center></html>";
+
+        OPEN_SUBTITLE = subtitle;
+    }
+
     private static Logger logger = Logger.getLogger(FileView.class.getName());
+
     private SubmittedFile currentFile;
     private Formatter htmlFormatter;
     private JTextPane textPane;
     private JPanel rootPanel;
     private JScrollPane scrollPane;
     private JLabel curtainLabel;
+    private JLabel curtainSubtitle;
     private JPanel curtainPanel;
 
     public FileView(MenuBarManager menuBar, SubmissionTree submissionTree) {
+        curtainLabel = new JLabel(NO_SELECTION);
+        curtainLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        curtainLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+        curtainLabel.setFont(Font.decode("Dialog-PLAIN-24"));
+        curtainPanel.add(curtainLabel);
+
+        curtainSubtitle = new JLabel();
+        curtainSubtitle.setHorizontalAlignment(SwingConstants.CENTER);
+        curtainSubtitle.setVerticalAlignment(SwingConstants.TOP);
+        curtainSubtitle.setFont(Font.decode("Dialog-PLAIN-20"));
+        curtainSubtitle.setForeground(UIManager.getColor("inactiveCaptionText"));
+        curtainPanel.add(curtainSubtitle);
+
         textPane.setContentType("text/html");
 
         /*
@@ -92,6 +141,8 @@ public class FileView {
             curtainPanel.setBorder(UIManager.getBorder("InsetBorder.aquaVariant"));
         }
 
+        curtainPanel.setLayout(new GridLayout(2, 1, 0, 10));
+
         scrollPane = new JScrollPane();
         if (Globals.operatingSystem == Globals.OS.OSX) {
             Border border = new LineBorder(new Color(197, 197, 197));
@@ -115,11 +166,13 @@ public class FileView {
 
         if (matchingFile == null) {
             curtainLabel.setText(UNKNOWN_FILE_TYPE);
+            curtainSubtitle.setText("");
             layout.show(rootPanel, CURTAIN_CARD_NAME);
             return;
 
         } else if (!matchingFile.contentsArePlainText) {
             curtainLabel.setText(NOT_DISPLAYABLE);
+            curtainSubtitle.setText(OPEN_SUBTITLE);
             layout.show(rootPanel, CURTAIN_CARD_NAME);
             return;
         }

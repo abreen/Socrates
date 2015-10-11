@@ -29,17 +29,7 @@
         </constraints>
         <properties/>
         <border type="none"/>
-        <children>
-          <component id="6c9a1" class="javax.swing.JLabel" binding="curtainLabel">
-            <constraints border-constraint="Center"/>
-            <properties>
-              <font name="Dialog" size="20"/>
-              <horizontalAlignment value="0"/>
-              <horizontalTextPosition value="0"/>
-              <text value="(no file selected)"/>
-            </properties>
-          </component>
-        </children>
+        <children/>
       </grid>
     </children>
   </grid>

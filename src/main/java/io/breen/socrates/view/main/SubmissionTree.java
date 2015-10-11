@@ -224,6 +224,9 @@ public class SubmissionTree implements Observer {
             }
         };
         openFile.setEnabled(false);
+        openFile.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ctrl)
+        );
         menuBar.openFile.setAction(openFile);
     }
 
