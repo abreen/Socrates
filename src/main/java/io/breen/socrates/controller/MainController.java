@@ -16,12 +16,19 @@ import io.breen.socrates.view.main.MainView;
 import io.breen.socrates.view.main.MenuBarManager;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.DefaultCaret;
+import javax.swing.text.Document;
 import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
@@ -29,12 +36,12 @@ import java.util.logging.Logger;
 public class MainController {
 
     private static Logger logger = Logger.getLogger(MainController.class.getName());
-
+    public JFrame transcriptWindow;
+    public JTextPane transcriptTextPane;
+    public Action showTranscript;
     private Criteria criteria;
     private List<Submission> submissions;
-
     private BlockingQueue<TestTask> tasks;
-
     private MainView mainView;
     private MenuBarManager menuBar;
 
@@ -42,6 +49,43 @@ public class MainController {
         menuBar = new MenuBarManager();
         mainView = new MainView(this, menuBar);
         menuBar.setView(mainView);
+
+        transcriptWindow = new JFrame("Transcript");
+        transcriptWindow.setAlwaysOnTop(true);
+        transcriptWindow.setMinimumSize(new Dimension(300, 200));
+        transcriptWindow.setSize(new Dimension(450, 300));
+        transcriptWindow.setLocationRelativeTo(null);
+
+        if (Globals.operatingSystem == Globals.OS.OSX) {
+            transcriptWindow.getRootPane().putClientProperty("Window.style", "small");
+        }
+
+        transcriptTextPane = new JTextPane();
+        transcriptTextPane.setEditable(false);
+        transcriptTextPane.setFont(Font.decode(Font.MONOSPACED));
+
+        DefaultCaret caret = (DefaultCaret)transcriptTextPane.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
+        JScrollPane scrollPane = new JScrollPane(transcriptTextPane);
+        scrollPane.setBorder(new EmptyBorder(3, 3, 3, 3));
+
+        transcriptWindow.add(scrollPane);
+
+        int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
+        showTranscript = new AbstractAction(menuBar.transcriptWindow.getText()) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                transcriptWindow.setVisible(true);
+            }
+        };
+        showTranscript.putValue(
+                Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_T, ctrl)
+        );
+        menuBar.transcriptWindow.setAction(showTranscript);
+
+        final Document transcriptDocument = transcriptTextPane.getDocument();
 
         tasks = new LinkedBlockingQueue<>();
 
@@ -58,14 +102,12 @@ public class MainController {
                         TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
 
                         Test testObj = (Test)node.getUserObject();
+
                         if (testObj instanceof Automatable &&
                                 node.getResult() == TestResult.NONE &&
                                 node.getAutomationStage() == AutomationStage.NONE &&
                                 !node.isConstrained())
                         {
-                            @SuppressWarnings("unchecked") final Automatable<File> test =
-                                    (Automatable<File>)testObj;
-
                             SubmittedFile submittedFile = mainView.submissionTree
                                     .getSelectedSubmittedFile();
                             File file = criteria.getFileByLocalPath(submittedFile.localPath);
@@ -78,7 +120,7 @@ public class MainController {
 
                             tasks.add(
                                     new TestTask(
-                                            node, test, file, submittedFile, submission
+                                            node, testObj, file, submittedFile, submission
                                     )
                             );
                         }
@@ -103,8 +145,10 @@ public class MainController {
 
                     t.node.setAutomationStage(AutomationStage.STARTED);
                     try {
-                        boolean passed = t.test.shouldPass(
-                                t.file, t.submittedFile, t.submission, criteria
+                        Automatable automatableTest = (Automatable)t.automatableTest;
+
+                        boolean passed = automatableTest.shouldPass(
+                                t.file, t.submittedFile, t.submission, criteria, transcriptDocument
                         );
 
                         if (passed) t.node.setResult(TestResult.PASSED);
@@ -115,7 +159,7 @@ public class MainController {
                         );
 
                     } catch (CannotBeAutomatedException x) {
-                        logger.warning("test cannot be automated: " + t.test);
+                        logger.warning("test cannot be automated: " + t.automatableTest);
 
                         t.node.setAutomationStage(
                                 AutomationStage.FINISHED_ERROR
@@ -174,19 +218,19 @@ public class MainController {
         mainView.setEnabled(true);
     }
 
-    private class TestTask<T> {
+    private class TestTask {
 
         public final TestWrapperNode node;
-        public final Automatable test;
+        public final Test automatableTest;
         public final File file;
         public final SubmittedFile submittedFile;
         public final Submission submission;
 
-        public TestTask(TestWrapperNode node, Automatable test, File file,
+        public TestTask(TestWrapperNode node, Test automatableTest, File file,
                         SubmittedFile submittedFile, Submission submission)
         {
             this.node = node;
-            this.test = test;
+            this.automatableTest = automatableTest;
             this.file = file;
             this.submittedFile = submittedFile;
             this.submission = submission;

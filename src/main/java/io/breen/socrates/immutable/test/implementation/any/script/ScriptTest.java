@@ -9,6 +9,7 @@ import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.python.PythonProcessBuilder;
 
+import javax.swing.text.Document;
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -52,7 +53,8 @@ public class ScriptTest extends Test implements Automatable {
      * @throws ScriptTestRuntimeException
      */
     @Override
-    public boolean shouldPass(File parent, SubmittedFile target, Submission submission, Criteria criteria)
+    public boolean shouldPass(File parent, SubmittedFile target, Submission submission,
+                              Criteria criteria, Document transcript)
             throws CannotBeAutomatedException
     {
         logger.info("running ScriptTest: " + this);

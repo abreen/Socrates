@@ -8,6 +8,8 @@ import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 import org.apache.xmlrpc.XmlRpcException;
 
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import java.io.IOException;
 import java.util.*;
 
@@ -42,6 +44,31 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
         super(deduction, description);
     }
 
+    private static String callToString(String functionName, List<Object> args) {
+        StringBuilder builder = new StringBuilder(functionName);
+
+        builder.append("(");
+
+        for (int i = 0; i < args.size(); i++) {
+            builder.append(repr(args.get(i)));
+
+            if (i != args.size() - 1) builder.append(", ");
+        }
+
+        builder.append(")");
+
+        return builder.toString();
+    }
+
+    private static String repr(Object o) {
+        if (o instanceof String) {
+            String s = (String)o;
+            return "'" + s + "'";
+        }
+
+        return o.toString();
+    }
+
     @Override
     public String toString() {
         return "FunctionEvalTest(" +
@@ -57,7 +84,8 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
     }
 
     @Override
-    public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission, Criteria criteria)
+    public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission,
+                              Criteria criteria, Document transcript)
             throws CannotBeAutomatedException, AutomationFailureException
     {
         Function func = parent.getFunctionForTest(this);
@@ -71,7 +99,19 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
             for (String parameter : func.parameters)
                 args.add(arguments.get(parameter));
 
+            try {
+                transcript.insertString(
+                        transcript.getLength(), ">>> " + callToString(func.name, args) + "\n", null
+                );
+            } catch (BadLocationException ignored) {}
+
             PythonInspector.PythonObject returnValue = inspector.functionEval(func.name, args);
+
+            try {
+                transcript.insertString(
+                        transcript.getLength(), repr(returnValue.value) + "\n", null
+                );
+            } catch (BadLocationException ignored) {}
 
             return PythonInspector.equals(this.value, returnValue);
 

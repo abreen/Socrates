@@ -21,7 +21,7 @@ public class MainView extends JFrame {
     private JPanel rootPanel;
     private boolean allSaved;
 
-    public MainView(MainController controller, MenuBarManager menuBar) {
+    public MainView(final MainController controller, MenuBarManager menuBar) {
         super("Socrates");
 
         this.controller = controller;
@@ -55,6 +55,7 @@ public class MainView extends JFrame {
                             if (rv != JOptionPane.YES_OPTION) return;
                         }
 
+                        controller.transcriptWindow.dispose();
                         dispose();
                         System.exit(0);
                     }

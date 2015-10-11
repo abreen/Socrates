@@ -8,6 +8,7 @@ import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 import org.apache.xmlrpc.XmlRpcException;
 
+import javax.swing.text.Document;
 import java.io.IOException;
 
 public class VariableExistsTest extends VariableTest implements Automatable<PythonFile> {
@@ -31,7 +32,7 @@ public class VariableExistsTest extends VariableTest implements Automatable<Pyth
 
     @Override
     public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission,
-                              Criteria criteria)
+                              Criteria criteria, Document transcript)
             throws CannotBeAutomatedException, AutomationFailureException
     {
         try (PythonInspector inspector = new PythonInspector(target.fullPath)) {

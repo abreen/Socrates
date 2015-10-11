@@ -6,6 +6,8 @@ import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
 
+import javax.swing.text.Document;
+
 /**
  * A test that takes awhile.
  */
@@ -22,7 +24,7 @@ public class TakesAwhileTest extends Test implements Automatable {
 
     @Override
     public boolean shouldPass(File parent, SubmittedFile target, Submission submission,
-                              Criteria criteria)
+                              Criteria criteria, Document transcript)
             throws CannotBeAutomatedException
     {
         try {

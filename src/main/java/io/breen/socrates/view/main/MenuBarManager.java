@@ -11,6 +11,7 @@ public class MenuBarManager {
     public final JMenu submissionMenu;
     public final JMenu fileMenu;
     public final JMenu testMenu;
+    public final JMenu windowMenu;
 
     public final JMenuItem nextSubmission;
     public final JMenuItem previousSubmission;
@@ -32,6 +33,8 @@ public class MenuBarManager {
     public final JMenuItem previousTest;
     public final JMenuItem clearNotes;
     public final JMenuItem focusOnNotes;
+
+    public final JMenuItem transcriptWindow;
 
 
     public MenuBarManager() {
@@ -128,12 +131,23 @@ public class MenuBarManager {
         testMenu.addSeparator();
         testMenu.add(clearNotes);
         testMenu.add(focusOnNotes);
+
+
+        /*
+         * The Window menu contains items for toggling the appearance of various windows.
+         */
+        windowMenu = new JMenu("Window");
+
+        transcriptWindow = new JMenuItem("Transcript");
+
+        windowMenu.add(transcriptWindow);
     }
 
     public void setView(MainView view) {
         menuBar.add(submissionMenu);
         menuBar.add(fileMenu);
         menuBar.add(testMenu);
+        menuBar.add(windowMenu);
 
         view.setJMenuBar(menuBar);
     }

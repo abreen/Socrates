@@ -7,6 +7,8 @@ import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.Automatable;
 import io.breen.socrates.immutable.test.Test;
 
+import javax.swing.text.Document;
+
 public class AlwaysPassingTest extends Test implements Automatable<PlainFile> {
 
     /**
@@ -20,7 +22,7 @@ public class AlwaysPassingTest extends Test implements Automatable<PlainFile> {
 
     @Override
     public boolean shouldPass(PlainFile parent, SubmittedFile target, Submission submission,
-                              Criteria criteria)
+                              Criteria criteria, Document transcript)
     {
         return true;
     }
