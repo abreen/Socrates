@@ -124,7 +124,7 @@ public class FileView {
             curtainPanel.setBorder(UIManager.getBorder("InsetBorder.aquaVariant"));
         }
 
-        curtainPanel.setLayout(new GridLayout(2, 1, 0, 10));
+        curtainPanel.setLayout(new GridLayout(2, 1, 0, 25));
 
         scrollPane = new JScrollPane();
         if (Globals.operatingSystem == Globals.OS.OSX) {
