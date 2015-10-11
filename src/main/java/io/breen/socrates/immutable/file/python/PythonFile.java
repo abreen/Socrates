@@ -28,12 +28,8 @@ public final class PythonFile extends File implements PostConstructionAction {
     /**
      * This empty constructor is used by SnakeYAML.
      */
-    public PythonFile() {}
-
-    public PythonFile(String path, double pointValue, Map<Date, Double> dueDates,
-                      List<Object> tests)
-    {
-        super(path, pointValue, dueDates, tests);
+    public PythonFile() {
+        language = "python";
     }
 
     private static boolean hasTest(List<Object> list, Test test) {
@@ -47,7 +43,6 @@ public final class PythonFile extends File implements PostConstructionAction {
     @Override
     public void afterConstruction() {
         super.afterConstruction();
-        language = "python";
     }
 
     @Override

@@ -17,7 +17,10 @@ public final class PlainFile extends File implements PostConstructionAction {
     /**
      * This empty constructor is used by SnakeYAML.
      */
-    public PlainFile() {}
+    public PlainFile() {
+        language = null;
+        contentsArePlainText = true;
+    }
 
     public PlainFile(String path, double pointValue, Map<Date, Double> dueDates,
                      List<Object> tests)
@@ -28,7 +31,6 @@ public final class PlainFile extends File implements PostConstructionAction {
     @Override
     public void afterConstruction() {
         super.afterConstruction();
-        language = null;
     }
 
     @Override

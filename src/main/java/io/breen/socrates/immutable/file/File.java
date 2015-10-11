@@ -34,6 +34,14 @@ public abstract class File implements Verifiable, PostConstructionAction {
      */
     public String language;
 
+    /**
+     * Whether the content of an actual file (e.g., on the file system) whose type is represented by
+     * this class is plain text and therefore displayable in the FileView. If this is set to true,
+     * Socrates will attempt to open the file and display the contents when a SubmittedFile
+     * associated with this class is selected.
+     */
+    public boolean contentsArePlainText;
+
     public Map<Date, Double> dueDates;
 
     /**

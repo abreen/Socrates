@@ -1,6 +1,7 @@
 package io.breen.socrates.immutable.criteria;
 
 import io.breen.socrates.immutable.file.File;
+import io.breen.socrates.immutable.file.java.JavaFile;
 import io.breen.socrates.immutable.file.plain.PlainFile;
 import io.breen.socrates.immutable.file.python.PythonFile;
 import io.breen.socrates.immutable.test.TestGroup;
@@ -170,6 +171,11 @@ public final class Criteria {
                         FunctionEvalTest.class, "!test:python:eval:function"
                 )
         );
+
+        /*
+         * Java source code file type and supported tests
+         */
+        cons.addTypeDescription(new TypeDescription(JavaFile.class, "!file:java"));
 
         Yaml yaml = new Yaml(cons);
         Criteria c = null;
