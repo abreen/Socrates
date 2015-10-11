@@ -1,26 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="io.breen.socrates.view.main.FileView">
-  <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+  <grid id="27dc6" binding="rootPanel" layout-manager="CardLayout" hgap="0" vgap="0" show="c58ec">
     <constraints>
       <xy x="20" y="20" width="500" height="400"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <scrollpane id="58b74" binding="scrollPane" custom-create="true">
-        <constraints border-constraint="Center"/>
+      <scrollpane id="1c19" binding="scrollPane" custom-create="true">
+        <constraints>
+          <card name="textPaneCard"/>
+        </constraints>
         <properties/>
         <border type="none"/>
         <children>
-          <component id="9ecc0" class="javax.swing.JTextPane" binding="textPane">
+          <component id="45db4" class="javax.swing.JTextPane" binding="textPane">
             <constraints/>
             <properties>
               <editable value="false"/>
-              <margin top="0" left="3" bottom="3" right="3"/>
+              <font name="Monospaced"/>
             </properties>
           </component>
         </children>
       </scrollpane>
+      <grid id="c58ec" binding="curtainPanel" custom-create="true" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <card name="curtainCard"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="6c9a1" class="javax.swing.JLabel" binding="curtainLabel">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <font name="Dialog" size="20"/>
+              <horizontalAlignment value="0"/>
+              <horizontalTextPosition value="0"/>
+              <text value="(no file selected)"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
 </form>

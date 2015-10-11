@@ -23,12 +23,21 @@ import java.util.logging.Logger;
 
 public class FileView {
 
+    private final static String CURTAIN_CARD_NAME = "curtainCard";
+    private final static String TEXT_PANE_CARD_NAME = "textPaneCard";
+
+    private final static String NO_SELECTION = "(no file selected)";
+    private final static String UNKNOWN_FILE_TYPE = "(unknown file type)";
+    private final static String NOT_DISPLAYABLE = "(not displayable)";
+
     private static Logger logger = Logger.getLogger(FileView.class.getName());
     private SubmittedFile currentFile;
     private Formatter htmlFormatter;
     private JTextPane textPane;
     private JPanel rootPanel;
     private JScrollPane scrollPane;
+    private JLabel curtainLabel;
+    private JPanel curtainPanel;
 
     public FileView(MenuBarManager menuBar, SubmissionTree submissionTree) {
         textPane.setContentType("text/html");
@@ -78,6 +87,11 @@ public class FileView {
     }
 
     private void createUIComponents() {
+        curtainPanel = new JPanel();
+        if (Globals.operatingSystem == Globals.OS.OSX) {
+            curtainPanel.setBorder(UIManager.getBorder("InsetBorder.aquaVariant"));
+        }
+
         scrollPane = new JScrollPane();
         if (Globals.operatingSystem == Globals.OS.OSX) {
             Border border = new LineBorder(new Color(197, 197, 197));
@@ -94,10 +108,23 @@ public class FileView {
     public void update(SubmittedFile submittedFile, File matchingFile) throws IOException {
         currentFile = submittedFile;
 
-        if (matchingFile == null || !matchingFile.contentsArePlainText) {
+        CardLayout layout = (CardLayout)rootPanel.getLayout();
+
+        if (matchingFile == null || !matchingFile.contentsArePlainText)
             textPane.setText(null);
+
+        if (matchingFile == null) {
+            curtainLabel.setText(UNKNOWN_FILE_TYPE);
+            layout.show(rootPanel, CURTAIN_CARD_NAME);
+            return;
+
+        } else if (!matchingFile.contentsArePlainText) {
+            curtainLabel.setText(NOT_DISPLAYABLE);
+            layout.show(rootPanel, CURTAIN_CARD_NAME);
             return;
         }
+
+        layout.show(rootPanel, TEXT_PANE_CARD_NAME);
 
         String contents = submittedFile.getContents();
         String text;
