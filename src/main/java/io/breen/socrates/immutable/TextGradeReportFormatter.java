@@ -162,6 +162,8 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
                 Test test = (Test)node.getUserObject();
                 if (node.getResult() == TestResult.FAILED)
                     deductions.add(new Deduction(test.deduction, test.description, notes));
+                if (node.getResult() == TestResult.PASSED && !notes.isEmpty())
+                    deductions.add(new Deduction(0, test.description, notes));
             }
         }
 
