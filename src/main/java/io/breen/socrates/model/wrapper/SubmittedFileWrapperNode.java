@@ -77,7 +77,18 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
 
     @Override
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> event) {
-        boolean notCompleteBefore = !isComplete();
+        /*
+         * TODO in order for this to affect the changed state of the entire submission,
+         * lots of changes need to be made (i.e., SubmissionCompletedChangeEvent is too
+         * specific?)
+         */
+        if (event instanceof NotesChangedEvent) {
+            SubmissionWrapperNode swn = (SubmissionWrapperNode)this.getParent();
+            swn.setSaved(false);
+            return;
+        }
+
+        boolean completeBefore = isComplete();
 
         if (event instanceof ResultChangedEvent) {
             ResultChangedEvent e = (ResultChangedEvent)event;
@@ -99,15 +110,15 @@ public class SubmittedFileWrapperNode extends DefaultMutableTreeNode
             }
         }
 
-        boolean notCompleteAfter = !isComplete();
+        boolean completeAfter = isComplete();
 
         FileCompletedChangeEvent e;
-        if (notCompleteBefore && !notCompleteAfter) {
+        if (!completeBefore && completeAfter) {
             e = new FileCompletedChangeEvent(this, true);
             for (Observer<SubmittedFileWrapperNode> o : observers)
                 o.objectChanged(e);
 
-        } else if (!notCompleteBefore && notCompleteAfter) {
+        } else if (completeBefore && !completeAfter) {
             e = new FileCompletedChangeEvent(this, false);
             for (Observer<SubmittedFileWrapperNode> o : observers)
                 o.objectChanged(e);

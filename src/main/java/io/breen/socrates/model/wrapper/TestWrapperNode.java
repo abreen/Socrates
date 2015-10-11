@@ -7,6 +7,8 @@ import io.breen.socrates.model.event.*;
 import io.breen.socrates.util.Observable;
 import io.breen.socrates.util.Observer;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -20,7 +22,9 @@ import java.util.List;
  *
  * @see TestGroupWrapperNode
  */
-public class TestWrapperNode extends DefaultMutableTreeNode implements Observable<TestWrapperNode> {
+public class TestWrapperNode extends DefaultMutableTreeNode
+        implements Observable<TestWrapperNode>, DocumentListener
+{
 
     /**
      * The Document object that the GUI uses to maintain the user's notes about this test. The
@@ -56,6 +60,7 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
         stage = AutomationStage.NONE;
 
         notes = new PlainDocument();
+        notes.addDocumentListener(this);
 
         observers = new LinkedList<>();
     }
@@ -125,5 +130,29 @@ public class TestWrapperNode extends DefaultMutableTreeNode implements Observabl
     @Override
     public synchronized void removeObserver(Observer<TestWrapperNode> observer) {
         observers.remove(observer);
+    }
+
+    /*
+     * Called for us by Swing when the notes field for this test node changes.
+     */
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        NotesChangedEvent event = new NotesChangedEvent(this);
+
+        synchronized (this) {
+            for (Observer<TestWrapperNode> o : observers)
+                o.objectChanged(event);
+        }
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        insertUpdate(e);
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        // TODO ?
     }
 }
