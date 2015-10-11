@@ -30,6 +30,7 @@ public final class PythonFile extends File implements PostConstructionAction {
      */
     public PythonFile() {
         language = "python";
+        contentsArePlainText = true;
     }
 
     private static boolean hasTest(List<Object> list, Test test) {

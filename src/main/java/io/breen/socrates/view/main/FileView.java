@@ -86,26 +86,40 @@ public class FileView {
     }
 
     /**
-     * Update the FileView and show the contents of the current file to the user. If the second
-     * parameter is null, the file will not be syntax highlighted.
+     * Update the FileView and show the contents of the current file to the user. If the File
+     * object represents a file whose contents can be displayed in the JTextPane (i.e., if the
+     * File's contentsArePlainText is true), the file is read. If the File's language field is
+     * non-null, the contents are syntax highlighted.
      */
     public void update(SubmittedFile submittedFile, File matchingFile) throws IOException {
-        if (submittedFile == currentFile) return;
+        currentFile = submittedFile;
 
-        String contents = submittedFile.getContents(), text = contents;
+        if (matchingFile == null || !matchingFile.contentsArePlainText) {
+            textPane.setText(null);
+            return;
+        }
 
-        try {
-            Lexer lexer = Lexer.getByName(matchingFile != null ? matchingFile.language : null);
-            CharArrayWriter w = new CharArrayWriter();
-            htmlFormatter.format(lexer.getTokens(contents), w);
-            text = w.toString();
+        String contents = submittedFile.getContents();
+        String text;
 
-        } catch (ResolutionException ignored) {}
+        if (matchingFile.language != null) {
+            try {
+                Lexer lexer = Lexer.getByName(matchingFile.language);
+                CharArrayWriter w = new CharArrayWriter();
+                htmlFormatter.format(lexer.getTokens(contents), w);
+                text = w.toString();
+
+            } catch (ResolutionException x) {
+                logger.severe("cannot syntax highlight: " + x);
+                text = contents;
+            }
+
+        } else {
+            text = "<pre>" + contents + "</pre>";
+        }
 
         textPane.setText(text);
         textPane.setCaretPosition(0);
-
-        currentFile = submittedFile;
     }
 
     public void update(SubmittedFile submittedFile) throws IOException {
