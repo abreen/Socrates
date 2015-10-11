@@ -61,7 +61,9 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
     }
 
     private static String repr(Object o) {
-        if (o instanceof String) {
+        if (o == null) {
+            return "None";
+        } else if (o instanceof String) {
             String s = (String)o;
             return "'" + s + "'";
         }
