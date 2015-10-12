@@ -12,13 +12,16 @@
           <card name="textPaneCard"/>
         </constraints>
         <properties/>
-        <border type="none"/>
+        <border type="none">
+          <size top="3" left="3" bottom="3" right="0"/>
+        </border>
         <children>
           <component id="45db4" class="javax.swing.JTextPane" binding="textPane">
             <constraints/>
             <properties>
               <editable value="false"/>
               <font name="Monospaced"/>
+              <margin top="2" left="5" bottom="2" right="5"/>
             </properties>
           </component>
         </children>
