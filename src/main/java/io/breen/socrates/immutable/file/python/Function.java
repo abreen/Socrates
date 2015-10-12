@@ -3,7 +3,7 @@ package io.breen.socrates.immutable.file.python;
 import java.util.List;
 
 /**
- * A class representing a function specified in the criteria file.
+ * A class representing a Python function specified in the criteria file.
  */
 public class Function {
 

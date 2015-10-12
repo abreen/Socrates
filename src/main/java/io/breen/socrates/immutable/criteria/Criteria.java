@@ -7,6 +7,7 @@ import io.breen.socrates.immutable.file.plain.PlainFile;
 import io.breen.socrates.immutable.file.python.PythonFile;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.implementation.any.ReviewTest;
+import io.breen.socrates.immutable.test.implementation.java.MethodEvalTest;
 import io.breen.socrates.immutable.test.implementation.python.FunctionEvalTest;
 import io.breen.socrates.immutable.test.implementation.python.VariableEvalTest;
 import org.yaml.snakeyaml.TypeDescription;
@@ -177,6 +178,11 @@ public final class Criteria {
          * Java source code file type and supported tests
          */
         cons.addTypeDescription(new TypeDescription(JavaFile.class, "!file:java"));
+        cons.addTypeDescription(
+                new TypeDescription(
+                        MethodEvalTest.class, "!test:java:eval:method"
+                )
+        );
 
         /*
          * PDF file type
