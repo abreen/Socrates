@@ -8,7 +8,7 @@
     </extension>
     <option name="MAIN_CLASS_NAME" value="io.breen.socrates.Main" />
     <option name="VM_PARAMETERS" value="-Djava.util.logging.config.file=&quot;logging.properties&quot; " />
-    <option name="PROGRAM_PARAMETERS" value="--criteria $USER_HOME$/cs111/15fall/criteria/ps4/ps4.yml --submissions $USER_HOME$/cs111/15fall/submissions/ps4/abreen $USER_HOME$/cs111/15fall/submissions/ps4/aajreige $USER_HOME$/cs111/15fall/submissions/ps4/abamr14" />
+    <option name="PROGRAM_PARAMETERS" value="--criteria $USER_HOME$/cs112/criteria/a4/a4.yml --submissions $USER_HOME$/cs112/submissions/a4/all/abreen" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" value="" />
