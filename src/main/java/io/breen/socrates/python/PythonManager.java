@@ -44,6 +44,7 @@ public final class PythonManager {
 
         switch (Globals.operatingSystem) {
         case WINDOWS:
+            paths.add(Paths.get("C:\\Python35\\python.exe"));
             paths.add(Paths.get("C:\\Python34\\python.exe"));
             paths.add(Paths.get("C:\\Python33\\python.exe"));
             paths.add(Paths.get("C:\\Python32\\python.exe"));
