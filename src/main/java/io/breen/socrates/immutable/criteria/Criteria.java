@@ -3,11 +3,13 @@ package io.breen.socrates.immutable.criteria;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.file.PDFFile;
 import io.breen.socrates.immutable.file.java.JavaFile;
+import io.breen.socrates.immutable.file.logicly.LogiclyFile;
 import io.breen.socrates.immutable.file.plain.PlainFile;
 import io.breen.socrates.immutable.file.python.PythonFile;
 import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.immutable.test.implementation.any.ReviewTest;
 import io.breen.socrates.immutable.test.implementation.java.MethodEvalTest;
+import io.breen.socrates.immutable.test.implementation.logicly.CircuitEvalTest;
 import io.breen.socrates.immutable.test.implementation.python.FunctionEvalTest;
 import io.breen.socrates.immutable.test.implementation.python.VariableEvalTest;
 import org.yaml.snakeyaml.TypeDescription;
@@ -188,6 +190,16 @@ public final class Criteria {
          * PDF file type
          */
         cons.addTypeDescription(new TypeDescription(PDFFile.class, "!file:pdf"));
+
+        /*
+         * Logicly file type and supported tests
+         */
+        cons.addTypeDescription(new TypeDescription(LogiclyFile.class, "!file:logicly"));
+        cons.addTypeDescription(
+                new TypeDescription(
+                        CircuitEvalTest.class, "!test:logicly:eval"
+                )
+        );
 
         Yaml yaml = new Yaml(cons);
         Criteria c = null;
