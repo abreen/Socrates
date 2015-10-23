@@ -51,10 +51,12 @@ public class VariableEvalTest extends VariableTest implements Automatable<Python
             PythonInspector.PythonObject value = inspector.variableEval(var.name);
             return PythonInspector.equals(this.value, value);
 
-        } catch (IOException | XmlRpcException x) {
+        } catch (IOException | XmlRpcException | IllegalArgumentException x) {
             throw new AutomationFailureException(x);
-        } catch (IllegalArgumentException | PythonError x) {
-            throw new CannotBeAutomatedException();
+        } catch (PythonError x) {
+            throw new CannotBeAutomatedException(
+                    "error occurred evaluating variable: " + x
+            );
         }
     }
 }

@@ -127,14 +127,11 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
                 }
             }
 
-        } catch (IOException | ParserConfigurationException | SAXException x) {
+        } catch (IOException | ParserConfigurationException | SAXException |
+                XPathExpressionException | DataFormatException x) {
             throw new AutomationFailureException(x);
-        } catch (XPathExpressionException x) {
-            // bug in our XPath code!
-            throw new IllegalArgumentException("invalid XPath expression: " + x);
-        } catch (DataFormatException x) {
-            // the file itself has an invalid format
-            throw new AutomationFailureException(x);
+        } catch (UnsupportedGateException x) {
+            throw new CannotBeAutomatedException("encountered unrecognized gate");
         }
 
         return true;
@@ -154,7 +151,9 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
         return documentBuilder.parse(new ByteArrayInputStream(bytes, 0, numBytes));
     }
 
-    private Pair<List<Switch>, List<LightBulb>> build(Node root) throws XPathExpressionException {
+    private Pair<List<Switch>, List<LightBulb>> build(Node root)
+            throws XPathExpressionException, UnsupportedGateException
+    {
         HashMap<String, Evaluatable> objects = new HashMap<>();
         HashMap<String, Switch> switches = new HashMap<>();
         HashMap<String, LightBulb> lightBulbs = new HashMap<>();
@@ -214,6 +213,12 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
                  * <logicly> element containing the definition, and make a recursive call to build
                  * it.
                  */
+                try {
+                    UUID.fromString(type);
+                } catch (IllegalArgumentException x) {
+                    throw new UnsupportedGateException();
+                }
+
                 String circuitName = el.getAttribute("name");
 
                 String expr = "/logicly/custom[@type='" + type + "']";

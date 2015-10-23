@@ -42,7 +42,9 @@ public class VariableExistsTest extends VariableTest implements Automatable<Pyth
         } catch (IOException | XmlRpcException x) {
             throw new AutomationFailureException(x);
         } catch (PythonError x) {
-            throw new CannotBeAutomatedException();
+            throw new CannotBeAutomatedException(
+                    "error occurred checking for variable existence: " + x
+            );
         }
     }
 }

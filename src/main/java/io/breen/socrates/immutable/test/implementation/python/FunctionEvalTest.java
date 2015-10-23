@@ -120,7 +120,9 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
         } catch (IOException | XmlRpcException x) {
             throw new AutomationFailureException(x);
         } catch (IllegalArgumentException | PythonError x) {
-            throw new CannotBeAutomatedException();
+            throw new CannotBeAutomatedException(
+                    "error occurred evaluating function: " + x
+            );
         }
     }
 }

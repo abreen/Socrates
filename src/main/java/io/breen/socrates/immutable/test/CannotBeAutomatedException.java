@@ -7,4 +7,9 @@ package io.breen.socrates.immutable.test;
  * Note: this exception does not indicate a failure condition. This exception merely causes the test
  * to lose its automatable status.
  */
-public class CannotBeAutomatedException extends Exception {}
+public class CannotBeAutomatedException extends Exception {
+
+    public CannotBeAutomatedException(String s) {
+        super(s);
+    }
+}

@@ -33,7 +33,7 @@ public class LateSubmissionTest extends Test implements Automatable {
                               Criteria criteria, Document transcript)
             throws CannotBeAutomatedException
     {
-        if (target.receipt == null) throw new CannotBeAutomatedException();
+        if (target.receipt == null) throw new CannotBeAutomatedException("missing receipt file");
 
         Date d = target.receipt.getLatestDate();
         return d.before(cutoff);

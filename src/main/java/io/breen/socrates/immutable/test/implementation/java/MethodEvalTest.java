@@ -91,7 +91,7 @@ public class MethodEvalTest extends Test implements Automatable<JavaFile> {
             }
         }
 
-        if (studentMethod == null) throw new CannotBeAutomatedException();
+        if (studentMethod == null) throw new CannotBeAutomatedException("could not locate method");
 
         // TODO use before/after to create an instance
 
