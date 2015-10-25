@@ -117,7 +117,16 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
 
             // for each output specified in criteria, evaluate from that light bulb
             for (Map.Entry<String, Boolean> entry : output.entrySet()) {
-                LightBulb b = lightBulbMap.get(entry.getKey());
+                String exportName = entry.getKey();
+                LightBulb b = lightBulbMap.get(exportName);
+
+                if (b == null) {
+                    // there is no light bulb with the proper export name
+                    throw new CannotBeAutomatedException(
+                            "could not find light bulb with export name '" + exportName + "'"
+                    );
+                }
+
                 boolean expected = entry.getValue();
 
                 try {
