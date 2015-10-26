@@ -111,7 +111,16 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
 
             // use the map to efficiently set the state of each switch
             for (Map.Entry<String, Boolean> entry : input.entrySet()) {
-                Switch s = switchMap.get(entry.getKey());
+                String exportName = entry.getKey();
+                Switch s = switchMap.get(exportName);
+
+                if (s == null) {
+                    // there is no switch with the proper export name
+                    throw new CannotBeAutomatedException(
+                            "could not find switch with export name '" + exportName + "'"
+                    );
+                }
+
                 s.state = entry.getValue();
             }
 
