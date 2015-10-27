@@ -28,8 +28,6 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
     private static Logger logger = Logger.getLogger(CircuitEvalTest.class.getName());
     private static XPathExpression objectsExpr;
     private static XPathExpression connectionsExpr;
-    private static XPathExpression locationLeftExpr;
-    private static XPathExpression locationRightExpr;
     private static DocumentBuilder documentBuilder;
 
     static {
@@ -38,8 +36,6 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
         try {
             objectsExpr = xpInstance.compile("logicly/object");
             connectionsExpr = xpInstance.compile("logicly/connection");
-            locationLeftExpr = xpInstance.compile("logicly/location[@id='left']");
-            locationRightExpr = xpInstance.compile("logicly/location[@id='right']");
 
         } catch (XPathExpressionException x) {
             logger.severe("error compiling built-in XPath expression: " + x);
@@ -173,8 +169,9 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
             throws XPathExpressionException, UnsupportedGateException
     {
         HashMap<String, Evaluatable> objects = new HashMap<>();
-        HashMap<String, Switch> switches = new HashMap<>();
-        HashMap<String, LightBulb> lightBulbs = new HashMap<>();
+
+        List<Switch> switches = new LinkedList<>();
+        List<LightBulb> lightBulbs = new LinkedList<>();
 
         NodeList nodes;
 
@@ -199,12 +196,12 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
             if (type.startsWith("switch")) {
                 String exportName = el.getAttribute("exportName");
                 obj = new Switch(UUID.fromString(uid), exportName);
-                switches.put(uid, (Switch)obj);
+                switches.add((Switch)obj);
 
             } else if (type.startsWith("light_bulb")) {
                 String exportName = el.getAttribute("exportName");
                 obj = new LightBulb(UUID.fromString(uid), exportName);
-                lightBulbs.put(uid, (LightBulb)obj);
+                lightBulbs.add((LightBulb)obj);
 
             } else if (type.startsWith("not")) {
                 obj = new NotGate(UUID.fromString(uid));
@@ -295,40 +292,6 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
             to.inputs[inputIndex] = from.outputs[outputIndex];
         }
 
-        /*
-         * Use the <location> elements, if any, to reorder the switch and light bulb lists.
-         * This is only used when this method is called recursively to construct custom circuits,
-         * and the supercircuit needs to connect objects to this circuit by position, not by the
-         * name of a switch/light bulb.
-         */
-        Element left = (Element)locationLeftExpr.evaluate(root, XPathConstants.NODE);
-        Element right = (Element)locationRightExpr.evaluate(root, XPathConstants.NODE);
-
-        List<Switch> switchList;
-        List<LightBulb> lightBulbList;
-
-        if (left != null && right != null) {
-            switchList = new ArrayList<>(switches.size());
-            lightBulbList = new ArrayList<>(lightBulbs.size());
-
-            /*
-             * The "left" element contains the ordering of inputs (switches).
-             * The "right" element contains the ordering of outputs (light bulbs).
-             */
-            String[] leftUIDs = left.getAttribute("uids").split(",");
-            String[] rightUIDs = right.getAttribute("uids").split(",");
-
-            for (String uid : leftUIDs)
-                switchList.add(switches.get(uid));
-
-            for (String uid : rightUIDs)
-                lightBulbList.add(lightBulbs.get(uid));
-
-        } else {
-            switchList = new ArrayList<>(switches.values());
-            lightBulbList = new ArrayList<>(lightBulbs.values());
-        }
-
-        return new Pair<>(switchList, lightBulbList);
+        return new Pair<>(switches, lightBulbs);
     }
 }
