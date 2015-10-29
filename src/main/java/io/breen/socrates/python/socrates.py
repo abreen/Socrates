@@ -15,8 +15,8 @@ import sys
 
 import json
 
-EXIT_PASSED = 1
-EXIT_FAILED = 2
+EXIT_PASSED = 10
+EXIT_FAILED = 11
 
 # wait for Socrates to supply the parameters to the test
 params = json.loads(input())

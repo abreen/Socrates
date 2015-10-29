@@ -88,8 +88,10 @@ public final class PythonManager {
             }
 
         } catch (IOException x) {
-            logger.severe("I/O error copying Python source to Socrates temporary directory: " + x);
+            logger.severe("I/O error copying Python source code to temporary directory: " + x);
         }
+
+        logger.info("using temporary directory for Python modules: " + socratesTmpDir);
     }
 
     private PythonManager() {}
@@ -101,6 +103,10 @@ public final class PythonManager {
      */
     public static Path getPathToSource(String scriptName) {
         return Paths.get(socratesTmpDir.toString(), scriptName);
+    }
+
+    public static Path getTempDirectory() {
+        return socratesTmpDir;
     }
 
     private static boolean isValidPython3InterpreterPath(Path path)

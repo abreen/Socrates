@@ -2,8 +2,6 @@ package io.breen.socrates.controller;
 
 import io.breen.socrates.immutable.criteria.Criteria;
 import io.breen.socrates.immutable.criteria.InvalidCriteriaException;
-import io.breen.socrates.immutable.hooks.HookManager;
-import io.breen.socrates.immutable.hooks.triggers.Hook;
 import io.breen.socrates.immutable.submission.*;
 import io.breen.socrates.view.DetailOptionPane;
 import io.breen.socrates.view.setup.SetupView;
@@ -55,7 +53,6 @@ public class SetupController {
 
                             // criteria was successfully loaded
                             logger.info("criteria was successfully loaded");
-                            HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
 
                             if (submissions == null) view.showSubmissionsCard();
                             else transferToMain();
@@ -114,7 +111,6 @@ public class SetupController {
                             }
 
                             if (numAdded > 0) {
-                                HookManager.runHook(Hook.BEFORE_GRADING);
                                 transferToMain();
                             } else {
                                 logger.warning("no submissions could be added");
@@ -135,13 +131,10 @@ public class SetupController {
             view.setVisible(true);
         } else if (submissions == null) {
             // we can skip the "Choose a criteria file" step
-            HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
             view.showSubmissionsCard();
             view.setVisible(true);
         } else {
             // we can skip the setup entirely
-            HookManager.runHook(Hook.AFTER_CRITERIA_LOAD);
-            HookManager.runHook(Hook.BEFORE_GRADING);
             main.start(criteriaPath, criteria, submissions);
         }
     }

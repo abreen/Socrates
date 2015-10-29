@@ -23,7 +23,8 @@ public class PythonInspector {
         moduleName = parts[0];
 
         builder = new ProcessBuilder(
-                PythonManager.python3Command.toString(), "-B",
+                PythonManager.python3Command.toString(),
+                "-B",
                 // turns off writing bytecode files (.py[co])
                 PythonManager.getPathToSource("tester.py").toString()
         );

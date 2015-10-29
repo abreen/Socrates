@@ -20,4 +20,9 @@ public class AutomationFailureException extends Exception {
     public AutomationFailureException(Exception e) {
         this.e = e;
     }
+
+    public AutomationFailureException(String msg) {
+        super(msg);
+        e = null;
+    }
 }

@@ -159,13 +159,14 @@ public class MainController {
                         );
 
                     } catch (CannotBeAutomatedException x) {
-                        logger.warning("test cannot be automated: " + t.automatableTest + ": " + x);
+                        logger.warning(t.automatableTest + ": cannot be automated: " + x);
 
                         t.node.setAutomationStage(
                                 AutomationStage.FINISHED_ERROR
                         );
+
                     } catch (AutomationFailureException x) {
-                        logger.warning("failure automating test: " + x.e);
+                        logger.severe(t.automatableTest + ": failure automating test: " + x);
 
                         t.node.setAutomationStage(
                                 AutomationStage.FINISHED_ERROR
