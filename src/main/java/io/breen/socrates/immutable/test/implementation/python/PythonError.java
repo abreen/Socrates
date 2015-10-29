@@ -1,10 +1,8 @@
 package io.breen.socrates.immutable.test.implementation.python;
 
 /**
- * An exception thrown when a PythonInspector attempts to make an XML-RPC method call and the server
- * returns a Python interpreter error. Note that this is *not* the exception thrown when there is an
- * error at the XML-RPC level (e.g., if a bad method name was specified for when the parameters do
- * not match); that exception indicates an error with our code, not a student's (hopefully).
+ * An exception thrown when a PythonInspector gets an error response, which indicates an
+ * error or exception was thrown by the Python interpreter when running the student's code.
  */
 public class PythonError extends Exception {
 

@@ -22,8 +22,8 @@ public final class PythonFile extends File implements PostConstructionAction {
      */
     public double importFailureDeduction;
 
-    public List<Variable> variables = new ArrayList<>(0);
-    public List<Function> functions = new ArrayList<>(0);
+    public List<Variable> variables = Collections.emptyList();
+    public List<Function> functions = Collections.emptyList();
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -31,6 +31,11 @@ public final class PythonFile extends File implements PostConstructionAction {
     public PythonFile() {
         language = "python";
         contentsArePlainText = true;
+    }
+
+    public PythonFile(double importFailureDeduction) {
+        this();
+        this.importFailureDeduction = importFailureDeduction;
     }
 
     private static boolean hasTest(List<Object> list, Test test) {

@@ -21,10 +21,10 @@ public final class PythonManager {
      * Python 3 programs.
      */
     public static Path python3Command;
-    public static Path XMLRPCServer;
-    public static Path socratesModule;
+
+    private static Path socratesTmpDir;
+
     private static Logger logger = Logger.getLogger(PythonManager.class.getName());
-    private static Path tempDir;
 
     static {
         List<Path> paths = new LinkedList<>();
@@ -49,6 +49,7 @@ public final class PythonManager {
             paths.add(Paths.get("C:\\Python33\\python.exe"));
             paths.add(Paths.get("C:\\Python32\\python.exe"));
             paths.add(Paths.get("C:\\Python31\\python.exe"));
+            paths.add(Paths.get("C:\\Python30\\python.exe"));
             break;
         case OSX:
         case LINUX:
@@ -73,37 +74,33 @@ public final class PythonManager {
             logger.severe("cannot find the Python 3 interpreter");
         }
 
-        try {
-            tempDir = Files.createTempDirectory("python");
-        } catch (IOException e) {
-            logger.severe("could not set up Python source directory:" + e);
-        }
-
-        logger.info("set up Python source directory: " + tempDir);
-
         /*
-         * Get the necessary resources as streams and write them to the temporary directory.
+         * Create a "socrates" directory in the system temporary directory, get the necessary
+         * resources as streams and copy them to the directory.
          */
         try {
-            InputStream stream = PythonManager.class.getResourceAsStream("server.py");
-            Path tempFile = Paths.get(tempDir.toString(), "server.py");
-            Files.copy(stream, tempFile, StandardCopyOption.REPLACE_EXISTING);
-            XMLRPCServer = tempFile;
+            socratesTmpDir = Files.createTempDirectory("socrates");
 
-            stream = PythonManager.class.getResourceAsStream("socrates.py");
-            tempFile = Paths.get(tempDir.toString(), "socrates.py");
-            Files.copy(stream, tempFile, StandardCopyOption.REPLACE_EXISTING);
-            socratesModule = tempFile;
+            for (String f : Arrays.asList("tester.py", "socrates.py")) {
+                InputStream stream = PythonManager.class.getResourceAsStream(f);
+                Path tempFile = Paths.get(socratesTmpDir.toString(), f);
+                Files.copy(stream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            }
 
         } catch (IOException x) {
-            logger.severe("I/O error copying Python source to temporary directory: " + x);
+            logger.severe("I/O error copying Python source to Socrates temporary directory: " + x);
         }
     }
 
     private PythonManager() {}
 
-    public static Path getPythonPathDirectory() {
-        return tempDir;
+    /**
+     * Given the name of a Python source code file (e.g., "socrates.py", the Socrates Python API
+     * module), this method returns a Path object representing the current location of that
+     * file in the system temporary directory.
+     */
+    public static Path getPathToSource(String scriptName) {
+        return Paths.get(socratesTmpDir.toString(), scriptName);
     }
 
     private static boolean isValidPython3InterpreterPath(Path path)

@@ -1,143 +1,54 @@
 package io.breen.socrates.immutable.test.implementation.python;
 
-import io.breen.socrates.Globals;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.breen.socrates.python.PythonManager;
-import io.breen.socrates.python.PythonProcessBuilder;
-import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.logging.Logger;
 
-/**
- * A class providing the ability to acquire information about a Python module (such as its class,
- * function and variable definitions) by communicating to an XML-RPC server that can load the module
- * into a running Python interpreter. The XML-RPC server also supports evaluating functions,
- * creating objects of user-defined types, and calling methods on those objects.
- *
- * An instance of this class uses a PythonProcessBuilder to start the XML-RPC server, and then uses
- * the Apache XML-RPC client library to communicate with the interpreter.
- */
-public class PythonInspector implements AutoCloseable {
+public class PythonInspector {
 
-    private enum RPCMethod {
-        HELLO("hello"),
-        GOODBYE("goodbye"),
-        MODULE_OPEN("module.open"),
-        MODULE_HASCLASS("module.hasClass"),
-        MODULE_HASFUNCTION("module.hasFunction"),
-        MODULE_HASVARIABLE("module.hasVariable"),
-        VARIABLE_EVAL("variable.eval"),
-        FUNCTION_EVAL("function.eval"),
-        OBJECT_NEW("object.new"),
-        OBJECT_NEWWITHOUTINIT("object.newWithoutInit"),
-        OBJECT_HASATTRIBUTE("object.hasAttribute"),
-        METHOD_EVAL("method.eval");
-
-        public final String methodString;
-
-        RPCMethod(String methodString) {
-            this.methodString = methodString;
-        }
-    }
-
-    private static Logger logger = Logger.getLogger(PythonInspector.class.getName());
-    private static String XMLRPCPath = "/xmlrpc";
-
-    private final PythonProcessBuilder builder;
+    private final String moduleName;
+    private final ProcessBuilder builder;
     private final Process process;
-    private final XmlRpcClient client;
 
     public PythonInspector(Path targetModulePath) throws IOException {
         if (!Files.isRegularFile(targetModulePath))
             throw new IllegalArgumentException("module path must be a path to a file");
 
-        int port = 45000 + (int)(Math.random() * 1000);
+        String fileName = targetModulePath.getFileName().toString();
+        String[] parts = fileName.split("\\.");
+        moduleName = parts[0];
 
-        URL url;
-        try {
-            url = new URL("http://127.0.0.1:" + port + XMLRPCPath);
-        } catch (MalformedURLException e) {
-            logger.severe("could not form URL for XML-RPC server: " + e);
-            throw e;
-        }
+        builder = new ProcessBuilder(
+                PythonManager.python3Command.toString(), "-B",
+                // turns off writing bytecode files (.py[co])
+                PythonManager.getPathToSource("tester.py").toString()
+        );
 
-        builder = new PythonProcessBuilder(PythonManager.XMLRPCServer, Integer.toString(port));
-        builder.setDirectory(targetModulePath.getParent());
+        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+        Map<String, String> env = builder.environment();
+        env.put(
+                "PYTHONPATH",
+
+                /*
+                 * Note: this leading path separator is very important! It ensures that PYTHONPATH
+                 * has the empty string as an entry, which tells the Python interpreter to look
+                 * in the current working directory of the Python process to find modules.
+                 */
+                System.getProperty("path.separator")
+        );
+
+        Path parentDir = targetModulePath.getParent();
+        builder.directory(parentDir.toFile());
+
         process = builder.start();
-
-        try {
-            int exitValue = process.exitValue();
-            logger.severe("XMLRPC process exited with code " + exitValue);
-            throw new IOException("XMLRPC process exited");
-
-        } catch (IllegalThreadStateException ignored) {
-            // a good sign: the process is running
-        }
-
-        XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-        config.setServerURL(url);
-        config.setEnabledForExtensions(true);
-
-        client = new XmlRpcClient();
-        client.setConfig(config);
-
-        int ms = 0;
-        for (int i = 1; i <= 1024; i *= 2) {
-            try {
-                Thread.sleep(i);
-                ms += i;
-            } catch (InterruptedException x) {
-                return;
-            }
-
-            try {
-                int status = process.exitValue();
-                if (status != Globals.NORMAL_EXIT_CODE) {
-                    String msg = "Python process exited with code " + status;
-                    throw new IOException(msg);
-                }
-
-            } catch (IllegalThreadStateException ignored) {}
-
-            try {
-                if (hello()) { // connected
-                    break;
-                } else {
-                    logger.severe("did not get true from hello() call");
-                    throw new IOException();
-                }
-            } catch (XmlRpcException ignored) {     // server may not be up yet
-            } catch (PythonError x) {
-                logger.severe("got PythonError with hello() call");
-                throw new IOException();
-            }
-        }
-
-        logger.fine("waited " + ms + " ms for XML-RPC server");
     }
 
-    private static PythonObject getPythonObject(Object response) throws PythonError {
-        Map<String, Object> map = (Map<String, Object>)response;
-        boolean error = (boolean)map.get("error");
-        if (error) {
-            String type = (String)map.get("errorType");
-            String message = (String)map.get("errorMessage");
-            throw new PythonError(type, message);
-        }
-
-        Object value = map.get("result");
-        String type = (String)map.get("type");
-        return new PythonObject(value, type);
-    }
-
-    public static boolean equals(Object expected, PythonObject other) {
+    private static boolean equals(Object expected, PythonObject other) {
         if (expected == null) {
             return other.value == null;
 
@@ -171,15 +82,25 @@ public class PythonInspector implements AutoCloseable {
 
             if (other == null || !other.type.equals("list")) return false;
 
-            if (!(other.value instanceof Object[])) return false;
+            if (!(other.value instanceof List)) return false;
 
-            Object[] objArr = (Object[])other.value;
+            List otherList = (List)other.value;
 
-            if (list.size() != objArr.length) return false;
+            return list.equals(otherList);
 
-            for (int i = 0; i < objArr.length; i++) {
-                if (!list.get(i).equals(objArr[i])) return false;
-            }
+        } else if (expected instanceof Object[]) {
+            Object[] arr = (Object[])expected;
+
+            if (other == null || !other.type.equals("list")) return false;
+
+            if (!(other.value instanceof List)) return false;
+
+            List otherList = (List)other.value;
+
+            if (arr.length != otherList.size()) return false;
+
+            for (int i = 0; i < arr.length; i++)
+                if (!arr[i].equals(otherList.get(i))) return false;
 
             return true;
 
@@ -196,73 +117,141 @@ public class PythonInspector implements AutoCloseable {
         throw new IllegalArgumentException();
     }
 
-    @Override
-    public void close() {
-        try {
-            goodbye();
-        } catch (XmlRpcException ignored) {}
-
-        process.destroy();
+    private Map<String, Object> newRequestMap() {
+        Map<String, Object> request = new HashMap<>();
+        request.put("name", moduleName);
+        return request;
     }
 
-    public boolean hello() throws XmlRpcException, PythonError {
-        Object response = client.execute(
-                RPCMethod.HELLO.methodString, new Object[] {}
-        );
-
-        return (boolean)getPythonObject(response).value;
+    private boolean isErrorResponse(Map<String, Object> response) {
+        return response.containsKey("error") && (boolean)response.get("error");
     }
 
-    public void goodbye() throws XmlRpcException {
-        client.execute(
-                RPCMethod.GOODBYE.methodString, new Object[] {}
+    private PythonError errorFromResponse(Map<String, Object> response) {
+        return new PythonError(
+                (String)response.get("error_type"), (String)response.get("error_message")
         );
     }
 
-    public void openModule(String moduleName) throws XmlRpcException, PythonError {
-        Object response = client.execute(
-                RPCMethod.MODULE_OPEN.methodString, new Object[] {moduleName}
-        );
-
-        getPythonObject(response);
+    private PythonObject toPythonObject(Map<String, Object> response) {
+        return new PythonObject(response.get("value"), (String)response.get("type"));
     }
 
-    public PythonObject variableEval(String variableName) throws XmlRpcException, PythonError {
-        Object response = client.execute(
-                RPCMethod.VARIABLE_EVAL.methodString, new Object[] {variableName}
-        );
+    public boolean variableExists(String variableName) throws IOException, PythonError {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> request = newRequestMap();
+        request.put("type", "exists");
 
-        return getPythonObject(response);
+        Map<String, String> targetMap = new HashMap<>();
+        targetMap.put("type", "variable");
+        targetMap.put("name", variableName);
+
+        request.put("target", targetMap);
+
+        mapper.writeValue(process.getOutputStream(), request);
+
+        Map<String, Object> response = mapper.readValue(process.getInputStream(), Map.class);
+
+        if (isErrorResponse(response)) throw errorFromResponse(response);
+
+        return (boolean)response.get("value");
     }
 
-    public boolean moduleHasVariable(String variableName) throws XmlRpcException, PythonError {
-        Object response = client.execute(
-                RPCMethod.MODULE_HASVARIABLE.methodString, new Object[] {variableName}
-        );
-
-        return (boolean)getPythonObject(response).value;
-    }
-
-    public boolean moduleHasFunction(String functionName) throws XmlRpcException, PythonError {
-        Object response = client.execute(
-                RPCMethod.MODULE_HASFUNCTION.methodString, new Object[] {functionName}
-        );
-
-        return (boolean)getPythonObject(response).value;
-    }
-
-    public PythonObject functionEval(String functionName, List<Object> args)
-            throws XmlRpcException, PythonError
+    public boolean variableEquals(String variableName, Object value) throws IOException, PythonError
     {
-        Object response = client.execute(
-                RPCMethod.FUNCTION_EVAL.methodString,
-                new Object[] {functionName, args, new HashMap<>()}
-        );
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> request = newRequestMap();
+        request.put("type", "eval");
 
-        return getPythonObject(response);
+        Map<String, String> targetMap = new HashMap<>();
+        targetMap.put("type", "variable");
+        targetMap.put("name", variableName);
+
+        request.put("target", targetMap);
+
+        mapper.writeValue(process.getOutputStream(), request);
+
+        Map<String, Object> response = mapper.readValue(process.getInputStream(), Map.class);
+
+        if (isErrorResponse(response)) throw errorFromResponse(response);
+
+        return equals(value, toPythonObject(response));
     }
 
-    public static class PythonObject {
+    public boolean canImportModule() throws IOException, PythonError {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> request = newRequestMap();
+        request.put("type", "load");
+
+        mapper.writeValue(process.getOutputStream(), request);
+
+        Map<String, Object> response = mapper.readValue(process.getInputStream(), Map.class);
+
+        if (isErrorResponse(response)) throw errorFromResponse(response);
+
+        return (boolean)response.get("value");
+    }
+
+    public boolean functionExists(String functionName) throws IOException, PythonError {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> request = newRequestMap();
+        request.put("type", "exists");
+
+        Map<String, String> targetMap = new HashMap<>();
+        targetMap.put("type", "function");
+        targetMap.put("name", functionName);
+
+        request.put("target", targetMap);
+
+        mapper.writeValue(process.getOutputStream(), request);
+
+        Map<String, Object> response = mapper.readValue(process.getInputStream(), Map.class);
+
+        if (isErrorResponse(response)) throw errorFromResponse(response);
+
+        return (boolean)response.get("value");
+    }
+
+    public boolean functionProduces(String functionName, List<Object> args,
+                                    Map<String, Object> kwargs, String input, Object returnValue,
+                                    String output) throws IOException, PythonError
+    {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> request = newRequestMap();
+        request.put("type", "eval");
+
+        Map<String, String> targetMap = new HashMap<>();
+        targetMap.put("type", "function");
+        targetMap.put("name", functionName);
+
+        request.put("target", targetMap);
+
+        // parameters of the test, not to the function
+        Map<String, Object> parametersMap = new HashMap<>();
+
+        if (args != null && !args.isEmpty()) parametersMap.put("args", args);
+        if (kwargs != null && !kwargs.isEmpty()) parametersMap.put("kwargs", kwargs);
+        if (input != null) parametersMap.put("input", input);
+
+        request.put("parameters", parametersMap);
+
+        mapper.writeValue(process.getOutputStream(), request);
+
+        Map<String, Object> response = mapper.readValue(process.getInputStream(), Map.class);
+
+        if (isErrorResponse(response)) throw errorFromResponse(response);
+
+        if (output != null) {
+            if (!response.containsKey("output")) return false;
+
+            String outputProduced = (String)response.get("output");
+            if (!output.equals(outputProduced)) return false;
+        }
+
+        return equals(returnValue, toPythonObject(response));
+    }
+
+    public class PythonObject {
 
         public final Object value;
         public final String type;

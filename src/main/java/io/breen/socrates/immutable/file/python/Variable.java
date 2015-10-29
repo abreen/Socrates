@@ -1,5 +1,6 @@
 package io.breen.socrates.immutable.file.python;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,4 +16,10 @@ public class Variable {
      * This empty constructor is used by SnakeYAML.
      */
     public Variable() {}
+
+    public Variable(String name, double pointValue) {
+        this.name = name;
+        this.pointValue = pointValue;
+        this.tests = Collections.emptyList();
+    }
 }

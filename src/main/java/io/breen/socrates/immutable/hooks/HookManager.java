@@ -5,7 +5,7 @@ import io.breen.socrates.immutable.criteria.Resource;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.hooks.triggers.*;
 import io.breen.socrates.immutable.test.Test;
-import io.breen.socrates.python.PythonProcessBuilder;
+import io.breen.socrates.python.PythonManager;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -106,8 +106,13 @@ public final class HookManager {
 
         try {
             Path path = script.getPath();
-            PythonProcessBuilder builder = new PythonProcessBuilder(path);
-            if (workingDir != null) builder.setDirectory(workingDir);
+            ProcessBuilder builder = new ProcessBuilder(
+                    PythonManager.python3Command.toString(),
+                    path.toString()
+            );
+
+            if (workingDir != null)
+                builder.directory(workingDir.toFile());
 
             Process process = builder.start();
             int exitCode = process.waitFor();

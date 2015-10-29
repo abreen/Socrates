@@ -6,7 +6,6 @@ import io.breen.socrates.immutable.file.python.Variable;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
-import org.apache.xmlrpc.XmlRpcException;
 
 import javax.swing.text.Document;
 import java.io.IOException;
@@ -23,14 +22,14 @@ public class VariableEvalTest extends VariableTest implements Automatable<Python
      */
     public VariableEvalTest() {}
 
-    public VariableEvalTest(double deduction, String description) {
+    public VariableEvalTest(Object expectedValue, double deduction, String description) {
         super(deduction, description);
+        value = expectedValue;
     }
 
     @Override
     public String toString() {
-        return "FunctionEvalTest(" +
-                "value=" + value + ")";
+        return "VariableEvalTest(value=" + value + ")";
     }
 
     @Override
@@ -46,16 +45,14 @@ public class VariableEvalTest extends VariableTest implements Automatable<Python
         Variable var = parent.getVariableForTest(this);
         if (var == null) throw new IllegalArgumentException();
 
-        try (PythonInspector inspector = new PythonInspector(target.fullPath)) {
-            inspector.openModule(parent.getModuleName());
-            PythonInspector.PythonObject value = inspector.variableEval(var.name);
-            return PythonInspector.equals(this.value, value);
-
-        } catch (IOException | XmlRpcException | IllegalArgumentException x) {
+        try {
+            PythonInspector inspector = new PythonInspector(target.fullPath);
+            return inspector.variableEquals(var.name, value);
+        } catch (IOException x) {
             throw new AutomationFailureException(x);
         } catch (PythonError x) {
             throw new CannotBeAutomatedException(
-                    "error occurred evaluating variable: " + x
+                    "Python error occurred evaluating variable: " + x
             );
         }
     }

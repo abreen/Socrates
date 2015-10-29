@@ -5,7 +5,6 @@ import io.breen.socrates.immutable.file.python.PythonFile;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
-import org.apache.xmlrpc.XmlRpcException;
 
 import javax.swing.text.Document;
 import java.io.IOException;
@@ -31,14 +30,15 @@ public class ImportTest extends Test implements Automatable<PythonFile> {
                               Criteria criteria, Document transcript)
             throws CannotBeAutomatedException, AutomationFailureException
     {
-        try (PythonInspector inspector = new PythonInspector(target.fullPath)) {
-            inspector.openModule(parent.getModuleName());
-        } catch (IOException | XmlRpcException x) {
+        try {
+            PythonInspector inspector = new PythonInspector(target.fullPath);
+            return inspector.canImportModule();
+        } catch (IOException x) {
             throw new AutomationFailureException(x);
         } catch (PythonError x) {
-            return false;
+            throw new CannotBeAutomatedException(
+                    "Python error occurred importing module: " + x
+            );
         }
-
-        return true;
     }
 }

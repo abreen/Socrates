@@ -6,7 +6,6 @@ import io.breen.socrates.immutable.file.python.Variable;
 import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.immutable.submission.SubmittedFile;
 import io.breen.socrates.immutable.test.*;
-import org.apache.xmlrpc.XmlRpcException;
 
 import javax.swing.text.Document;
 import java.io.IOException;
@@ -35,15 +34,14 @@ public class VariableExistsTest extends VariableTest implements Automatable<Pyth
                               Criteria criteria, Document transcript)
             throws CannotBeAutomatedException, AutomationFailureException
     {
-        try (PythonInspector inspector = new PythonInspector(target.fullPath)) {
-            inspector.openModule(parent.getModuleName());
-            return inspector.moduleHasVariable(this.variable.name);
-
-        } catch (IOException | XmlRpcException x) {
+        try {
+            PythonInspector inspector = new PythonInspector(target.fullPath);
+            return inspector.variableExists(variable.name);
+        } catch (IOException x) {
             throw new AutomationFailureException(x);
         } catch (PythonError x) {
             throw new CannotBeAutomatedException(
-                    "error occurred checking for variable existence: " + x
+                    "Python error occurred looking for variable: " + x
             );
         }
     }
