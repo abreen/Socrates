@@ -36,7 +36,7 @@ public class FunctionExistsTest extends FunctionTest implements Automatable<Pyth
     {
         try {
             PythonInspector inspector = new PythonInspector(target.fullPath);
-            return inspector.variableExists(function.name);
+            return inspector.functionExists(function.name);
         } catch (IOException x) {
             throw new AutomationFailureException(x);
         } catch (PythonError x) {
