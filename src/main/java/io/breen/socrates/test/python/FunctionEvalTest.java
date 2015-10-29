@@ -97,6 +97,7 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
 
         try {
             PythonInspector inspector = new PythonInspector(target.fullPath);
+            appendToDocument(transcript, callToString(func.name, args));
             return inspector.functionProduces(func.name, args, null, input, value, output);
         } catch (IOException x) {
             throw new AutomationFailureException(x);

@@ -1,5 +1,8 @@
 package io.breen.socrates.test;
 
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+
 /**
  * Class representing a single test specified by the criteria. Instances of non-abstract subclasses
  * of this class are immutable, and are created when a Criteria object is created.
@@ -30,6 +33,16 @@ public abstract class Test {
     public Test(double deduction, String description) {
         this.deduction = deduction;
         this.description = description;
+    }
+
+    /**
+     * A utility function for appending a string to a Document object. Useful for appending strings
+     * to the notes of a test, or the transcript document.
+     */
+    public static void appendToDocument(Document doc, String s) {
+        try {
+            doc.insertString(doc.getLength(), s, null);
+        } catch (BadLocationException ignored) {}
     }
 
     public String toString() {
