@@ -12,17 +12,11 @@ package io.breen.socrates.test;
  */
 public class AutomationFailureException extends Exception {
 
-    /**
-     * The exception that was thrown when automation failed.
-     */
-    public final Exception e;
-
     public AutomationFailureException(Exception e) {
-        this.e = e;
+        super("encountered exception: " + e);
     }
 
     public AutomationFailureException(String msg) {
         super(msg);
-        e = null;
     }
 }

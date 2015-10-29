@@ -1,6 +1,7 @@
 package io.breen.socrates.test.any;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.breen.socrates.Globals;
 import io.breen.socrates.criteria.Criteria;
 import io.breen.socrates.file.File;
 import io.breen.socrates.python.PythonManager;
@@ -11,13 +12,10 @@ import io.breen.socrates.test.*;
 import javax.swing.text.Document;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ScriptTest extends Test implements Automatable {
-
-    public static final int PASSED_EXIT_CODE = 10;
-    public static final int FAILED_EXIT_CODE = 11;
-    public static final int ERROR_EXIT_CODE = 12;
 
     /**
      * The string specifying the path to this script, relative to the "scripts" directory in a
@@ -79,12 +77,19 @@ public class ScriptTest extends Test implements Automatable {
         Path parentDir = target.fullPath.getParent();
         builder.directory(parentDir.toFile());
 
+        ObjectMapper mapper = new ObjectMapper();
+        Process process;
+
         int exitCode;
         try {
-            Process process = builder.start();
+            process = builder.start();
 
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.writeValue(process.getOutputStream(), parameters);
+            Map<String, Object> params = new HashMap<>(parameters);
+            params.put("target_full_path", target.fullPath.toString());
+            params.put("target_local_path", target.localPath.toString());
+            params.put("student_name", submission.studentName);
+
+            mapper.writeValue(process.getOutputStream(), params);
 
             exitCode = process.waitFor();
 
@@ -92,12 +97,36 @@ public class ScriptTest extends Test implements Automatable {
             throw new AutomationFailureException(x);
         }
 
-        if (exitCode == ERROR_EXIT_CODE)
-            throw new CannotBeAutomatedException("script raised an error");
-
-        if (exitCode != PASSED_EXIT_CODE && exitCode != FAILED_EXIT_CODE)
+        if (exitCode != Globals.NORMAL_EXIT_CODE)
             throw new AutomationFailureException("script exited abnormally");
 
-        return exitCode == PASSED_EXIT_CODE;
+        Map<String, Object> response;
+        try {
+            response = mapper.readValue(process.getInputStream(), Map.class);
+        } catch (IOException x) {
+            throw new AutomationFailureException(x);
+        }
+
+        if (isErrorResponse(response)) {
+            String errorType = (String)response.get("error_type");
+            String errorMessage = (String)response.get("error_message");
+
+            throw new CannotBeAutomatedException(
+                    "script raised error: " + errorType + ": " + errorMessage
+            );
+        }
+
+        String transcriptStr = (String)response.get("transcript");
+        if (transcriptStr != null) {
+            if (!transcriptStr.endsWith("\n")) transcriptStr += "\n";
+
+            appendToDocument(transcript, transcriptStr);
+        }
+
+        return (boolean)response.get("should_pass");
+    }
+
+    private boolean isErrorResponse(Map<String, Object> response) {
+        return response.containsKey("error") && (boolean)response.get("error");
     }
 }
