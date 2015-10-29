@@ -1,9 +1,9 @@
 package io.breen.socrates.model.wrapper;
 
-import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.model.AutomationStage;
 import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.event.*;
+import io.breen.socrates.test.Test;
 import io.breen.socrates.util.Observable;
 import io.breen.socrates.util.Observer;
 

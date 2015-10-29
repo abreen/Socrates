@@ -1,10 +1,10 @@
 package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
-import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.file.File;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import io.breen.socrates.model.wrapper.UnrecognizedFileWrapperNode;
+import io.breen.socrates.submission.SubmittedFile;
 import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;

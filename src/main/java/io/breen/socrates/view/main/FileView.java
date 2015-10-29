@@ -4,10 +4,10 @@ import com.threecrickets.jygments.ResolutionException;
 import com.threecrickets.jygments.format.Formatter;
 import com.threecrickets.jygments.grammar.Lexer;
 import io.breen.socrates.Globals;
-import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.file.File;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import io.breen.socrates.model.wrapper.UnrecognizedFileWrapperNode;
+import io.breen.socrates.submission.SubmittedFile;
 
 import javax.swing.*;
 import javax.swing.border.Border;

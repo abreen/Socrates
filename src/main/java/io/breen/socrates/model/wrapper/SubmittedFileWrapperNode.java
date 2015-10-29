@@ -1,10 +1,10 @@
 package io.breen.socrates.model.wrapper;
 
-import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.submission.SubmittedFile;
-import io.breen.socrates.immutable.test.*;
+import io.breen.socrates.file.File;
 import io.breen.socrates.model.*;
 import io.breen.socrates.model.event.*;
+import io.breen.socrates.submission.SubmittedFile;
+import io.breen.socrates.test.*;
 import io.breen.socrates.util.Observable;
 import io.breen.socrates.util.*;
 import io.breen.socrates.util.Observer;

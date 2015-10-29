@@ -2,9 +2,9 @@ package io.breen.socrates;
 
 import io.breen.socrates.controller.MainController;
 import io.breen.socrates.controller.SetupController;
-import io.breen.socrates.immutable.criteria.Criteria;
-import io.breen.socrates.immutable.criteria.InvalidCriteriaException;
-import io.breen.socrates.immutable.submission.*;
+import io.breen.socrates.criteria.Criteria;
+import io.breen.socrates.criteria.InvalidCriteriaException;
+import io.breen.socrates.submission.*;
 import org.apache.commons.cli.*;
 
 import java.io.*;

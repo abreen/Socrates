@@ -1,7 +1,7 @@
 package io.breen.socrates.model.wrapper;
 
-import io.breen.socrates.immutable.submission.Submission;
 import io.breen.socrates.model.event.*;
+import io.breen.socrates.submission.Submission;
 import io.breen.socrates.util.Observable;
 import io.breen.socrates.util.*;
 import io.breen.socrates.util.Observer;

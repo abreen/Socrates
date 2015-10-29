@@ -1,10 +1,10 @@
 package io.breen.socrates.model;
 
-import io.breen.socrates.immutable.test.Test;
-import io.breen.socrates.immutable.test.TestGroup;
 import io.breen.socrates.model.event.ResultChangedEvent;
 import io.breen.socrates.model.wrapper.TestGroupWrapperNode;
 import io.breen.socrates.model.wrapper.TestWrapperNode;
+import io.breen.socrates.test.Test;
+import io.breen.socrates.test.TestGroup;
 import io.breen.socrates.util.ObservableChangedEvent;
 import io.breen.socrates.util.Observer;
 

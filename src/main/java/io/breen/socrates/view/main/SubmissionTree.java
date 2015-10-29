@@ -2,12 +2,12 @@ package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
 import io.breen.socrates.controller.MainController;
-import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.submission.Submission;
-import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.file.File;
 import io.breen.socrates.model.event.GradeReportSavedEvent;
 import io.breen.socrates.model.event.SubmissionCompletedChangeEvent;
 import io.breen.socrates.model.wrapper.*;
+import io.breen.socrates.submission.Submission;
+import io.breen.socrates.submission.SubmittedFile;
 import io.breen.socrates.util.*;
 import io.breen.socrates.util.Observer;
 

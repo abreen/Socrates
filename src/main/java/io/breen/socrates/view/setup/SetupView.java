@@ -1,6 +1,6 @@
 package io.breen.socrates.view.setup;
 
-import io.breen.socrates.immutable.criteria.Criteria;
+import io.breen.socrates.criteria.Criteria;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

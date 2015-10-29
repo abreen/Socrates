@@ -1,6 +1,6 @@
 package io.breen.socrates.model.wrapper;
 
-import io.breen.socrates.immutable.test.TestGroup;
+import io.breen.socrates.test.TestGroup;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 

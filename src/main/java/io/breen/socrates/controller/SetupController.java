@@ -1,8 +1,8 @@
 package io.breen.socrates.controller;
 
-import io.breen.socrates.immutable.criteria.Criteria;
-import io.breen.socrates.immutable.criteria.InvalidCriteriaException;
-import io.breen.socrates.immutable.submission.*;
+import io.breen.socrates.criteria.Criteria;
+import io.breen.socrates.criteria.InvalidCriteriaException;
+import io.breen.socrates.submission.*;
 import io.breen.socrates.view.DetailOptionPane;
 import io.breen.socrates.view.setup.SetupView;
 

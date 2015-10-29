@@ -1,6 +1,6 @@
 package io.breen.socrates.model.wrapper;
 
-import io.breen.socrates.immutable.submission.SubmittedFile;
+import io.breen.socrates.submission.SubmittedFile;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 

@@ -1,16 +1,16 @@
 package io.breen.socrates.controller;
 
 import io.breen.socrates.Globals;
-import io.breen.socrates.immutable.TextGradeReportFormatter;
-import io.breen.socrates.immutable.criteria.Criteria;
-import io.breen.socrates.immutable.file.File;
-import io.breen.socrates.immutable.submission.Submission;
-import io.breen.socrates.immutable.submission.SubmittedFile;
-import io.breen.socrates.immutable.test.*;
+import io.breen.socrates.TextGradeReportFormatter;
+import io.breen.socrates.criteria.Criteria;
+import io.breen.socrates.file.File;
 import io.breen.socrates.model.AutomationStage;
 import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.wrapper.SubmissionWrapperNode;
 import io.breen.socrates.model.wrapper.TestWrapperNode;
+import io.breen.socrates.submission.Submission;
+import io.breen.socrates.submission.SubmittedFile;
+import io.breen.socrates.test.*;
 import io.breen.socrates.util.Pair;
 import io.breen.socrates.view.main.MainView;
 import io.breen.socrates.view.main.MenuBarManager;

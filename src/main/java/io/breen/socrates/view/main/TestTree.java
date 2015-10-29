@@ -1,10 +1,10 @@
 package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
-import io.breen.socrates.immutable.test.*;
 import io.breen.socrates.model.TestResult;
 import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
 import io.breen.socrates.model.wrapper.TestWrapperNode;
+import io.breen.socrates.test.*;
 import io.breen.socrates.util.ObservableChangedEvent;
 import io.breen.socrates.util.Observer;
 import io.breen.socrates.view.icon.TestIcon;
