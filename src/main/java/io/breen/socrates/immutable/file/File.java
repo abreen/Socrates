@@ -3,7 +3,7 @@ package io.breen.socrates.immutable.file;
 import io.breen.socrates.immutable.PostConstructionAction;
 import io.breen.socrates.immutable.Verifiable;
 import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.immutable.test.implementation.any.LateSubmissionTest;
+import io.breen.socrates.immutable.test.any.LateSubmissionTest;
 
 import java.util.*;
 

@@ -4,7 +4,7 @@ import io.breen.socrates.immutable.PostConstructionAction;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.immutable.test.implementation.python.*;
+import io.breen.socrates.immutable.test.python.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

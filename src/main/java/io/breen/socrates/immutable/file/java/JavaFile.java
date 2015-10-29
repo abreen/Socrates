@@ -4,8 +4,8 @@ import io.breen.socrates.immutable.PostConstructionAction;
 import io.breen.socrates.immutable.file.File;
 import io.breen.socrates.immutable.test.Test;
 import io.breen.socrates.immutable.test.TestGroup;
-import io.breen.socrates.immutable.test.implementation.java.ClassExistsTest;
-import io.breen.socrates.immutable.test.implementation.java.MethodExistsTest;
+import io.breen.socrates.immutable.test.java.ClassExistsTest;
+import io.breen.socrates.immutable.test.java.MethodExistsTest;
 
 import java.util.*;
 
