@@ -17,6 +17,7 @@ import json
 
 EXIT_PASSED = 10
 EXIT_FAILED = 11
+EXIT_ERROR = 12
 
 # wait for Socrates to supply the parameters to the test
 params = json.loads(input())
@@ -25,8 +26,14 @@ params = json.loads(input())
 def get_parameters():
     return params
 
+
 def pass_test():
     sys.exit(EXIT_PASSED)
 
+
 def fail_test():
     sys.exit(EXIT_FAILED)
+
+
+def raise_error():
+    sys.exit(EXIT_ERROR)

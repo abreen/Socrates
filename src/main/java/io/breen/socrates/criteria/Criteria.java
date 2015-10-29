@@ -8,7 +8,7 @@ import io.breen.socrates.file.plain.PlainFile;
 import io.breen.socrates.file.python.PythonFile;
 import io.breen.socrates.test.TestGroup;
 import io.breen.socrates.test.any.ReviewTest;
-import io.breen.socrates.test.any.script.ScriptTest;
+import io.breen.socrates.test.any.ScriptTest;
 import io.breen.socrates.test.java.MethodEvalTest;
 import io.breen.socrates.test.logicly.CircuitEvalTest;
 import io.breen.socrates.test.python.FunctionEvalTest;

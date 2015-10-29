@@ -1,4 +1,4 @@
-package io.breen.socrates.test.any.script;
+package io.breen.socrates.test.any;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.breen.socrates.criteria.Criteria;
@@ -17,6 +17,7 @@ public class ScriptTest extends Test implements Automatable {
 
     public static final int PASSED_EXIT_CODE = 10;
     public static final int FAILED_EXIT_CODE = 11;
+    public static final int ERROR_EXIT_CODE = 12;
 
     /**
      * The string specifying the path to this script, relative to the "scripts" directory in a
@@ -90,6 +91,9 @@ public class ScriptTest extends Test implements Automatable {
         } catch (IOException | InterruptedException x) {
             throw new AutomationFailureException(x);
         }
+
+        if (exitCode == ERROR_EXIT_CODE)
+            throw new CannotBeAutomatedException("script raised an error");
 
         if (exitCode != PASSED_EXIT_CODE && exitCode != FAILED_EXIT_CODE)
             throw new AutomationFailureException("script exited abnormally");
