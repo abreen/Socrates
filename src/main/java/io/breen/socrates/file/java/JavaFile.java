@@ -15,7 +15,7 @@ import java.util.*;
  */
 public final class JavaFile extends File implements PostConstructionAction {
 
-    public List<Class> classes = new ArrayList<>(0);
+    public List<Class> classes = Collections.emptyList();
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -25,13 +25,14 @@ public final class JavaFile extends File implements PostConstructionAction {
         contentsArePlainText = true;
     }
 
-    public JavaFile(String path, double pointValue, Map<Date, Double> dueDates, List<Object> tests)
+    public JavaFile(String path, double pointValue, Map<Date, Double> dueDates,
+                    List<java.lang.Object> tests)
     {
         super(path, pointValue, dueDates, tests);
     }
 
-    private static boolean hasTest(List<Object> list, Test test) {
-        for (Object o : list)
+    private static boolean hasTest(List<java.lang.Object> list, Test test) {
+        for (java.lang.Object o : list)
             if (o instanceof Test && o == test) return true;
             else if (o instanceof TestGroup) return hasTest(((TestGroup)o).members, test);
 
@@ -45,10 +46,10 @@ public final class JavaFile extends File implements PostConstructionAction {
 
     @Override
     protected TestGroup createTestRoot() {
-        List<Object> tests = new LinkedList<>();
+        List<java.lang.Object> tests = new LinkedList<>();
 
         for (Class c : classes) {
-            List<Object> methodRoots = new LinkedList<>();
+            List<java.lang.Object> methodRoots = new LinkedList<>();
 
             for (Method m : c.methods) {
                 Test methodExistsTest = new MethodExistsTest(m);

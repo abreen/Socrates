@@ -2,7 +2,8 @@ package io.breen.socrates.criteria;
 
 import io.breen.socrates.file.File;
 import io.breen.socrates.file.PDFFile;
-import io.breen.socrates.file.java.JavaFile;
+import io.breen.socrates.file.java.*;
+import io.breen.socrates.file.java.Object;
 import io.breen.socrates.file.logicly.LogiclyFile;
 import io.breen.socrates.file.plain.PlainFile;
 import io.breen.socrates.file.python.PythonFile;
@@ -188,12 +189,27 @@ public class Criteria {
         );
 
         /*
-         * Java source code file type and supported tests
+         * Java source code file type, supported tests and supporting object definitions
          */
         cons.addTypeDescription(new TypeDescription(JavaFile.class, "!file:java"));
         cons.addTypeDescription(
                 new TypeDescription(
                         MethodEvalTest.class, "!test:java:eval:method"
+                )
+        );
+        cons.addTypeDescription(
+                new TypeDescription(
+                        Parameter.class, "!java:parameter"
+                )
+        );
+        cons.addTypeDescription(
+                new TypeDescription(
+                        Type.class, "!java:type"
+                )
+        );
+        cons.addTypeDescription(
+                new TypeDescription(
+                        Object.class, "!java:object"
                 )
         );
 

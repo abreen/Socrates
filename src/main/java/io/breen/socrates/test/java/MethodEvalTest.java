@@ -3,6 +3,7 @@ package io.breen.socrates.test.java;
 import io.breen.socrates.criteria.Criteria;
 import io.breen.socrates.file.java.Class;
 import io.breen.socrates.file.java.*;
+import io.breen.socrates.file.java.Object;
 import io.breen.socrates.submission.Submission;
 import io.breen.socrates.submission.SubmittedFile;
 import io.breen.socrates.test.*;
@@ -10,14 +11,16 @@ import org.codehaus.janino.JavaSourceClassLoader;
 
 import javax.swing.text.Document;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 
 public class MethodEvalTest extends Test implements Automatable<JavaFile> {
 
     /**
      * The expected return value of the method.
+     *
+     * @see io.breen.socrates.file.java.Object
      */
     public Object value;
 
@@ -33,28 +36,35 @@ public class MethodEvalTest extends Test implements Automatable<JavaFile> {
 
     /**
      * For each parameter, the actual value of the argument to give the function.
+     *
+     * @see io.breen.socrates.file.java.Object
      */
     public Map<String, Object> arguments;
 
+    /**
+     * This empty constructor is used by SnakeYAML.
+     */
     public MethodEvalTest() {}
 
-    private static Object[] buildArguments(List<String> parameters, Map<String, Object> arguments) {
-        Object[] args = new Object[parameters.size()];
+    private static java.lang.Object[] buildArguments(List<Parameter> parameters,
+                                                     Map<String, Object> arguments)
+    {
+        java.lang.Object[] args = new java.lang.Object[parameters.size()];
 
-        for (int i = 0; i < args.length; i++) {
-            Object o = arguments.get(parameters.get(i));
-
-            if (o instanceof ArrayList) {
-                // TODO get rid of this ugly hack to convert SnakeYAML's ArrayLists to arrays
-                // TODO what if an ArrayList really should be passed in?!
-
-                o = ((ArrayList)o).toArray(new String[] {});
-            }
-
-            args[i] = o;
-        }
+        for (int i = 0; i < args.length; i++)
+            args[i] = arguments.get(parameters.get(i).name).toJavaObject();
 
         return args;
+    }
+
+    @Override
+    public String toString() {
+        return "MethodEvalTest(" +
+                "value=" + value + ", " +
+                "output=" + output + ", " +
+                "input=" + input + ", " +
+                "arguments=" + arguments +
+                ")";
     }
 
     @Override
@@ -91,29 +101,33 @@ public class MethodEvalTest extends Test implements Automatable<JavaFile> {
             }
         }
 
-        if (studentMethod == null) throw new CannotBeAutomatedException("could not locate method");
+        if (studentMethod == null) {
+            appendToDocument(transcript, "could not locate method: is it named incorrectly?");
+            throw new CannotBeAutomatedException("could not locate method");
+        }
 
         // TODO use before/after to create an instance
 
-        Object[] args = buildArguments(method.parameters, arguments);
+        java.lang.Object[] args = buildArguments(method.parameters, arguments);
 
         // TODO buffer & send input to the method
 
-        Object returnValue;
+        java.lang.Object returnValue;
         try {
             returnValue = studentMethod.invoke(null, args);
-        } catch (IllegalAccessException | InvocationTargetException x) {
+        } catch (IllegalArgumentException x) {
+            appendToDocument(transcript, "could not invoke method: " + x.getLocalizedMessage());
+            throw new CannotBeAutomatedException("got exception invoking method: " + x);
+        } catch (IllegalAccessException x) {
             throw new AutomationFailureException(x);
+        } catch (InvocationTargetException x) {
+            appendToDocument(transcript, "exception was thrown in student code: " + x.getCause());
+            return false;
         }
 
         // TODO capture and check output
 
-        if (Modifier.isStatic(studentMethod.getModifiers())) {
-            // do not compare return value
-            return true;
-        }
-
-        return value.equals(returnValue);
+        return returnValue.equals(value.toJavaObject());
     }
 
     @Override

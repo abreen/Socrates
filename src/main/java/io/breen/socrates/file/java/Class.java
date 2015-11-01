@@ -1,6 +1,6 @@
 package io.breen.socrates.file.java;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -10,8 +10,8 @@ public class Class {
 
     public String name;
     public double pointValue;
-    public List<Object> tests = new ArrayList<>(0);
-    public List<Method> methods = new ArrayList<>(0);
+    public List<java.lang.Object> tests = Collections.emptyList();
+    public List<Method> methods = Collections.emptyList();
 
     /**
      * This empty constructor is used by SnakeYAML.

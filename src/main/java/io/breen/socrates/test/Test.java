@@ -40,6 +40,8 @@ public abstract class Test {
      * to the notes of a test, or the transcript document.
      */
     public static void appendToDocument(Document doc, String s) {
+        if (!s.endsWith("\n")) s += "\n";
+
         try {
             doc.insertString(doc.getLength(), s, null);
         } catch (BadLocationException ignored) {}

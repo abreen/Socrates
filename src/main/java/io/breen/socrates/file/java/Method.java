@@ -9,8 +9,8 @@ public class Method {
 
     public String name;
     public double pointValue;
-    public List<String> parameters;
-    public List<Object> tests;
+    public List<Parameter> parameters;
+    public List<java.lang.Object> tests;
 
     /**
      * This empty constructor is used by SnakeYAML.
