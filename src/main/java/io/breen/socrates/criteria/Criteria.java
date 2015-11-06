@@ -59,6 +59,12 @@ public class Criteria {
     public Map<String, Path> scripts;
 
     /**
+     * If this criteria was created from a criteria package, this field stores the file system
+     * location to which the archive was "unzipped".
+     */
+    private Path tempDir;
+
+    /**
      * This empty constructor is used by SnakeYAML.
      */
     public Criteria() {}
@@ -115,6 +121,7 @@ public class Criteria {
             c = loadCriteriaFileFromPath(criteriaPath[0]);
             c.staticResources = staticResources;
             c.scripts = scripts;
+            c.tempDir = tempDir;
 
         } else {
             logger.warning("unable to determine criteria type from extension");
@@ -258,6 +265,10 @@ public class Criteria {
         }
 
         file.close();
+    }
+
+    public Path getStaticDir() {
+        return Paths.get(tempDir.toString(), "static");
     }
 
     public File getFileByLocalPath(Path path) {

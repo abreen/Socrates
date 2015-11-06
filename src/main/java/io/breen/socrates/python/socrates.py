@@ -28,6 +28,9 @@ def conclude(passes, transcript=None, notes=None):
     if passes not in [True, False]:
         raise ValueError('result must be True or False')
 
+    for func in _callbacks:
+        func()
+
     resp = json.dumps({
         'error': False,
         'should_pass': passes,
@@ -48,6 +51,9 @@ def error(exc):
     obtained. In this case, Socrates will raise an internal CannotBeAutomatedException, which
     prompts the grader to manually choose a test result.
     """
+    for func in _callbacks:
+        func()
+
     resp = json.dumps({
         'error': True,
         'error_type': type(exc).__name__,
@@ -62,8 +68,16 @@ def error(exc):
     sys.exit(EXIT_NORMAL)
 
 
+def before_exit(func):
+    """Register a "callback" function to be run just before Socrates receives a result and the
+    script exits. The callback will be run before exiting when either error() or conclude() is
+    called. This function may be called many times to add many callbacks.
+    """
+    _callbacks.append(func)
+
+
 def get_parameters():
-    return params
+    return _params.copy()
 
 
 if __name__ == '__main__':
@@ -71,4 +85,5 @@ if __name__ == '__main__':
     sys.exit(EXIT_ERROR)
 
 # wait for Socrates to supply the parameters to the test
-params = json.loads(input())
+_params = json.loads(input())
+_callbacks = []

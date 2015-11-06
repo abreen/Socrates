@@ -12,8 +12,7 @@ import io.breen.socrates.test.*;
 import javax.swing.text.Document;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ScriptTest extends Test implements Automatable {
 
@@ -27,7 +26,7 @@ public class ScriptTest extends Test implements Automatable {
      * A map containing parameters needed to run the test. (This comes directly from the criteria
      * file.) These parameters are optional, and are sent to the script when it starts.
      */
-    public Map<String, Object> parameters;
+    public Map<String, Object> parameters = Collections.emptyMap();
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -88,6 +87,8 @@ public class ScriptTest extends Test implements Automatable {
             params.put("target_full_path", target.fullPath.toString());
             params.put("target_local_path", target.localPath.toString());
             params.put("student_name", submission.studentName);
+
+            params.put("static_path", criteria.getStaticDir().toString());
 
             mapper.writeValue(process.getOutputStream(), params);
 
