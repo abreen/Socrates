@@ -112,9 +112,9 @@ public class ScriptTest extends Test implements Automatable {
             String errorType = (String)response.get("error_type");
             String errorMessage = (String)response.get("error_message");
 
-            throw new CannotBeAutomatedException(
-                    "script raised error: " + errorType + ": " + errorMessage
-            );
+            String reason = "script raised error: " + errorType + ": " + errorMessage;
+            appendToDocument(transcript, reason + "\n");
+            throw new CannotBeAutomatedException(reason);
         }
 
         String transcriptStr = (String)response.get("transcript");
