@@ -55,6 +55,7 @@ public final class PythonManager {
         case LINUX:
             paths.add(Paths.get("/usr/local/bin/python"));
             paths.add(Paths.get("/usr/local/bin/python3"));
+            paths.add(Paths.get("/usr/local/bin/python3.4"));
             paths.add(Paths.get("/usr/bin/python"));
             paths.add(Paths.get("/usr/bin/python3"));
         }
