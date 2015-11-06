@@ -123,6 +123,8 @@ public class MainController {
                                             node, testObj, file, submittedFile, submission
                                     )
                             );
+
+                            node.setAutomationStage(AutomationStage.QUEUED);
                         }
                     }
                 }

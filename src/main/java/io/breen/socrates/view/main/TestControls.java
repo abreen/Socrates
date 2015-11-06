@@ -243,7 +243,12 @@ public class TestControls implements Observer<TestWrapperNode> {
     public static TestIcon newIcon(TestWrapperNode node) {
         if (node == null) return new DefaultTestIcon();
 
-        if (node.getAutomationStage() == AutomationStage.STARTED) return new RunningTestIcon();
+        switch (node.getAutomationStage()) {
+        case QUEUED:
+            return new QueuedTestIcon();
+        case STARTED:
+            return new RunningTestIcon();
+        }
 
         switch (node.getResult()) {
         case NONE:

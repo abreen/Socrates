@@ -5,5 +5,5 @@ package io.breen.socrates.model;
  * depending on whether the automation has started, ended normally, or ended abnormally.
  */
 public enum AutomationStage {
-    NONE, STARTED, FINISHED_NORMAL, FINISHED_ERROR
+    NONE, QUEUED, STARTED, FINISHED_NORMAL, FINISHED_ERROR
 }
