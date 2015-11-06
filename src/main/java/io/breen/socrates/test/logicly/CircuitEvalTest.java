@@ -83,7 +83,8 @@ public class CircuitEvalTest extends Test implements Automatable<LogiclyFile> {
 
     @Override
     public boolean shouldPass(LogiclyFile parent, SubmittedFile target, Submission submission,
-                              Criteria criteria, javax.swing.text.Document transcript)
+                              Criteria criteria, javax.swing.text.Document transcript,
+                              javax.swing.text.Document notes)
             throws CannotBeAutomatedException, AutomationFailureException
     {
         List<Switch> switches;

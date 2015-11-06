@@ -1,5 +1,6 @@
 package io.breen.socrates.test;
 
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
@@ -39,12 +40,18 @@ public abstract class Test {
      * A utility function for appending a string to a Document object. Useful for appending strings
      * to the notes of a test, or the transcript document.
      */
-    public static void appendToDocument(Document doc, String s) {
-        if (!s.endsWith("\n")) s += "\n";
-
-        try {
-            doc.insertString(doc.getLength(), s, null);
-        } catch (BadLocationException ignored) {}
+    public static void appendToDocument(final Document doc, final String s) {
+        SwingUtilities.invokeLater(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        int length = doc.getLength();
+                        try {
+                            doc.insertString(length, s, null);
+                        } catch (BadLocationException ignored) {}
+                    }
+                }
+        );
     }
 
     public String toString() {

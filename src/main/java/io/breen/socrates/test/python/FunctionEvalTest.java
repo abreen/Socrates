@@ -85,7 +85,7 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
 
     @Override
     public boolean shouldPass(PythonFile parent, SubmittedFile target, Submission submission,
-                              Criteria criteria, Document transcript)
+                              Criteria criteria, Document transcript, Document notes)
             throws CannotBeAutomatedException, AutomationFailureException
     {
         Function func = parent.getFunctionForTest(this);

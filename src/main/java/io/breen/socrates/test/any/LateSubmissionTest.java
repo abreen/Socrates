@@ -30,7 +30,7 @@ public class LateSubmissionTest extends Test implements Automatable {
 
     @Override
     public boolean shouldPass(File parent, SubmittedFile target, Submission submission,
-                              Criteria criteria, Document transcript)
+                              Criteria criteria, Document transcript, Document notes)
             throws CannotBeAutomatedException
     {
         if (target.receipt == null) throw new CannotBeAutomatedException("missing receipt file");

@@ -150,7 +150,12 @@ public class MainController {
                         Automatable automatableTest = (Automatable)t.automatableTest;
 
                         boolean passed = automatableTest.shouldPass(
-                                t.file, t.submittedFile, t.submission, criteria, transcriptDocument
+                                t.file,
+                                t.submittedFile,
+                                t.submission,
+                                criteria,
+                                transcriptDocument,
+                                t.node.notes
                         );
 
                         if (passed) t.node.setResult(TestResult.PASSED);

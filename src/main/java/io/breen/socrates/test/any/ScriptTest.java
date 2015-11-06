@@ -47,7 +47,7 @@ public class ScriptTest extends Test implements Automatable {
 
     @Override
     public boolean shouldPass(File parent, SubmittedFile target, Submission submission,
-                              Criteria criteria, Document transcript)
+                              Criteria criteria, Document transcript, Document notes)
             throws CannotBeAutomatedException, AutomationFailureException
     {
         Path scriptPath = criteria.scripts.get(path);
@@ -122,6 +122,11 @@ public class ScriptTest extends Test implements Automatable {
             if (!transcriptStr.endsWith("\n")) transcriptStr += "\n";
 
             appendToDocument(transcript, transcriptStr);
+        }
+
+        String notesStr = (String)response.get("notes");
+        if (notesStr != null) {
+            appendToDocument(notes, notesStr);
         }
 
         return (boolean)response.get("should_pass");

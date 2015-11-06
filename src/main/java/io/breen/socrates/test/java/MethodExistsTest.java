@@ -22,7 +22,7 @@ public class MethodExistsTest extends Test implements Automatable<JavaFile> {
 
     @Override
     public boolean shouldPass(JavaFile parent, SubmittedFile target, Submission submission,
-                              Criteria criteria, Document transcript)
+                              Criteria criteria, Document transcript, Document notes)
             throws CannotBeAutomatedException, AutomationFailureException
     {
         Class klass = parent.getClassForMethod(method);

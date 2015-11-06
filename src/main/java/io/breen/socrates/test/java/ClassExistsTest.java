@@ -22,7 +22,7 @@ public class ClassExistsTest extends Test implements Automatable<JavaFile> {
 
     @Override
     public boolean shouldPass(JavaFile parent, SubmittedFile target, Submission submission,
-                              Criteria criteria, Document transcript)
+                              Criteria criteria, Document transcript, Document notes)
             throws CannotBeAutomatedException, AutomationFailureException
     {
         ClassLoader cl = new JavaSourceClassLoader(

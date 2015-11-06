@@ -22,7 +22,7 @@ public class AlwaysPassingTest extends Test implements Automatable<PlainFile> {
 
     @Override
     public boolean shouldPass(PlainFile parent, SubmittedFile target, Submission submission,
-                              Criteria criteria, Document transcript)
+                              Criteria criteria, Document transcript, Document notes)
     {
         return true;
     }

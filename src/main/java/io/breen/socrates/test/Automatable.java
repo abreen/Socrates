@@ -37,6 +37,6 @@ public interface Automatable<T extends File> {
      * occurs
      */
     boolean shouldPass(T parent, SubmittedFile target, Submission submission, Criteria criteria,
-                       Document transcript)
+                       Document transcript, Document notes)
             throws CannotBeAutomatedException, AutomationFailureException;
 }
