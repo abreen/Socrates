@@ -47,9 +47,8 @@ public final class PythonManager {
             paths.add(Paths.get("C:\\Python35\\python.exe"));
             paths.add(Paths.get("C:\\Python34\\python.exe"));
             paths.add(Paths.get("C:\\Python33\\python.exe"));
-            paths.add(Paths.get("C:\\Python32\\python.exe"));
-            paths.add(Paths.get("C:\\Python31\\python.exe"));
-            paths.add(Paths.get("C:\\Python30\\python.exe"));
+            paths.add(Paths.get("C:\\Program Files (x86)\\Anaconda\\python.exe"));
+            paths.add(Paths.get("C:\\Program Files\\Anaconda\\python.exe"));
             break;
         case OSX:
         case LINUX:
