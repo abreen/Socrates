@@ -68,7 +68,7 @@ except ImportError as e:
 
 except (SyntaxError, NameError) as e:
     if msg['type'] == 'load':
-        conclude(False)
+        conclude(False, type(e).__name__ + ': ' + str(e))
     else:
         error(e)
 
