@@ -36,9 +36,9 @@ public class ImportTest extends Test implements Automatable<PythonFile> {
         } catch (IOException x) {
             throw new AutomationFailureException(x);
         } catch (PythonError x) {
-            throw new CannotBeAutomatedException(
-                    "Python error occurred importing module: " + x
-            );
+            String reason = "Python error occurred importing module: " + x;
+            appendToDocument(transcript, reason);
+            throw new CannotBeAutomatedException(reason);
         }
     }
 }
