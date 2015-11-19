@@ -234,8 +234,22 @@ public class PythonInspector {
         return (boolean)response.get("value");
     }
 
-    public boolean functionProduces(String functionName, List<Object> args,
-                                    Map<String, Object> kwargs, String input, Object returnValue,
+    /**
+     * Asks the Python interpreter to run a Python function with the specified arguments and
+     * determine whether it equals the value specified. If the function doesn't produce the expected
+     * value and/or output, the Boolean value returned is false. In either case, the string returned
+     * is the output produced by the function (if any), followed by the newline character, and the
+     * string representation of the return value (i.e., as if the function were evaluated on the
+     * Python REPL).
+     *
+     * @return A pair indicating whether the expected value is the same
+     *
+     * @throws IOException If a low-level error occurs communicating with the interpreter
+     * @throws PythonError If a Python error occurs evaluating the function
+     */
+    public Pair<Boolean, String> functionProduces(String functionName, List<Object> args,
+                                                  Map<String, Object> kwargs, String input,
+                                                  Object returnValue,
                                     String output) throws IOException, PythonError
     {
         ObjectMapper mapper = new ObjectMapper();
@@ -263,14 +277,17 @@ public class PythonInspector {
 
         if (isErrorResponse(response)) throw errorFromResponse(response);
 
-        if (output != null) {
-            if (!response.containsKey("output")) return false;
+        String str = "";
 
-            String outputProduced = (String)response.get("output");
-            if (!output.equals(outputProduced)) return false;
-        }
+        if (response.containsKey("output")) str += response.get("output");
+        str += response.get("value");
 
-        return equals(returnValue, toPythonObject(response));
+        if (output != null)
+            if (!response.containsKey("output") || !output.equals(response.get("output")))
+                // we expect output, but this function produces no output/incorrect output
+                return new Pair<>(false, str);
+
+        return new Pair<>(equals(returnValue, toPythonObject(response)), str);
     }
 
     public class PythonObject {

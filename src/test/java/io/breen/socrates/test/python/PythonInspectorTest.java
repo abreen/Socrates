@@ -146,7 +146,7 @@ public class PythonInspectorTest {
         assertTrue(
                 new PythonInspector(paths.get(3)).functionProduces(
                         "ten", null, null, null, 10, null
-                )
+                ).first
         );
     }
 
@@ -155,7 +155,7 @@ public class PythonInspectorTest {
         assertFalse(
                 new PythonInspector(paths.get(3)).functionProduces(
                         "ten", null, null, null, 99, null
-                )
+                ).first
         );
     }
 
@@ -164,7 +164,7 @@ public class PythonInspectorTest {
         assertTrue(
                 new PythonInspector(paths.get(3)).functionProduces(
                         "twice", Collections.singletonList((Object)20), null, null, 40, null
-                )
+                ).first
         );
     }
 
@@ -173,7 +173,7 @@ public class PythonInspectorTest {
         assertFalse(
                 new PythonInspector(paths.get(3)).functionProduces(
                         "twice", Collections.singletonList((Object)25), null, null, 99, null
-                )
+                ).first
         );
     }
 
@@ -187,7 +187,7 @@ public class PythonInspectorTest {
                         null,
                         Arrays.asList(1, 3, 5),
                         null
-                )
+                ).first
         );
     }
 }

@@ -34,7 +34,7 @@ public class ImportTest extends Test implements Automatable<PythonFile> {
         try {
             PythonInspector inspector = new PythonInspector(target.fullPath);
 
-            appendToDocument(transcript, ">>> import " + parent.getModuleName() + "\n");
+            appendToDocument(transcript, ">>> from " + parent.getModuleName() + "import *\n");
 
             Pair<Boolean, String> result = inspector.canImportModule();
 

@@ -6,6 +6,7 @@ import io.breen.socrates.file.python.PythonFile;
 import io.breen.socrates.submission.Submission;
 import io.breen.socrates.submission.SubmittedFile;
 import io.breen.socrates.test.*;
+import io.breen.socrates.util.Pair;
 
 import javax.swing.text.Document;
 import java.io.IOException;
@@ -97,14 +98,23 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
 
         try {
             PythonInspector inspector = new PythonInspector(target.fullPath);
+
             appendToDocument(transcript, ">>> " + callToString(func.name, args) + "\n");
-            return inspector.functionProduces(func.name, args, null, input, value, output);
+
+            Pair<Boolean, String> result = inspector.functionProduces(
+                    func.name, args, null, input, value, output
+            );
+
+            appendToDocument(transcript, result.second + "\n");
+
+            return result.first;
+
         } catch (IOException x) {
             throw new AutomationFailureException(x);
         } catch (PythonError x) {
-            throw new CannotBeAutomatedException(
-                    "Python error occurred evaluating function: " + x
-            );
+            String reason = "Python error occurred evaluating function: " + x;
+            appendToDocument(transcript, reason + "\n");
+            throw new CannotBeAutomatedException(reason);
         }
     }
 }
