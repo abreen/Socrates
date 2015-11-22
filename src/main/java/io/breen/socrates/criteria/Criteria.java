@@ -2,18 +2,13 @@ package io.breen.socrates.criteria;
 
 import io.breen.socrates.file.File;
 import io.breen.socrates.file.PDFFile;
-import io.breen.socrates.file.java.*;
-import io.breen.socrates.file.java.Object;
+import io.breen.socrates.file.java.JavaFile;
 import io.breen.socrates.file.logicly.LogiclyFile;
 import io.breen.socrates.file.plain.PlainFile;
 import io.breen.socrates.file.python.PythonFile;
 import io.breen.socrates.test.TestGroup;
 import io.breen.socrates.test.any.ReviewTest;
 import io.breen.socrates.test.any.ScriptTest;
-import io.breen.socrates.test.java.MethodEvalTest;
-import io.breen.socrates.test.logicly.CircuitEvalTest;
-import io.breen.socrates.test.python.FunctionEvalTest;
-import io.breen.socrates.test.python.VariableEvalTest;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -186,12 +181,27 @@ public class Criteria {
         cons.addTypeDescription(new TypeDescription(PythonFile.class, "!file:python"));
         cons.addTypeDescription(
                 new TypeDescription(
-                        VariableEvalTest.class, "!test:python:eval:variable"
+                        io.breen.socrates.test.python.VariableEvalTest.class, "!test:python:eval:variable"
                 )
         );
         cons.addTypeDescription(
                 new TypeDescription(
-                        FunctionEvalTest.class, "!test:python:eval:function"
+                        io.breen.socrates.test.python.FunctionEvalTest.class, "!test:python:eval:function"
+                )
+        );
+        cons.addTypeDescription(
+                new TypeDescription(
+                        io.breen.socrates.file.python.Type.class, "!python:type"
+                )
+        );
+        cons.addTypeDescription(
+                new TypeDescription(
+                        io.breen.socrates.file.python.Object.class, "!python:object"
+                )
+        );
+        cons.addTypeDescription(
+                new TypeDescription(
+                        io.breen.socrates.test.python.MethodEvalTest.class, "!test:python:eval:method"
                 )
         );
 
@@ -201,22 +211,22 @@ public class Criteria {
         cons.addTypeDescription(new TypeDescription(JavaFile.class, "!file:java"));
         cons.addTypeDescription(
                 new TypeDescription(
-                        MethodEvalTest.class, "!test:java:eval:method"
+                        io.breen.socrates.test.java.MethodEvalTest.class, "!test:java:eval:method"
                 )
         );
         cons.addTypeDescription(
                 new TypeDescription(
-                        Parameter.class, "!java:parameter"
+                        io.breen.socrates.file.java.Parameter.class, "!java:parameter"
                 )
         );
         cons.addTypeDescription(
                 new TypeDescription(
-                        Type.class, "!java:type"
+                        io.breen.socrates.file.java.Type.class, "!java:type"
                 )
         );
         cons.addTypeDescription(
                 new TypeDescription(
-                        Object.class, "!java:object"
+                        io.breen.socrates.file.java.Object.class, "!java:object"
                 )
         );
 
@@ -231,7 +241,7 @@ public class Criteria {
         cons.addTypeDescription(new TypeDescription(LogiclyFile.class, "!file:logicly"));
         cons.addTypeDescription(
                 new TypeDescription(
-                        CircuitEvalTest.class, "!test:logicly:eval"
+                        io.breen.socrates.test.logicly.CircuitEvalTest.class, "!test:logicly:eval"
                 )
         );
 

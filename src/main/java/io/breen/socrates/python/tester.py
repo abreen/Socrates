@@ -24,6 +24,9 @@ import types
 import json
 import importlib
 import inspect
+from io import StringIO
+
+LOGGING = False
 
 globalz = {}  # globals() in the imported module
 objects = {}
@@ -37,23 +40,58 @@ def log(s):
     print(s, file=sys.stderr)
 
 
-def conclude(val, output=None):
-    print(json.dumps({
+def conclude(val, output=None, after=None):
+    s = json.dumps({
         'error': False,  # no error occurred
-        'value': val,  # the value of a variable/value returned by a function
+        'value': val,  # the value of a variable/value returned by a function or method
         'type': type(val).__name__,  # the type of the value (the type name as a string)
-        'output': output  # any characters sent to the standard out during eval
-    }))
+        'output': output,  # any characters sent to the standard out during eval
+        'after': after  # if a method is being tested on an instance, its state after a method call
+    })
+
+    if LOGGING:
+        print(s, file=sys.stderr)
+
+    print(s)
+
     sys.exit(0)
 
 
 def error(exc):
-    print(json.dumps({
+    s = json.dumps({
         'error': True,
         'error_type': type(exc).__name__,
         'error_message': str(exc)
-    }))
+    })
+
+    if LOGGING:
+        print(s, file=sys.stderr)
+
+    print(s)
+
     sys.exit(1)
+
+
+def new(klass, fields):
+    """Create and return an instance of the specified class and fill the instance with fields
+    as specified by the second argument. This function does *not* call the class' constructor.
+    """
+    obj = klass.__new__(klass)
+    for attr, val in fields.items():
+        setattr(obj, attr, val)
+
+    return obj
+
+
+def find_method(class_name, method_name):
+    try:
+        for name, value in inspect.getmembers(classes[class_name]):
+            if inspect.isfunction(value) and name == method_name:
+                return value
+
+    except KeyError as e:
+        # the class could not be found
+        return None
 
 
 # wait for a JSON message describing what we should do
@@ -96,8 +134,14 @@ if msg['type'] == 'exists':
         conclude(target['name'] in variables)
     elif target['type'] == 'function':
         conclude(target['name'] in functions)
-    elif target['type'] == 'classes':
+    elif target['type'] == 'class':
         conclude(target['name'] in classes)
+    elif target['type'] == 'method':
+        method_name = target['name']
+        class_name = target['class_name']
+
+        method = find_method(class_name, method_name)
+        conclude(method is not None)
 
 elif msg['type'] == 'eval':
     target = msg['target']
@@ -105,19 +149,57 @@ elif msg['type'] == 'eval':
     if target['type'] == 'variable':
         conclude(variables[target['name']])
 
-    elif target['type'] == 'function':
+    elif target['type'] in ['function', 'method']:
         parameters = msg['parameters']
         args = parameters.get('args', [])
+        object_indices = parameters.get('object_indices', [])
         kwargs = parameters.get('kwargs', {})
         in_str = parameters.get('input', '')
 
-        rv, output_str = None, None
+        before = parameters.get('before', None)
+        after = parameters.get('after', None)
+
+        if target['type'] == 'method':
+            before_class = classes[before['class_name']]
+            before_fields = before['fields']
+
+            before_obj = new(before_class, before_fields)
+
+        for i in object_indices:
+            args[i] = new(classes[args[i]['class_name']], args[i]['fields'])
+
+        in_buf = StringIO(in_str)
+        out_buf = StringIO()
+
+        sys.stdin = in_buf
+        sys.stdout = out_buf
+
         try:
-            # TODO provide standard in, if necessary
-            rv = functions[target['name']](*args, **kwargs)
-            output_str = ''
+            if target['type'] == 'function':
+                f = functions[target['name']]
+                rv = f(*args, **kwargs)
+
+            elif target['type'] == 'method':
+                m = find_method(before['class_name'], target['name'])
+                rv = m(before_obj, *args, **kwargs)
+
         except Exception as e:
+            sys.stdin = sys.__stdin__
+            sys.stdout = sys.__stdout__
             error(e)
 
-        # TODO capture standard out
-        conclude(rv, output_str)
+        sys.stdin = sys.__stdin__
+        sys.stdout = sys.__stdout__
+
+        output_str = out_buf.getvalue()
+
+        after_fields = None
+        if target['type'] == 'method':
+            after_fields = {}
+            for name, value in inspect.getmembers(before_obj):
+                if inspect.isbuiltin(value) or name[0] == '_' or callable(value):
+                    continue
+
+                after_fields[name] = value
+
+        conclude(rv, output=output_str, after=after_fields)

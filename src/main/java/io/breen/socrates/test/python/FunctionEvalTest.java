@@ -15,9 +15,10 @@ import java.util.*;
 public class FunctionEvalTest extends FunctionTest implements Automatable<PythonFile> {
 
     /**
-     * The expected return value of the function.
+     * The expected return value of the function (could be a standard Java object as instantiated by
+     * SnakeYAML, or an Object defined in io.breen.socrates.file.python.Object).
      */
-    public Object value;
+    public java.lang.Object value;
 
     /**
      * The expected output of the function.
@@ -30,9 +31,10 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
     public String input;
 
     /**
-     * For each parameter, the actual value of the argument to give the function.
+     * For each parameter, the actual value of the argument to give the function. Each value could
+     * be a standard Java object, or an Object defined in io.breen.socrates.file.python.Object.
      */
-    public Map<String, Object> arguments;
+    public Map<String, java.lang.Object> arguments;
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -41,33 +43,6 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
 
     public FunctionEvalTest(double deduction, String description) {
         super(deduction, description);
-    }
-
-    private static String callToString(String functionName, List<Object> args) {
-        StringBuilder builder = new StringBuilder(functionName);
-
-        builder.append("(");
-
-        for (int i = 0; i < args.size(); i++) {
-            builder.append(repr(args.get(i)));
-
-            if (i != args.size() - 1) builder.append(", ");
-        }
-
-        builder.append(")");
-
-        return builder.toString();
-    }
-
-    private static String repr(Object o) {
-        if (o == null) {
-            return "None";
-        } else if (o instanceof String) {
-            String s = (String)o;
-            return "'" + s + "'";
-        }
-
-        return o.toString();
     }
 
     @Override
@@ -92,14 +67,19 @@ public class FunctionEvalTest extends FunctionTest implements Automatable<Python
         Function func = parent.getFunctionForTest(this);
         if (func == null) throw new IllegalArgumentException();
 
-        List<Object> args = new LinkedList<>();
+        List<java.lang.Object> args = new LinkedList<>();
         for (String parameter : func.parameters)
             args.add(arguments.get(parameter));
+
+        // TODO kwargs, if any
 
         try {
             PythonInspector inspector = new PythonInspector(target.fullPath);
 
-            appendToDocument(transcript, ">>> " + callToString(func.name, args) + "\n");
+            appendToDocument(
+                    transcript,
+                    ">>> " + PythonInspector.callToString(func.name, args) + "\n"
+            );
 
             Pair<Boolean, String> result = inspector.functionProduces(
                     func.name, args, null, input, value, output

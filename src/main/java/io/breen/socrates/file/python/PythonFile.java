@@ -24,6 +24,7 @@ public final class PythonFile extends File implements PostConstructionAction {
 
     public List<Variable> variables = Collections.emptyList();
     public List<Function> functions = Collections.emptyList();
+    public List<Class> classes = Collections.emptyList();
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -38,8 +39,8 @@ public final class PythonFile extends File implements PostConstructionAction {
         this.importFailureDeduction = importFailureDeduction;
     }
 
-    private static boolean hasTest(List<Object> list, Test test) {
-        for (Object o : list)
+    private static boolean hasTest(List<java.lang.Object> list, Test test) {
+        for (java.lang.Object o : list)
             if (o instanceof Test && o == test) return true;
             else if (o instanceof TestGroup) return hasTest(((TestGroup)o).members, test);
 
@@ -53,13 +54,13 @@ public final class PythonFile extends File implements PostConstructionAction {
 
     @Override
     protected TestGroup createTestRoot() {
-        List<Object> tests = new LinkedList<>();
+        List<java.lang.Object> tests = new LinkedList<>();
 
         for (Variable v : variables) {
             Test test = new VariableExistsTest(v);
 
             if (!v.tests.isEmpty()) {
-                List<Object> members = new LinkedList<>();
+                List<java.lang.Object> members = new LinkedList<>();
                 members.add(test);
                 members.add(new TestGroup(v.tests, 0, 0.0));
 
@@ -75,7 +76,7 @@ public final class PythonFile extends File implements PostConstructionAction {
             Test test = new FunctionExistsTest(f);
 
             if (!f.tests.isEmpty()) {
-                List<Object> members = new LinkedList<>();
+                List<java.lang.Object> members = new LinkedList<>();
                 members.add(test);
                 members.add(new TestGroup(f.tests, 0, 0.0));
 
@@ -87,11 +88,36 @@ public final class PythonFile extends File implements PostConstructionAction {
             }
         }
 
+        for (Class c : classes) {
+            Test classExistsTest = new ClassExistsTest(c);
+            List<java.lang.Object> subTests = new LinkedList<>();
+
+            if (!c.tests.isEmpty()) subTests.addAll(c.tests);
+
+            for (Method m : c.methods) {
+                Test methodExistsTest = new MethodExistsTest(m);
+                List<java.lang.Object> methodSubTests = new LinkedList<>();
+
+                if (!m.tests.isEmpty()) methodSubTests.addAll(m.tests);
+
+                List<java.lang.Object> decision2 = new ArrayList<>(2);
+                decision2.add(methodExistsTest);
+                decision2.add(new TestGroup(methodSubTests, 0, 0.0));
+
+                subTests.add(new TestGroup(decision2, 1, 0.0));
+            }
+
+            List<java.lang.Object> decision = new ArrayList<>(2);
+            decision.add(classExistsTest);
+            decision.add(new TestGroup(subTests, 0, 0.0));
+            tests.add(new TestGroup(decision, 1, 0.0));
+        }
+
         TestGroup root = super.createTestRoot();
 
         Test test = new ImportTest(this);
 
-        List<Object> members = new LinkedList<>();
+        List<java.lang.Object> members = new LinkedList<>();
         members.add(test);
 
         if (!tests.isEmpty()) members.add(new TestGroup(tests, 0, 0.0));
@@ -118,6 +144,21 @@ public final class PythonFile extends File implements PostConstructionAction {
     public Function getFunctionForTest(FunctionTest test) {
         for (Function f : functions)
             if (hasTest(f.tests, test)) return f;
+
+        return null;
+    }
+
+    public Class getClassContainingMethod(Method method) {
+        for (Class c : classes)
+            if (c.methods.contains(method)) return c;
+
+        return null;
+    }
+
+    public Method getMethodForTest(MethodTest test) {
+        for (Class c : classes)
+            for (Method m : c.methods)
+                if (hasTest(m.tests, test)) return m;
 
         return null;
     }

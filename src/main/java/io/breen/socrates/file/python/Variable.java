@@ -10,7 +10,7 @@ public class Variable {
 
     public String name;
     public double pointValue;
-    public List<Object> tests;
+    public List<java.lang.Object> tests;
 
     /**
      * This empty constructor is used by SnakeYAML.
