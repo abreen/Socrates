@@ -34,6 +34,32 @@
         <border type="none"/>
         <children/>
       </grid>
+      <grid id="7954d" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <card name="plainTextPaneCard"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <scrollpane id="ed06" binding="plainScrollPane" custom-create="true">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="9f281" class="javax.swing.JTextArea" binding="textArea">
+                <constraints/>
+                <properties>
+                  <editable value="false"/>
+                  <font name="Monospaced"/>
+                  <lineWrap value="true"/>
+                  <margin top="2" left="5" bottom="2" right="5"/>
+                  <wrapStyleWord value="true"/>
+                </properties>
+              </component>
+            </children>
+          </scrollpane>
+        </children>
+      </grid>
     </children>
   </grid>
 </form>

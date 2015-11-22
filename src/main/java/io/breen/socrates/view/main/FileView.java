@@ -25,6 +25,7 @@ public class FileView {
 
     private final static String CURTAIN_CARD_NAME = "curtainCard";
     private final static String TEXT_PANE_CARD_NAME = "textPaneCard";
+    private final static String PLAIN_TEXT_PANE_CARD_NAME = "plainTextPaneCard";
 
     private final static String NO_SELECTION = "(no file selected)";
     private final static String UNKNOWN_FILE_TYPE = "(unknown file type)";
@@ -57,6 +58,8 @@ public class FileView {
     private JLabel curtainLabel;
     private JLabel curtainSubtitle;
     private JPanel curtainPanel;
+    private JTextArea textArea;
+    private JScrollPane plainScrollPane;
 
     public FileView(MenuBarManager menuBar, SubmissionTree submissionTree) {
         curtainLabel = new JLabel(NO_SELECTION);
@@ -127,9 +130,11 @@ public class FileView {
         curtainPanel.setLayout(new GridLayout(2, 1, 0, 25));
 
         scrollPane = new JScrollPane();
+        plainScrollPane = new JScrollPane();
         if (Globals.operatingSystem == Globals.OS.OSX) {
             Border border = new LineBorder(new Color(197, 197, 197));
             scrollPane.setBorder(border);
+            plainScrollPane.setBorder(border);
         }
     }
 
@@ -137,7 +142,9 @@ public class FileView {
      * Update the FileView and show the contents of the current file to the user. If the File
      * object represents a file whose contents can be displayed in the JTextPane (i.e., if the
      * File's contentsArePlainText is true), the file is read. If the File's language field is
-     * non-null, the contents are syntax highlighted.
+     * non-null, the contents are syntax highlighted. Otherwise, the contents are not syntax
+     * hightlighted, and they are not shown using the JTextPane --- instead, we use a JTextArea
+     * so that we can do word wrapping.
      */
     public void update(SubmittedFile submittedFile, File matchingFile) throws IOException {
         currentFile = submittedFile;
@@ -160,12 +167,12 @@ public class FileView {
             return;
         }
 
-        layout.show(rootPanel, TEXT_PANE_CARD_NAME);
-
         String contents = submittedFile.getContents();
         String text;
 
         if (matchingFile.language != null) {
+            layout.show(rootPanel, TEXT_PANE_CARD_NAME);
+
             try {
                 Lexer lexer = Lexer.getByName(matchingFile.language);
                 CharArrayWriter w = new CharArrayWriter();
@@ -177,12 +184,16 @@ public class FileView {
                 text = contents;
             }
 
-        } else {
-            text = "<pre>" + contents + "</pre>";
-        }
+            textPane.setText(text);
+            textPane.setCaretPosition(0);
 
-        textPane.setText(text);
-        textPane.setCaretPosition(0);
+        } else {
+            layout.show(rootPanel, PLAIN_TEXT_PANE_CARD_NAME);
+            text = contents;
+
+            textArea.setText(text);
+            textArea.setCaretPosition(0);
+        }
     }
 
     public void update(SubmittedFile submittedFile) throws IOException {
