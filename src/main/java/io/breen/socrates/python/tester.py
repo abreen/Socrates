@@ -19,7 +19,9 @@
 """
 
 import sys
+import _thread
 
+import threading
 import types
 import json
 import importlib
@@ -27,6 +29,7 @@ import inspect
 from io import StringIO
 
 LOGGING = False
+TIMEOUT = 10  # seconds
 
 globalz = {}  # globals() in the imported module
 objects = {}
@@ -93,6 +96,9 @@ def find_method(class_name, method_name):
         # the class could not be found
         return None
 
+
+timer = threading.Timer(TIMEOUT, _thread.interrupt_main)
+timer.start()
 
 # wait for a JSON message describing what we should do
 msg = json.loads(input())
