@@ -493,7 +493,7 @@ public class PythonInspector {
 
                     Map<String, java.lang.Object> fieldsMap = new HashMap<>();
                     for (Map.Entry<String, java.lang.Object> field : obj.fields.entrySet())
-                        // should recursively convert field value
+                        // TODO should recursively convert field value
                         fieldsMap.put(field.getKey(), field.getValue());
 
                     Map<String, java.lang.Object> objMap = new HashMap<>();
