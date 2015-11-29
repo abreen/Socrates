@@ -96,8 +96,8 @@ def find_method(class_name, method_name):
         # the class could not be found
         return None
 
-
 timer = threading.Timer(TIMEOUT, _thread.interrupt_main)
+timer.daemon = True  # so that the interrupt_main() call will terminate the whole process
 timer.start()
 
 # wait for a JSON message describing what we should do
