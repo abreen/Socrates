@@ -47,6 +47,7 @@ public final class PythonManager {
             paths.add(Paths.get("C:\\Python35\\python.exe"));
             paths.add(Paths.get("C:\\Python34\\python.exe"));
             paths.add(Paths.get("C:\\Python33\\python.exe"));
+            paths.add(Paths.get("C:\\Python32\\python.exe"));
             paths.add(Paths.get("C:\\Program Files (x86)\\Anaconda\\python.exe"));
             paths.add(Paths.get("C:\\Program Files\\Anaconda\\python.exe"));
             break;
@@ -54,7 +55,10 @@ public final class PythonManager {
         case LINUX:
             paths.add(Paths.get("/usr/local/bin/python"));
             paths.add(Paths.get("/usr/local/bin/python3"));
+            paths.add(Paths.get("/usr/local/bin/python3.5"));
             paths.add(Paths.get("/usr/local/bin/python3.4"));
+            paths.add(Paths.get("/usr/local/bin/python3.3"));
+            paths.add(Paths.get("/usr/local/bin/python3.2"));
             paths.add(Paths.get("/usr/bin/python"));
             paths.add(Paths.get("/usr/bin/python3"));
         }
@@ -121,7 +125,7 @@ public final class PythonManager {
         if (builder.start().waitFor() == Globals.NORMAL_EXIT_CODE) {
             // this path is probably valid for a Python interpreter
 
-            // but is it Python >= 3.3?
+            // but is it Python >= 3.2?
             ProcessBuilder builder2 = new ProcessBuilder(
                     pathStr,
                     "-c",
@@ -129,7 +133,7 @@ public final class PythonManager {
             );
 
             int exitCode = builder2.start().waitFor();
-            return exitCode >= 33 && exitCode < 40;
+            return exitCode >= 32 && exitCode < 40;
         } else {
             return false;
         }
