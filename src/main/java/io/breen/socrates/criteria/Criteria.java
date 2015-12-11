@@ -1,7 +1,6 @@
 package io.breen.socrates.criteria;
 
-import io.breen.socrates.file.File;
-import io.breen.socrates.file.PDFFile;
+import io.breen.socrates.file.*;
 import io.breen.socrates.file.java.JavaFile;
 import io.breen.socrates.file.logicly.LogiclyFile;
 import io.breen.socrates.file.plain.PlainFile;
@@ -244,6 +243,11 @@ public class Criteria {
                         io.breen.socrates.test.logicly.CircuitEvalTest.class, "!test:logicly:eval"
                 )
         );
+
+         /*
+         * JFLAP file type
+         */
+        cons.addTypeDescription(new TypeDescription(JFLAPFile.class, "!file:jflap"));
 
         Yaml yaml = new Yaml(cons);
         Criteria c = null;
