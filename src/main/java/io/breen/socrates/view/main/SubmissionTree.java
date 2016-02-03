@@ -432,7 +432,7 @@ public class SubmissionTree implements Observer {
                         );
 
                         final Color selectedText = UIManager.getColor("textHighlight");
-                        final Color inactive = UIManager.getColor("textInactiveText");
+                        final Color inactive = Color.GRAY;
 
                         String statusHex;
                         if (selected) {

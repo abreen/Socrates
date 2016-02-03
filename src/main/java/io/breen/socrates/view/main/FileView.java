@@ -143,7 +143,7 @@ public class FileView {
      * object represents a file whose contents can be displayed in the JTextPane (i.e., if the
      * File's contentsArePlainText is true), the file is read. If the File's language field is
      * non-null, the contents are syntax highlighted. Otherwise, the contents are not syntax
-     * hightlighted, and they are not shown using the JTextPane --- instead, we use a JTextArea
+     * highlighted, and they are not shown using the JTextPane --- instead, we use a JTextArea
      * so that we can do word wrapping.
      */
     public void update(SubmittedFile submittedFile, File matchingFile) throws IOException {

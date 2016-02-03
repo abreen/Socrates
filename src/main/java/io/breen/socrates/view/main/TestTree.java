@@ -30,6 +30,7 @@ public class TestTree implements Observer<TestWrapperNode> {
     private JPanel navPanel;
     private JButton previousButton;
     private JButton nextButton;
+    private JPanel treePanel;
 
     public TestTree(MenuBarManager menuBar, SubmissionTree submissionTree) {
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -277,7 +278,7 @@ public class TestTree implements Observer<TestWrapperNode> {
 
                             if (!selected) {
                                 if (testNode.isConstrained()) {
-                                    setForeground(UIManager.getColor("textInactiveText"));
+                                    setForeground(Color.GRAY);
                                 } else {
                                     setForeground(Color.BLACK);
                                 }
@@ -298,7 +299,7 @@ public class TestTree implements Observer<TestWrapperNode> {
                                 String s = "<html>";
                                 s += "<b>";
                                 s += g.label;
-                                s += "</b> ";
+                                s += "</b>&nbsp;&nbsp;&nbsp;";
                                 s += text;
                                 s += "</html>";
 
