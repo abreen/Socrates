@@ -16,6 +16,7 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -31,6 +32,10 @@ import java.util.logging.Logger;
  */
 public class SubmissionTree implements Observer {
 
+    private static final String selectedHex = Globals.toHex(UIManager.getColor(
+            "Tree.selectionForeground"));
+    private static final String unknownFileHex = Globals.toHex(Color.GRAY);
+    private static final String commentHex = Globals.toHex(Color.GRAY);
     private static Logger logger = Logger.getLogger(SubmissionTree.class.getName());
     public final Action resetAllTests;
     public final Action saveGradeReport;
@@ -244,6 +249,20 @@ public class SubmissionTree implements Observer {
         }
     }
 
+    /**
+     * This helper method is needed because (stupidly) the way to get the operating system's icon
+     * for a file is different on OS X.
+     */
+    private static Icon getSystemIcon(Path p) {
+        if (Globals.operatingSystem == Globals.OS.OSX) {
+            JFileChooser c = new JFileChooser();
+            return c.getIcon(p.toFile());
+        } else {
+            FileSystemView fsv = FileSystemView.getFileSystemView();
+            return fsv.getSystemIcon(p.toFile());
+        }
+    }
+
     private void createUIComponents() {
         root = new DefaultMutableTreeNode(null);
 
@@ -419,6 +438,8 @@ public class SubmissionTree implements Observer {
                 }
         );
 
+        final FileSystemView fsView = FileSystemView.getFileSystemView();
+
         tree.setCellRenderer(
                 new DefaultTreeCellRenderer() {
                     @Override
@@ -427,61 +448,78 @@ public class SubmissionTree implements Observer {
                                                                   boolean expanded, boolean isLeaf,
                                                                   int row, boolean focused)
                     {
-                        super.getTreeCellRendererComponent(
+                        JLabel jl = (JLabel)super.getTreeCellRendererComponent(
                                 tree, value, selected, expanded, isLeaf, row, focused
                         );
 
-                        final Color selectedText = UIManager.getColor("textHighlight");
-                        final Color inactive = Color.GRAY;
+                        if (value instanceof UnrecognizedFileWrapperNode || value instanceof
+                                SubmittedFileWrapperNode) {
+                            /*
+                             * Set the icon for this file using the system's preferred icon for
+                             * the file type/extension.
+                             */
+                            SubmittedFile sf;
 
-                        String statusHex;
-                        if (selected) {
-                            statusHex = Globals.toHex(selectedText);
-                        } else {
-                            statusHex = Globals.toHex(inactive);
+                            if (value instanceof UnrecognizedFileWrapperNode)
+                                sf = (SubmittedFile)((UnrecognizedFileWrapperNode)value)
+                                        .getUserObject();
+                            else
+                                sf = (SubmittedFile)((SubmittedFileWrapperNode)value)
+                                        .getUserObject();
+
+                            Icon i = getSystemIcon(sf.fullPath);
+                            if (i != null) {
+                                jl.setIcon(i);
+                            }
                         }
 
+                        String fileName = jl.getText();
+
+                        // displayed in parentheses to the right of the file name
+                        String comment = "";
+
                         if (value instanceof UnrecognizedFileWrapperNode) {
-                            if (!selected) setForeground(inactive);
+                            comment = "?";
 
                         } else if (value instanceof SubmittedFileWrapperNode) {
                             SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
 
-                            String text = getText();
-                            if (sfwn.isComplete()) {
-                                setText(
-                                        "<html>" + text + " <font color=\"" + statusHex + "\">" +
-                                                "(complete)</font></html>"
-                                );
-                            } else {
-                                setText(text);
-                            }
+                            if (sfwn.isComplete()) comment = "complete";
 
                         } else if (value instanceof SubmissionWrapperNode) {
                             SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
 
-                            String text = getText();
                             if (swn.isComplete()) {
-                                if (swn.isSaved()) {
-                                    setText(
-                                            "<html>" + text + " <font color=\"" + statusHex +
-                                                    "\">" +
-                                                    "(complete)</font></html>"
-                                    );
-                                } else {
-                                    setText(
-                                            "<html>" + text + " <font color=\"" + statusHex +
-                                                    "\">" +
-                                                    "(complete, <b>unsaved</b>)</font></html>"
-                                    );
-                                }
+                                comment = "complete";
 
-                            } else {
-                                setText(text);
+                                if (!swn.isSaved()) comment += ", <b>unsaved</b>";
                             }
                         }
 
-                        return this;
+                        String s = "<html>";
+                        if (selected) {
+                            // all text should be the selected text color (probably white)
+                            s += "<font color=\"" + selectedHex + "\">";
+                            s += fileName;
+
+                            if (!comment.isEmpty()) s += " (" + comment + ")";
+
+                            s += "</font>";
+                        } else {
+                            s += fileName;
+
+                            if (!comment.isEmpty()) {
+                                s += " ";
+                                s += "<font color=\"" + commentHex + "\">";
+                                s += "(" + comment + ")";
+                                s += "</font>";
+                            }
+                        }
+                        s += "</html>";
+
+                        jl.setText(s);
+
+                        return jl;
                     }
                 }
         );

@@ -7,6 +7,7 @@ import io.breen.socrates.criteria.InvalidCriteriaException;
 import io.breen.socrates.submission.*;
 import org.apache.commons.cli.*;
 
+import javax.swing.*;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.*;
@@ -23,6 +24,14 @@ public class Main {
          */
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
+
+        try {
+            // improves UI on Windows, especially
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception x) {
+            System.err.println("failed setting L&F");
+            System.exit(5);
+        }
 
         /*
          * Set up default Socrates properties. These properties are the ones saved
