@@ -26,26 +26,32 @@ public class TestGroup {
     public double maxValue;
 
     /**
+     * An optional label to display in the GUI above the members of this group. If the group
+     * contains logically related members, this can enhance readability.
+     */
+    public String label;
+
+    /**
      * This empty constructor is used by SnakeYAML.
      */
     public TestGroup() {}
 
     public TestGroup(List<Object> members, int maxNum, double maxValue) {
+        this(members, maxNum, maxValue, null);
+    }
+
+    public TestGroup(List<Object> members, int maxNum, double maxValue, String label) {
         this.members = members;
         this.maxNum = maxNum;
         this.maxValue = maxValue;
+        this.label = label;
     }
-
-    //    public TestGroup(List<Either<Test, TestGroup>> newMembers, TestGroup oldGroup) {
-    //        this.members = newMembers;
-    //        this.maxNum = oldGroup.maxNum;
-    //        this.maxValue = oldGroup.maxValue;
-    //    }
 
     public String toString() {
         return "TestGroup(" +
                 "maxNum=" + maxNum + ", " +
                 "maxValue=" + maxValue + ", " +
-                "members=" + members + ")";
+                "members=" + members + ", " +
+                "label=" + label + ")";
     }
 }

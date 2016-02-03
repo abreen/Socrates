@@ -2,8 +2,7 @@ package io.breen.socrates.view.main;
 
 import io.breen.socrates.Globals;
 import io.breen.socrates.model.TestResult;
-import io.breen.socrates.model.wrapper.SubmittedFileWrapperNode;
-import io.breen.socrates.model.wrapper.TestWrapperNode;
+import io.breen.socrates.model.wrapper.*;
 import io.breen.socrates.test.*;
 import io.breen.socrates.util.ObservableChangedEvent;
 import io.breen.socrates.util.Observer;
@@ -286,8 +285,27 @@ public class TestTree implements Observer<TestWrapperNode> {
 
                             setIcon(i);
 
-                        } else {
+                        } else if (value instanceof TestGroupWrapperNode) {
+                            TestGroupWrapperNode groupNode = (TestGroupWrapperNode)value;
+
+                            // test groups never need an icon
                             setIcon(null);
+
+                            String text = getText();
+                            TestGroup g = (TestGroup)groupNode.getUserObject();
+
+                            if (g.label != null) {
+                                String s = "<html>";
+                                s += "<b>";
+                                s += g.label;
+                                s += "</b> ";
+                                s += text;
+                                s += "</html>";
+
+                                setText(s);
+                            } else {
+                                setText(text);
+                            }
                         }
 
                         return this;
