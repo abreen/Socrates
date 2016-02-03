@@ -52,7 +52,7 @@ public class PropertiesList extends JPanel {
     public void add(String key, String value) {
         JLabel keyLabel = new JLabel(key, SwingConstants.RIGHT);
         keyLabel.setFont(Font.decode("Dialog-12"));
-        keyLabel.setForeground(UIManager.getColor("inactiveCaptionText"));
+        keyLabel.setForeground(Color.GRAY);
         keyLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
         keysPanel.add(keyLabel);
         keysPanel.add(Box.createRigidArea(new Dimension(0, 5)));

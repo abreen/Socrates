@@ -72,7 +72,7 @@ public class FileView {
         curtainSubtitle.setHorizontalAlignment(SwingConstants.CENTER);
         curtainSubtitle.setVerticalAlignment(SwingConstants.TOP);
         curtainSubtitle.setFont(Font.decode("Dialog-PLAIN-20"));
-        curtainSubtitle.setForeground(UIManager.getColor("inactiveCaptionText"));
+        curtainSubtitle.setForeground(Color.DARK_GRAY);
         curtainPanel.add(curtainSubtitle);
 
         textPane.setContentType("text/html");
