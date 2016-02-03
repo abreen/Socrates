@@ -61,30 +61,33 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
         line(w);
 
         double totalPoints = 0.0;
-        double earnedPoints = 0.0;
-        for (File file : criteria.files) {
+        for (File file : criteria.files)
             totalPoints += file.pointValue;
 
-            double earnedThisFile = file.pointValue;
+        double deductedPoints = 0.0;
 
+        for (File file : criteria.files) {
             w.append(file.path);
             w.append(" (");
             w.append(decFmt.format(file.pointValue));
-            if (file.pointValue == 1) w.append(" point)");
-            else w.append(" points)");
+            w.append(file.pointValue == 1 ? " point)" : " points)");
             line(w);
 
             SubmittedFileWrapperNode sfwn = map.get(file);
             if (sfwn == null) {
+                deductedPoints += file.pointValue;
+
                 w.append("not submitted");
                 line(w);
                 line(w);
                 line(w);
-                // don't add to earnedPoints
                 continue;
             }
 
+            double deductedThisFile = 0.0;
+
             SubmittedFile submittedFile = (SubmittedFile)sfwn.getUserObject();
+
             Receipt receipt = submittedFile.receipt;
             if (receipt != null) {
                 w.append("submitted on ");
@@ -96,25 +99,44 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
 
             List<Deduction> ds = getDeductions((TestGroupWrapperNode)sfwn.treeModel.getRoot());
             for (Deduction d : ds) {
-                double thisDeduction = d.points;
-
-                if (d.points > earnedThisFile) {
-                    thisDeduction = earnedThisFile;
-                    earnedThisFile = 0.0;
-                } else if (d.points == earnedThisFile) {
-                    thisDeduction = 0.0;
-                    earnedThisFile = 0.0;
-                } else {
-                    earnedThisFile -= d.points;
-                }
-
                 StringBuilder builder = new StringBuilder();
                 builder.append("-");
-                builder.append(thisDeduction);
+
+                double displayedDeduction;
+                boolean displayActual = false;
+
+                if (deductedThisFile == file.pointValue) {
+                    // we previously reached the deduction limit
+
+                    displayedDeduction = 0.0;
+                    displayActual = true;
+
+                } else if (deductedThisFile + d.points <= file.pointValue) {
+                    // subtracting this deduction would not cause us to go over the limit
+
+                    displayedDeduction = d.points;
+
+                } else {
+                    // deductedThisFile != file.pointValue &&
+                    // deductedThisFile + d.points > file.pointValue
+
+                    // subtracting this deduction will cause us to go over the limit;
+                    // display the rest of the points being taken away
+                    displayedDeduction = file.pointValue - deductedThisFile;
+                    displayActual = true;
+                }
+
+                builder.append(decFmt.format(displayedDeduction));
                 builder.append("\t");
                 builder.append(d.description);
 
-                if (d.notes.length() > 0) {
+                if (displayActual) {
+                    builder.append(" [");
+                    builder.append(decFmt.format(d.points));
+                    builder.append("-point deduction]");
+                }
+
+                if (!d.notes.isEmpty()) {
                     builder.append("\n\n\tGrader notes: ");
                     builder.append(d.notes);
                     builder.append("\n");
@@ -122,16 +144,23 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
 
                 w.append(builder.toString());
                 line(w);
+
+                deductedThisFile += d.points;
+                if (deductedThisFile > file.pointValue) deductedThisFile = file.pointValue;
             }
 
-            line(w);
-            line(w);
+            if (deductedThisFile == 0) {
+                w.append("(no deductions)");
+            }
 
-            earnedPoints += earnedThisFile;
+            deductedPoints += deductedThisFile;
+
+            line(w);
+            line(w);
         }
 
         w.append("total: ");
-        w.append(decFmt.format(earnedPoints));
+        w.append(decFmt.format(totalPoints - deductedPoints));
         w.append("/");
         w.append(decFmt.format(totalPoints));
         line(w);
@@ -179,7 +208,7 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
         public Deduction(double points, String description, String notes) {
             this.points = points;
             this.description = description;
-            this.notes = notes;
+            this.notes = notes.trim();
         }
 
         public Deduction(double points, String description) {
@@ -193,7 +222,7 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
             builder.append("\t");
             builder.append(description);
 
-            if (notes.length() > 0) {
+            if (!notes.isEmpty()) {
                 builder.append("\n\n\tGrader notes: ");
                 builder.append(notes);
                 builder.append("\n");
