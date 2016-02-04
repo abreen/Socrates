@@ -105,8 +105,21 @@ msg = json.loads(input())
 
 module = None
 try:
+    import_in_buf = StringIO()
+    import_out_buf = StringIO()
+
+    sys.stdin = import_in_buf
+    sys.stdout = import_out_buf
+
     module = importlib.import_module(msg['name'])
+
+    sys.stdin = sys.__stdin__
+    sys.stdout = sys.__stdout__
+
 except ImportError as e:
+    sys.stdin = sys.__stdin__
+    sys.stdout = sys.__stdout__
+
     # could not find module
     error(e)
 
@@ -117,7 +130,7 @@ except (SyntaxError, NameError) as e:
         error(e)
 
 if msg['type'] == 'load':
-    conclude(True)
+    conclude(True, output=import_out_buf.getvalue())
 
 # catalog the members of this module
 for member_name, value in inspect.getmembers(module):
