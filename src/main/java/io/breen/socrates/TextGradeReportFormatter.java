@@ -166,13 +166,15 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
         w.close();
     }
 
+    private final static String nl = System.getProperty("line.separator");
+
     private void line(Writer writer) throws IOException {
-        writer.append(System.getProperty("line.separator"));
+        writer.append(nl);
     }
 
     private void insertNotes(StringBuilder builder, String notes) {
-        String nl = System.getProperty("line.separator");
         builder.append(nl + nl + "\tGrader notes: ");
+        builder.append(notes);
         builder.append(nl);
     }
 
