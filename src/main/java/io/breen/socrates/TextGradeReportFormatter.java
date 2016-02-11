@@ -172,9 +172,7 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
 
     private void insertNotes(StringBuilder builder, String notes) {
         String nl = System.getProperty("line.separator");
-        builder.append(nl);
-        builder.append(nl);
-        builder.append("\tGrader notes: ");
+        builder.append(nl + nl + "\tGrader notes: ");
         builder.append(nl);
     }
 
