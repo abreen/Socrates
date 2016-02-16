@@ -137,9 +137,7 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
                 }
 
                 if (!d.notes.isEmpty()) {
-                    builder.append("\n\n\tGrader notes: ");
-                    builder.append(d.notes);
-                    builder.append("\n");
+                    insertNotes(builder, d.notes);
                 }
 
                 w.append(builder.toString());
@@ -168,8 +166,16 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
         w.close();
     }
 
+    private final static String nl = System.getProperty("line.separator");
+
     private void line(Writer writer) throws IOException {
-        writer.append("\n");
+        writer.append(nl);
+    }
+
+    private void insertNotes(StringBuilder builder, String notes) {
+        builder.append(nl + nl + "\tGrader notes: ");
+        builder.append(notes);
+        builder.append(nl);
     }
 
     private List<Deduction> getDeductions(TestGroupWrapperNode root) {
@@ -223,9 +229,7 @@ public class TextGradeReportFormatter extends GradeReportFormatter {
             builder.append(description);
 
             if (!notes.isEmpty()) {
-                builder.append("\n\n\tGrader notes: ");
-                builder.append(notes);
-                builder.append("\n");
+                insertNotes(builder, notes);
             }
 
             return builder.toString();
