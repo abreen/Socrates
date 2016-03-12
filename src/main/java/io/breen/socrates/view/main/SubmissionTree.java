@@ -58,6 +58,7 @@ public class SubmissionTree implements Observer {
 
         notSaved = new LinkedList<>();
 
+        $$$setupUI$$$();
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
@@ -68,7 +69,7 @@ public class SubmissionTree implements Observer {
                 DefaultMutableTreeNode node = getSelectedNode();
                 if (node == null || !(node instanceof SubmittedFileWrapperNode)) return;
 
-                ((SubmittedFileWrapperNode)node).resetAllTests();
+                ((SubmittedFileWrapperNode) node).resetAllTests();
             }
         };
         resetAllTests.setEnabled(false);
@@ -81,7 +82,7 @@ public class SubmissionTree implements Observer {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SubmissionWrapperNode node = getCurrentSubmissionNode();
-                Submission s = (Submission)node.getUserObject();
+                Submission s = (Submission) node.getUserObject();
 
                 Path dest = Paths.get(
                         s.submissionDir.toString(), Globals.DEFAULT_GRADE_FILE_NAME
@@ -99,7 +100,7 @@ public class SubmissionTree implements Observer {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SubmissionWrapperNode node = getCurrentSubmissionNode();
-                Submission s = (Submission)node.getUserObject();
+                Submission s = (Submission) node.getUserObject();
 
                 Path dest = chooseSaveLocation(s.submissionDir);
                 if (dest == null) return;
@@ -153,7 +154,7 @@ public class SubmissionTree implements Observer {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SubmissionWrapperNode node = getCurrentSubmissionNode();
-                Submission s = (Submission)node.getUserObject();
+                Submission s = (Submission) node.getUserObject();
                 Path path = s.submissionDir;
                 try {
                     Desktop.getDesktop().open(path.toFile());
@@ -241,11 +242,11 @@ public class SubmissionTree implements Observer {
         int rv = fc.showSaveDialog(null);
 
         switch (rv) {
-        case JFileChooser.APPROVE_OPTION:
-            return fc.getSelectedFile().toPath();
-        case JFileChooser.CANCEL_OPTION:
-        default:
-            return null;
+            case JFileChooser.APPROVE_OPTION:
+                return fc.getSelectedFile().toPath();
+            case JFileChooser.CANCEL_OPTION:
+            default:
+                return null;
         }
     }
 
@@ -269,19 +270,18 @@ public class SubmissionTree implements Observer {
         tree = new JTree(root) {
             @Override
             public String convertValueToText(Object value, boolean selected, boolean expanded,
-                                             boolean leaf, int row, boolean hasFocus)
-            {
+                                             boolean leaf, int row, boolean hasFocus) {
                 if (value instanceof SubmittedFileWrapperNode) {
-                    SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
-                    return ((SubmittedFile)sfwn.getUserObject()).localPath.toString();
+                    SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode) value;
+                    return ((SubmittedFile) sfwn.getUserObject()).localPath.toString();
 
                 } else if (value instanceof UnrecognizedFileWrapperNode) {
-                    UnrecognizedFileWrapperNode ufwn = (UnrecognizedFileWrapperNode)value;
-                    return ((SubmittedFile)ufwn.getUserObject()).localPath.toString();
+                    UnrecognizedFileWrapperNode ufwn = (UnrecognizedFileWrapperNode) value;
+                    return ((SubmittedFile) ufwn.getUserObject()).localPath.toString();
 
                 } else if (value instanceof SubmissionWrapperNode) {
-                    SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
-                    Submission submission = (Submission)swn.getUserObject();
+                    SubmissionWrapperNode swn = (SubmissionWrapperNode) value;
+                    Submission submission = (Submission) swn.getUserObject();
                     return submission.studentName;
                 }
 
@@ -296,7 +296,7 @@ public class SubmissionTree implements Observer {
                     @Override
                     public void valueChanged(TreeSelectionEvent e) {
                         TreePath path = e.getPath();
-                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path
                                 .getLastPathComponent();
 
                         if (!e.isAddedPath()) node = null;
@@ -446,9 +446,8 @@ public class SubmissionTree implements Observer {
                     public Component getTreeCellRendererComponent(JTree tree, Object value,
                                                                   boolean selected,
                                                                   boolean expanded, boolean isLeaf,
-                                                                  int row, boolean focused)
-                    {
-                        JLabel jl = (JLabel)super.getTreeCellRendererComponent(
+                                                                  int row, boolean focused) {
+                        JLabel jl = (JLabel) super.getTreeCellRendererComponent(
                                 tree, value, selected, expanded, isLeaf, row, focused
                         );
 
@@ -461,10 +460,10 @@ public class SubmissionTree implements Observer {
                             SubmittedFile sf;
 
                             if (value instanceof UnrecognizedFileWrapperNode)
-                                sf = (SubmittedFile)((UnrecognizedFileWrapperNode)value)
+                                sf = (SubmittedFile) ((UnrecognizedFileWrapperNode) value)
                                         .getUserObject();
                             else
-                                sf = (SubmittedFile)((SubmittedFileWrapperNode)value)
+                                sf = (SubmittedFile) ((SubmittedFileWrapperNode) value)
                                         .getUserObject();
 
                             Icon i = getSystemIcon(sf.fullPath);
@@ -482,12 +481,12 @@ public class SubmissionTree implements Observer {
                             comment = "?";
 
                         } else if (value instanceof SubmittedFileWrapperNode) {
-                            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)value;
+                            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode) value;
 
                             if (sfwn.isComplete()) comment = "complete";
 
                         } else if (value instanceof SubmissionWrapperNode) {
-                            SubmissionWrapperNode swn = (SubmissionWrapperNode)value;
+                            SubmissionWrapperNode swn = (SubmissionWrapperNode) value;
 
                             if (swn.isComplete()) {
                                 comment = "complete";
@@ -542,26 +541,26 @@ public class SubmissionTree implements Observer {
     }
 
     public SubmittedFile getSelectedSubmittedFile() {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node == null) return null;
 
         Object userObject = node.getUserObject();
 
-        if (userObject instanceof SubmittedFile) return (SubmittedFile)userObject;
+        if (userObject instanceof SubmittedFile) return (SubmittedFile) userObject;
         else return null;
     }
 
     public DefaultMutableTreeNode getSelectedNode() {
-        return (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        return (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
     }
 
     public SubmissionWrapperNode getCurrentSubmissionNode() {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
-        if (node instanceof SubmissionWrapperNode) return (SubmissionWrapperNode)node;
+        if (node instanceof SubmissionWrapperNode) return (SubmissionWrapperNode) node;
         else if (node instanceof SubmittedFileWrapperNode || node instanceof
                 UnrecognizedFileWrapperNode)
-            return (SubmissionWrapperNode)node.getParent();
+            return (SubmissionWrapperNode) node.getParent();
         else return null;
     }
 
@@ -610,7 +609,7 @@ public class SubmissionTree implements Observer {
     }
 
     public void expandFirstSubmission() {
-        DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode)root.getFirstChild();
+        DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode) root.getFirstChild();
         tree.expandPath(new TreePath(firstChild.getPath()));
     }
 
@@ -625,7 +624,7 @@ public class SubmissionTree implements Observer {
     }
 
     public DefaultMutableTreeNode getParent(DefaultMutableTreeNode node) {
-        return (DefaultMutableTreeNode)node.getParent();
+        return (DefaultMutableTreeNode) node.getParent();
     }
 
     public boolean isLeaf(DefaultMutableTreeNode node) {
@@ -642,12 +641,12 @@ public class SubmissionTree implements Observer {
 
     public boolean firstSiblingSelected() {
         if (!hasSelection()) return false;
-        return isFirstSibling((DefaultMutableTreeNode)tree.getLastSelectedPathComponent());
+        return isFirstSibling((DefaultMutableTreeNode) tree.getLastSelectedPathComponent());
     }
 
     public boolean lastSiblingSelected() {
         if (!hasSelection()) return false;
-        return isLastSibling((DefaultMutableTreeNode)tree.getLastSelectedPathComponent());
+        return isLastSibling((DefaultMutableTreeNode) tree.getLastSelectedPathComponent());
     }
 
     public DefaultMutableTreeNode getNextSibling(DefaultMutableTreeNode node) {
@@ -675,31 +674,31 @@ public class SubmissionTree implements Observer {
     }
 
     public DefaultMutableTreeNode getFirstChild(DefaultMutableTreeNode node) {
-        return (DefaultMutableTreeNode)node.getFirstChild();
+        return (DefaultMutableTreeNode) node.getFirstChild();
     }
 
     public DefaultMutableTreeNode getLastChild(DefaultMutableTreeNode node) {
-        return (DefaultMutableTreeNode)node.getLastChild();
+        return (DefaultMutableTreeNode) node.getLastChild();
     }
 
     private DefaultTreeModel getModel() {
-        return (DefaultTreeModel)tree.getModel();
+        return (DefaultTreeModel) tree.getModel();
     }
 
     @Override
     public void objectChanged(ObservableChangedEvent event) {
         if (event.source instanceof SubmissionWrapperNode) {
-            SubmissionWrapperNode swn = (SubmissionWrapperNode)event.source;
+            SubmissionWrapperNode swn = (SubmissionWrapperNode) event.source;
             getModel().nodeChanged(swn);
 
         } else if (event.source instanceof SubmittedFileWrapperNode) {
-            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)event.source;
+            SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode) event.source;
             getModel().nodeChanged(sfwn);
 
         }
 
         if (event instanceof SubmissionCompletedChangeEvent) {
-            SubmissionCompletedChangeEvent e = (SubmissionCompletedChangeEvent)event;
+            SubmissionCompletedChangeEvent e = (SubmissionCompletedChangeEvent) event;
 
             if (e.isNowComplete) {
                 notSaved.add(e.source);
@@ -718,12 +717,36 @@ public class SubmissionTree implements Observer {
                 }
             }
         } else if (event instanceof GradeReportSavedEvent) {
-            GradeReportSavedEvent e = (GradeReportSavedEvent)event;
+            GradeReportSavedEvent e = (GradeReportSavedEvent) event;
 
             notSaved.remove(e.source);
 
             if (notSaved.isEmpty()) view.setAllSaved(true);
 
         }
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        createUIComponents();
+        rootPanel = new JPanel();
+        rootPanel.setLayout(new BorderLayout(0, 0));
+        scrollPane.setVerticalScrollBarPolicy(22);
+        rootPanel.add(scrollPane, BorderLayout.CENTER);
+        tree.setMaximumSize(new Dimension(-1, -1));
+        scrollPane.setViewportView(tree);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return rootPanel;
     }
 }

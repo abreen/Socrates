@@ -17,9 +17,9 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class Main {
+public class Socrates {
 
-    private static Logger logger = Logger.getLogger(Main.class.getName());
+    private static Logger logger = Logger.getLogger(Socrates.class.getName());
 
     public static void main(String[] args) {
         /*

@@ -33,6 +33,7 @@ public class TestTree implements Observer<TestWrapperNode> {
     private JPanel treePanel;
 
     public TestTree(MenuBarManager menuBar, SubmissionTree submissionTree) {
+        $$$setupUI$$$();
         int ctrl = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         int shift = InputEvent.SHIFT_DOWN_MASK;
         int alt = InputEvent.ALT_DOWN_MASK;
@@ -47,9 +48,9 @@ public class TestTree implements Observer<TestWrapperNode> {
                 while (bfs.hasMoreElements()) {
                     DefaultMutableTreeNode dmtn = bfs.nextElement();
                     if (dmtn instanceof TestWrapperNode) {
-                        TestWrapperNode twn = (TestWrapperNode)dmtn;
+                        TestWrapperNode twn = (TestWrapperNode) dmtn;
                         if (twn.getResult() != TestResult.NONE) continue;
-                        Test t = (Test)twn.getUserObject();
+                        Test t = (Test) twn.getUserObject();
                         if (!(t instanceof Automatable)) twn.setResult(TestResult.PASSED);
 
                     }
@@ -94,18 +95,18 @@ public class TestTree implements Observer<TestWrapperNode> {
          * to append the accelerator key shortcut to emphasize use of the shortcuts.
          */
         switch (Globals.operatingSystem) {
-        case OSX:
-            nextButton.setText("Next (⌘J)");
-            previousButton.setText("Previous (⌘K)");
-            break;
-        case WINDOWS:
-        case LINUX:
-            nextButton.setText("Next (Ctrl + J)");
-            previousButton.setText("Previous (Ctrl + K)");
-            break;
-        default:
-            nextButton.setText("Next");
-            previousButton.setText("Previous");
+            case OSX:
+                nextButton.setText("Next (⌘J)");
+                previousButton.setText("Previous (⌘K)");
+                break;
+            case WINDOWS:
+            case LINUX:
+                nextButton.setText("Next (Ctrl + J)");
+                previousButton.setText("Previous (Ctrl + K)");
+                break;
+            default:
+                nextButton.setText("Next");
+                previousButton.setText("Previous");
         }
 
         submissionTree.addTreeSelectionListener(
@@ -113,14 +114,14 @@ public class TestTree implements Observer<TestWrapperNode> {
                     @Override
                     public void valueChanged(TreeSelectionEvent e) {
                         TreePath path = e.getPath();
-                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path
                                 .getLastPathComponent();
 
                         if (!e.isAddedPath()) node = null;
 
                         if (node != null) {
                             if (node instanceof SubmittedFileWrapperNode) {
-                                SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode)node;
+                                SubmittedFileWrapperNode sfwn = (SubmittedFileWrapperNode) node;
 
                                 update(sfwn.treeModel);
 
@@ -167,19 +168,18 @@ public class TestTree implements Observer<TestWrapperNode> {
     }
 
     private void createUIComponents() {
-        tree = new JTree((TreeModel)null) {
+        tree = new JTree((TreeModel) null) {
             @Override
             public String convertValueToText(Object value, boolean selected, boolean expanded,
-                                             boolean leaf, int row, boolean hasFocus)
-            {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+                                             boolean leaf, int row, boolean hasFocus) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
                 Object userObject = node.getUserObject();
 
                 if (userObject instanceof TestGroup) {
-                    return testGroupToString((TestGroup)userObject);
+                    return testGroupToString((TestGroup) userObject);
 
                 } else if (userObject instanceof Test) {
-                    return ((Test)userObject).description;
+                    return ((Test) userObject).description;
                 }
 
                 return super.convertValueToText(
@@ -195,7 +195,7 @@ public class TestTree implements Observer<TestWrapperNode> {
                 new PredicateTreeSelectionModel() {
                     @Override
                     public boolean predicate(TreePath path) {
-                        DefaultMutableTreeNode node = (DefaultMutableTreeNode)path
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path
                                 .getLastPathComponent();
                         return node.getUserObject() instanceof Test;
                     }
@@ -207,7 +207,7 @@ public class TestTree implements Observer<TestWrapperNode> {
                     @Override
                     public void valueChanged(TreeSelectionEvent e) {
                         TreePath path = e.getPath();
-                        TestWrapperNode node = (TestWrapperNode)path.getLastPathComponent();
+                        TestWrapperNode node = (TestWrapperNode) path.getLastPathComponent();
 
                         if (!e.isAddedPath()) node = null;
 
@@ -263,14 +263,13 @@ public class TestTree implements Observer<TestWrapperNode> {
                     public Component getTreeCellRendererComponent(JTree tree, Object value,
                                                                   boolean selected,
                                                                   boolean expanded, boolean isLeaf,
-                                                                  int row, boolean focused)
-                    {
+                                                                  int row, boolean focused) {
                         super.getTreeCellRendererComponent(
                                 tree, value, selected, expanded, isLeaf, row, focused
                         );
 
                         if (value instanceof TestWrapperNode) {
-                            TestWrapperNode testNode = (TestWrapperNode)value;
+                            TestWrapperNode testNode = (TestWrapperNode) value;
 
                             TestIcon i = TestControls.newIcon(testNode);
                             i.setIconHeight(16);
@@ -287,13 +286,13 @@ public class TestTree implements Observer<TestWrapperNode> {
                             setIcon(i);
 
                         } else if (value instanceof TestGroupWrapperNode) {
-                            TestGroupWrapperNode groupNode = (TestGroupWrapperNode)value;
+                            TestGroupWrapperNode groupNode = (TestGroupWrapperNode) value;
 
                             // test groups never need an icon
                             setIcon(null);
 
                             String text = getText();
-                            TestGroup g = (TestGroup)groupNode.getUserObject();
+                            TestGroup g = (TestGroup) groupNode.getUserObject();
 
                             if (g.label != null) {
                                 String s = "<html>";
@@ -335,7 +334,7 @@ public class TestTree implements Observer<TestWrapperNode> {
                 DefaultMutableTreeNode n = dfs.nextElement();
 
                 if (n instanceof TestWrapperNode) {
-                    TestWrapperNode node = (TestWrapperNode)n;
+                    TestWrapperNode node = (TestWrapperNode) n;
                     node.removeObserver(this);
                 }
             }
@@ -350,7 +349,7 @@ public class TestTree implements Observer<TestWrapperNode> {
                 DefaultMutableTreeNode n = dfs.nextElement();
 
                 if (n instanceof TestWrapperNode) {
-                    TestWrapperNode node = (TestWrapperNode)n;
+                    TestWrapperNode node = (TestWrapperNode) n;
                     node.addObserver(this);
                 }
             }
@@ -370,7 +369,7 @@ public class TestTree implements Observer<TestWrapperNode> {
     public TestWrapperNode getSelectedTestWrapperNode() {
         if (!hasSelection()) return null;
 
-        return (TestWrapperNode)tree.getLastSelectedPathComponent();
+        return (TestWrapperNode) tree.getLastSelectedPathComponent();
     }
 
     public boolean hasSelection() {
@@ -404,7 +403,7 @@ public class TestTree implements Observer<TestWrapperNode> {
             DefaultMutableTreeNode node = dfs.nextElement();
 
             if (node instanceof TestWrapperNode) {
-                TestWrapperNode n = (TestWrapperNode)node;
+                TestWrapperNode n = (TestWrapperNode) node;
                 if (!n.isConstrained()) {
                     if (n.getResult() == TestResult.NONE) return n;
                 }
@@ -440,11 +439,11 @@ public class TestTree implements Observer<TestWrapperNode> {
             return;
         }
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
         DefaultMutableTreeNode next = node.getNextLeaf();
 
-        while (next != null && (!(next instanceof TestWrapperNode) || ((TestWrapperNode)next)
+        while (next != null && (!(next instanceof TestWrapperNode) || ((TestWrapperNode) next)
                 .isConstrained())) {
             next = next.getNextLeaf();
         }
@@ -466,11 +465,11 @@ public class TestTree implements Observer<TestWrapperNode> {
     public void goToPreviousTest() {
         if (!hasSelection() || firstTestForFileSelected()) return;
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
         DefaultMutableTreeNode prev = node.getPreviousLeaf();
 
-        while (prev != null && (!(prev instanceof TestWrapperNode) || ((TestWrapperNode)prev)
+        while (prev != null && (!(prev instanceof TestWrapperNode) || ((TestWrapperNode) prev)
                 .isConstrained())) {
             prev = prev.getPreviousLeaf();
         }
@@ -485,12 +484,12 @@ public class TestTree implements Observer<TestWrapperNode> {
     }
 
     public void expandFirstTest() {
-        DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode)getRoot().getFirstChild();
+        DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode) getRoot().getFirstChild();
         tree.expandPath(new TreePath(firstChild.getPath()));
     }
 
     private void expandTree(TreePath parent) {
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode)parent.getLastPathComponent();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) parent.getLastPathComponent();
 
         Enumeration<DefaultMutableTreeNode> children = root.children();
         while (children.hasMoreElements()) {
@@ -508,19 +507,51 @@ public class TestTree implements Observer<TestWrapperNode> {
 
     private DefaultMutableTreeNode getRoot() {
         TreeModel model = tree.getModel();
-        return (DefaultMutableTreeNode)(model == null ? null : model.getRoot());
+        return (DefaultMutableTreeNode) (model == null ? null : model.getRoot());
     }
 
     private DefaultMutableTreeNode getRoot(TreeModel model) {
-        return (DefaultMutableTreeNode)model.getRoot();
+        return (DefaultMutableTreeNode) model.getRoot();
     }
 
     private DefaultTreeModel getModel() {
-        return (DefaultTreeModel)tree.getModel();
+        return (DefaultTreeModel) tree.getModel();
     }
 
     @Override
     public void objectChanged(ObservableChangedEvent<TestWrapperNode> event) {
         getModel().nodeChanged(event.source);
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        createUIComponents();
+        rootPanel = new JPanel();
+        rootPanel.setLayout(new BorderLayout(0, 0));
+        scrollPane.setVerticalScrollBarPolicy(22);
+        rootPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setViewportView(tree);
+        navPanel = new JPanel();
+        navPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        rootPanel.add(navPanel, BorderLayout.SOUTH);
+        previousButton = new JButton();
+        previousButton.setText("Previous");
+        navPanel.add(previousButton);
+        nextButton = new JButton();
+        nextButton.setText("Next");
+        navPanel.add(nextButton);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return rootPanel;
     }
 }
