@@ -1,17 +1,17 @@
 package io.breen.socrates.test.python;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.breen.socrates.Globals;
 import io.breen.socrates.file.python.Object;
-import io.breen.socrates.python.PythonManager;
 import io.breen.socrates.util.Pair;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class PythonInspector {
-
     private final String moduleName;
     private final ProcessBuilder builder;
     private final Process process;
@@ -24,10 +24,16 @@ public class PythonInspector {
         String[] parts = fileName.split("\\.");
         moduleName = parts[0];
 
+        Path testerPath = Globals.extractOrGetFile(Paths.get("tester.py"));
+
+        if (testerPath == null)
+            throw new RuntimeException("could not locate tester.py");
+
         builder = new ProcessBuilder(
-                PythonManager.python3Command.toString(), "-B",
+                Globals.interpreter.path.toString(),
                 // turns off writing bytecode files (.py[co])
-                PythonManager.getPathToSource("tester.py").toString()
+                "-B",
+                testerPath.toString()
         );
 
         builder.redirectError(ProcessBuilder.Redirect.INHERIT);
@@ -90,8 +96,8 @@ public class PythonInspector {
 
             return list.equals(otherList);
 
-        } else if (expected instanceof Object[]) {
-            Object[] arr = (Object[])expected;
+        } else if (expected.getClass().isArray()) {
+            java.lang.Object[] arr = (java.lang.Object[])expected;
 
             if (other == null || !other.type.equals("list")) return false;
 

@@ -1,5 +1,8 @@
 package io.breen.socrates;
 
+import io.breen.pyfinder.PythonFinder;
+import io.breen.pyfinder.PythonInterpreter;
+import io.breen.pyfinder.PythonVersion;
 import io.breen.socrates.controller.MainController;
 import io.breen.socrates.controller.SetupController;
 import io.breen.socrates.criteria.Criteria;
@@ -91,6 +94,27 @@ public class Main {
         }
 
         /*
+         * Try to find a Python interpreter. If no suitable interpreter could be found, we may prompt the user
+         * to enter a path to a valid Python interpreter, or quit.
+         */
+        PythonFinder finder = new PythonFinder();
+        try {
+            List<PythonInterpreter> all = finder.findOrNewer(new PythonVersion(3, 2));
+            if (!all.isEmpty()) {
+                Globals.interpreter = all.get(0);
+                logger.info("located Python interpreter: " + Globals.interpreter);
+            } else {
+                logger.warning("could not find a Python interpreter");
+                // TODO prompt user
+                System.exit(5);
+            }
+
+        } catch (InterruptedException | IOException x) {
+            logger.severe("encountered exception finding Python interpreter: " + x);
+            System.exit(5);
+        }
+
+        /*
          * Create the MainController. It will wait for the SetupController to send it
          * a message indicating that the criteria and initial submissions have been
          * loaded.
@@ -124,7 +148,7 @@ public class Main {
                 } catch (IllegalArgumentException x) {
                     logger.warning("invalid submission: '" + p + "' " + x);
                 } catch (IOException x) {
-                    logger.warning("I/O exception occurred adding submission: " + x);
+                    logger.warning("IOException occurred adding submission: " + x);
                 } catch (ReceiptFormatException x) {
                     logger.warning("invalid receipt for submission '" + p + "'");
                 } catch (AlreadyGradedException x) {

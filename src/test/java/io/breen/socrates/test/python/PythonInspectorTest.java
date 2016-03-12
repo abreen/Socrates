@@ -1,5 +1,8 @@
 package io.breen.socrates.test.python;
 
+import io.breen.pyfinder.PythonFinder;
+import io.breen.pyfinder.PythonVersion;
+import io.breen.socrates.Globals;
 import org.junit.*;
 
 import java.nio.charset.Charset;
@@ -16,6 +19,8 @@ public class PythonInspectorTest {
 
     @Before
     public void setUp() throws Exception {
+        Globals.interpreter = new PythonFinder().findOrNewer(new PythonVersion(3, 2)).get(0);
+
         parentDir = Paths.get("parent");
 
         paths = Arrays.asList(

@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="jygments">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/src/lib/jygments.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

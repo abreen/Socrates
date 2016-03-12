@@ -1,15 +1,8 @@
-out/*
-dist/*
+target/
 
 socrates.log*
 
-.idea/workspace.xml
-.idea/tasks.xml
-
-# Package Files #
-#*.jar
-*.war
-*.ear
+src/main/java/META-INF/
 
 .classpath
 .project

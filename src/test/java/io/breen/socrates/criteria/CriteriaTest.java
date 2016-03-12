@@ -1,11 +1,16 @@
 package io.breen.socrates.criteria;
 
+import io.breen.pyfinder.PythonFinder;
+import io.breen.pyfinder.PythonInterpreter;
+import io.breen.pyfinder.PythonVersion;
+import io.breen.socrates.Globals;
 import org.junit.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,6 +43,8 @@ public class CriteriaTest {
 
     @Before
     public void setUp() throws Exception {
+        Globals.interpreter = new PythonFinder().findOrNewer(new PythonVersion(3, 2)).get(0);
+
         {
             // nonexistent: don't create the file
         }

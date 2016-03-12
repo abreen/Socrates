@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.breen.socrates.Globals;
 import io.breen.socrates.criteria.Criteria;
 import io.breen.socrates.file.File;
-import io.breen.socrates.python.PythonManager;
 import io.breen.socrates.submission.Submission;
 import io.breen.socrates.submission.SubmittedFile;
 import io.breen.socrates.test.*;
@@ -12,6 +11,7 @@ import io.breen.socrates.test.*;
 import javax.swing.text.Document;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class ScriptTest extends Test implements Automatable {
@@ -54,9 +54,17 @@ public class ScriptTest extends Test implements Automatable {
         if (scriptPath == null)
             throw new AutomationFailureException("could not find script: " + path);
 
+        Path socratesPyPath;
+        try {
+            socratesPyPath = Globals.extractOrGetFile(Paths.get("socrates.py"));
+        } catch (IOException x) {
+            throw new AutomationFailureException("could not locate socrates.py");
+        }
+
         ProcessBuilder builder = new ProcessBuilder(
-                PythonManager.python3Command.toString(), "-B",
+                Globals.interpreter.path.toString(),
                 // turns off writing bytecode files (.py[co])
+                "-B",
                 scriptPath.toString()
         );
 
@@ -70,7 +78,7 @@ public class ScriptTest extends Test implements Automatable {
         Map<String, String> env = builder.environment();
         env.put(
                 "PYTHONPATH",
-                System.getProperty("path.separator") + PythonManager.getTempDirectory().toString()
+                System.getProperty("path.separator") + socratesPyPath.toString()
         );
 
         Path parentDir = target.fullPath.getParent();
