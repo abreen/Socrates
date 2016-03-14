@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 
 
 public class Globals {
@@ -21,16 +20,20 @@ public class Globals {
         WINDOWS, OSX, LINUX, OTHER
     }
 
-    public static final int NORMAL_EXIT_CODE = 0;
     public static final Color GRAY = new Color(140, 140, 140);
     public static final Color LIGHT_GRAY = new Color(186, 186, 186);
     public static final Color YELLOW = new Color(205, 174, 0);
     public static final Color RED = new Color(189, 12, 13);
     public static final Color GREEN = new Color(49, 141, 34);
     public static final Color BLUE = new Color(37, 123, 210);
+
     public static final SimpleDateFormat ISO8601_UTC;
     public static final SimpleDateFormat ISO8601;
+
     public static final String DEFAULT_GRADE_FILE_NAME = "grade.txt";
+
+    public static final Properties defaultProperties;
+
     public static Properties properties;
     public static OS operatingSystem;
 
@@ -52,6 +55,8 @@ public class Globals {
         } else {
             operatingSystem = OS.OTHER;
         }
+
+        defaultProperties = new Properties();
     }
 
     public static void enableFullScreen(Window window) {

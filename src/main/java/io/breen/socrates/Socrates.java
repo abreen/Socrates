@@ -7,136 +7,136 @@ import io.breen.socrates.controller.MainController;
 import io.breen.socrates.controller.SetupController;
 import io.breen.socrates.criteria.Criteria;
 import io.breen.socrates.criteria.InvalidCriteriaException;
-import io.breen.socrates.submission.*;
+import io.breen.socrates.submission.AlreadyGradedException;
+import io.breen.socrates.submission.ReceiptFormatException;
+import io.breen.socrates.submission.Submission;
+import io.breen.socrates.view.View;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.apache.commons.cli.*;
 
-import javax.swing.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class Socrates {
+public class Socrates extends Application {
 
     private static Logger logger = Logger.getLogger(Socrates.class.getName());
 
-    public static void main(String[] args) {
-        /*
-         * Set up System properties. These are ugly, platform-specific options.
-         */
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("apple.eawt.quitStrategy", "CLOSE_ALL_WINDOWS");
+    @Override
+    public void start(Stage stage) {
+        String userHome = System.getProperty("user.home");
+        Path localPropPath = null;
 
-        try {
-            // improves UI on Windows, especially
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception x) {
-            System.err.println("failed setting L&F");
-            System.exit(5);
+        Properties props = null;
+
+        if (userHome != null) {
+            localPropPath = Paths.get(userHome, ".socrates.properties");
+            if (Files.exists(localPropPath) && Files.isRegularFile(localPropPath)) {
+                try {
+                    props = new Properties();
+                    props.load(Files.newInputStream(localPropPath));
+                } catch (IOException x) {
+                    logger.warning("IOException loading .socrates.properties: " + x);
+                }
+            }
         }
 
-        /*
-         * Set up default Socrates properties. These properties are the ones saved
-         * to socrates.properties.
-         */
-        setDefaultProperties();
-
-        /*
-         * We parse the command-line arguments first, in case the user specifies a
-         * different path to the .properties file.
-         */
-
-        Options opts = createOptions();
-
-        CommandLine cmd = null;
-        try {
-            cmd = new DefaultParser().parse(opts, args);
-        } catch (UnrecognizedOptionException e) {
-            System.err.println("error: unrecognized option: " + e.getOption());
-            System.exit(1);
-        } catch (ParseException e) {
-            logger.info("got ParseException for command-line args: " + e.toString());
-            System.err.println("error parsing command-line arguments");
-            System.exit(2);
+        if (props == null) {
+            props = new Properties(Globals.defaultProperties);
         }
 
-        if (cmd.hasOption("help")) {
-            logger.info("got --help command-line option");
-            new HelpFormatter().printHelp("socrates", opts);
-            System.exit(0);
-        }
+        PythonInterpreter interp = null;
 
-        final Path defaultPropPath = Paths.get(
-                System.getProperty("user.home"), "socrates.properties"
-        );
-
-        Path propPath;
-        if (cmd.hasOption("properties")) {
-            String value = cmd.getOptionValue("properties");
-            logger.config("using command-line argument for properties: " + value);
-            propPath = Paths.get(value);
-        } else {
-            logger.config("using default properties path: " + defaultPropPath);
-            propPath = defaultPropPath;
-        }
-
-        if (Files.exists(propPath)) {
+        String interpPathStr = props.getProperty("pythonInterpreter");
+        if (interpPathStr != null) {
             try {
-                loadPropertiesFrom(propPath);
-            } catch (IOException e) {
-                logger.severe("could not load .properties file: " + e);
-                System.exit(3);
+                interp = PythonInterpreter.fromPath(Paths.get(interpPathStr));
+                logger.info("found Python interpreter again from path in .socrates.properties: " + interp);
+            } catch (IOException | InterruptedException x) {
+                logger.warning("exception checking Python interpreter path from .socrates.properties: " + x);
             }
-        } else if (cmd.hasOption("properties")) {
-            logger.severe("specified .properties file does not exist");
-            System.exit(4);
         }
 
-        /*
-         * Try to find a Python interpreter. If no suitable interpreter could be found, we may prompt the user
-         * to enter a path to a valid Python interpreter, or quit.
-         */
-        PythonFinder finder = new PythonFinder();
-        try {
-            List<PythonInterpreter> all = finder.findOrNewer(new PythonVersion(3, 2));
-            if (!all.isEmpty()) {
-                Globals.interpreter = all.get(0);
-                logger.info("located Python interpreter: " + Globals.interpreter);
-            } else {
-                logger.warning("could not find a Python interpreter");
-                // TODO prompt user
-                System.exit(5);
-            }
+        if (interp == null) {
+            /*
+             * The properties file doesn't have a path to a valid Python interpreter, or that path is invalid;
+             * we need to search for a Python interpreter now.
+             */
 
-        } catch (InterruptedException | IOException x) {
-            logger.severe("encountered exception finding Python interpreter: " + x);
-            System.exit(5);
+            PythonFinder finder = new PythonFinder();
+            try {
+                List<PythonInterpreter> all = finder.findOrNewer(new PythonVersion(3, 2));
+                if (!all.isEmpty()) {
+                    interp = all.get(0);
+                    logger.info("located Python interpreter: " + interp);
+                    props.setProperty("pythonInterpreter", interp.path.toString());
+
+                } else {
+                    logger.warning("could not find a Python interpreter");
+
+                    // TODO prompt user
+                    return;
+                }
+
+            } catch (InterruptedException | IOException x) {
+                logger.severe("encountered exception finding Python interpreter: " + x);
+                return;
+            }
         }
 
-        /*
-         * Create the MainController. It will wait for the SetupController to send it
-         * a message indicating that the criteria and initial submissions have been
-         * loaded.
-         */
-        MainController main = new MainController();
+        if (localPropPath != null) {
+            try {
+                props.store(Files.newOutputStream(localPropPath), null);
+                if (Globals.operatingSystem == Globals.OS.WINDOWS)
+                    Files.setAttribute(localPropPath, "dos:hidden", true);
+
+            } catch (IOException x) {
+                logger.warning("IOException storing .socrates.properties: " + x);
+            }
+        }
+
+        Parameters params = getParameters();
+        Map<String, String> namedParams = params.getNamed();
+
+        logger.info("command line arguments: " + namedParams);
 
         Path criteriaPath = null;
         Criteria criteria = null;
-        if (cmd.hasOption("criteria")) {
+        if (namedParams.containsKey("criteria")) {
             try {
-                criteriaPath = Paths.get(cmd.getOptionValue("criteria"));
+                criteriaPath = Paths.get(namedParams.get("criteria"));
                 criteria = Criteria.loadFromPath(criteriaPath);
+                logger.info("successfully loaded criteria from " + criteriaPath);
             } catch (InvalidPathException x) {
                 logger.warning("command-line option for criteria path was invalid");
             } catch (IOException | InvalidCriteriaException x) {
-                logger.warning(criteriaPath + " specified an invalid criteria: " + x);
+                logger.warning("IOException or invalid criteria: " + x);
             }
         }
 
         List<Submission> submissions = null;
-        if (cmd.hasOption("submissions")) {
-            String[] paths = cmd.getOptionValues("submissions");
+        if (namedParams.containsKey("submissions")) {
+            String pathsStr = namedParams.get("submissions");
+            String[] paths = pathsStr.split("\\s+");
+
             submissions = new ArrayList<>(paths.length);
             for (String str : paths) {
                 Path p = null;
@@ -159,71 +159,74 @@ public class Socrates {
             if (submissions.size() == 0) {
                 submissions = null;
             }
+        } else {
+            logger.info("no submissions specified in command line arguments");
         }
 
-        /*
-         * Start the SetupController.
-         * If the --criteria command line option was specified and a Criteria object
-         * could be created, that step of the setup will be skipped.
-         * If the --submissions command line option was specified, and at least one
-         * submission could be added, that step of the setup will be skipped.
-         */
-        SetupController setup = new SetupController(main);
-        setup.start(criteriaPath, criteria, submissions);
+        //MainController main = new MainController();
+        //SetupController setup = new SetupController(main);
+        //setup.start(criteriaPath, criteria, submissions);
+
+        try {
+            new View().showStage();
+
+        } catch (Exception x) {
+            ButtonType exitButton;
+            if (Globals.operatingSystem == Globals.OS.OSX)
+                exitButton = new ButtonType("Quit");
+            else
+                exitButton = new ButtonType("Exit");
+
+            Alert alert = new Alert(
+                    AlertType.ERROR,
+                    "An internal error occurred, and Socrates must be closed. Click Show Details for detailed " +
+                            "information about the error.",
+                    exitButton
+            );
+
+            alert.getDialogPane().setPrefSize(500, 300);
+
+            StringBuilder sb = new StringBuilder();
+            for (StackTraceElement el : x.getStackTrace()) {
+                sb.append(el);
+                sb.append("\n");
+            }
+
+            String stackTrace = sb.toString();
+
+            String exceptionStr = x.getClass().getSimpleName();
+
+            if (Arrays.asList('A', 'E', 'I', 'O', 'U').indexOf(exceptionStr.charAt(0)) != -1) {
+                exceptionStr = "An " + exceptionStr;
+            } else {
+                exceptionStr = "A " + exceptionStr;
+            }
+
+            Label label = new Label(exceptionStr + " exception was thrown.");
+
+            TextArea textArea = new TextArea(stackTrace);
+            textArea.setEditable(false);
+            textArea.setStyle(
+                    "-fx-font-family: monospace"
+            );
+
+            GridPane.setVgrow(textArea, Priority.ALWAYS);
+            GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+            GridPane pane = new GridPane();
+            pane.setVgap(10);
+
+            pane.add(label, 0, 0);
+            pane.add(textArea, 0, 1);
+
+            alert.getDialogPane().setExpandableContent(pane);
+
+            alert.showAndWait();
+            Platform.exit();
+        }
     }
 
-    private static void setDefaultProperties() {
-        Properties defaults = new Properties();
-        // no default properties
-        Globals.properties = new Properties(defaults);
-        logger.config("setting default properties: " + defaults.toString());
-    }
-
-    private static void storeProperties(Path path) throws IOException {
-        logger.config("storing properties to: " + path);
-        BufferedWriter writer = Files.newBufferedWriter(path, Charset.defaultCharset());
-        Globals.properties.store(writer, null);
-    }
-
-    private static void loadPropertiesFrom(Path path) throws IOException {
-        logger.config("loading properties from: " + path);
-        BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset());
-        Globals.properties.load(reader);
-        logger.config("loaded these properties: " + Globals.properties.toString());
-    }
-
-    private static Options createOptions() {
-        Options opts = new Options();
-
-        opts.addOption(
-                Option.builder("p")
-                      .longOpt("properties")
-                      .hasArg()
-                      .argName("path")
-                      .desc("path to socrates.properties file")
-                      .build()
-        );
-
-        opts.addOption(
-                Option.builder("c")
-                      .longOpt("criteria")
-                      .hasArg()
-                      .argName("path")
-                      .desc("path to a criteria (.yml) file")
-                      .build()
-        );
-
-        opts.addOption(
-                Option.builder("s")
-                      .longOpt("submissions")
-                      .hasArgs()
-                      .argName("paths")
-                      .desc("space-separated paths to submission directories")
-                      .build()
-        );
-
-        opts.addOption("h", "help", false, "print this message");
-
-        return opts;
+    public static void main(String[] args) {
+        launch(args);
     }
 }

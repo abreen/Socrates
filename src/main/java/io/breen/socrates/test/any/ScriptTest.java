@@ -106,7 +106,7 @@ public class ScriptTest extends Test implements Automatable {
             throw new AutomationFailureException(x);
         }
 
-        if (exitCode != Globals.NORMAL_EXIT_CODE)
+        if (exitCode != 0)
             throw new AutomationFailureException("script exited abnormally");
 
         Map<String, Object> response;
