@@ -1,162 +1,125 @@
 package io.breen.socrates.file.python;
 
-import io.breen.socrates.PostConstructionAction;
 import io.breen.socrates.file.File;
-import io.breen.socrates.test.Test;
-import io.breen.socrates.test.TestGroup;
-import io.breen.socrates.test.python.*;
+import io.breen.socrates.test.Node;
+import io.breen.socrates.test.TestNode;
+import io.breen.socrates.test.python.node.FunctionTestNode;
+import io.breen.socrates.test.python.node.MethodTestNode;
+import io.breen.socrates.test.python.node.VariableTestNode;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A PythonFile is a representation of a Python module (a file ending in .py containing valid Python
  * code) containing source code.
  */
-public final class PythonFile extends File implements PostConstructionAction {
+public class PythonFile extends File {
 
     /**
      * The deduction taken when the Python module cannot be imported due to a serious error (e.g., a
      * syntax error).
      */
-    public double importFailureDeduction;
-
-    public List<Variable> variables = Collections.emptyList();
-    public List<Function> functions = Collections.emptyList();
-    public List<Class> classes = Collections.emptyList();
+    private double importFailureDeduction;
+    private List<Variable> variables = Collections.emptyList();
+    private List<Function> functions = Collections.emptyList();
+    private List<PythonClass> classes = Collections.emptyList();
 
     /**
      * This empty constructor is used by SnakeYAML.
      */
     public PythonFile() {
-        language = "python";
-        contentsArePlainText = true;
     }
 
     public PythonFile(double importFailureDeduction) {
-        this();
         this.importFailureDeduction = importFailureDeduction;
     }
 
-    private static boolean hasTest(List<java.lang.Object> list, Test test) {
-        for (java.lang.Object o : list)
-            if (o instanceof Test && o == test) return true;
-            else if (o instanceof TestGroup) return hasTest(((TestGroup)o).members, test);
+    private static boolean hasTest(List<Node> list, TestNode test) {
+        for (Node n : list) {
+            if (n == test)
+                return true;
+
+            if (!n.isLeaf())
+                return hasTest(n.getChildren(), test);
+        }
 
         return false;
     }
 
-    @Override
-    public void afterConstruction() {
-        super.afterConstruction();
+    public double getImportFailureDeduction() {
+        return importFailureDeduction;
     }
 
-    @Override
-    protected TestGroup createTestRoot() {
-        List<java.lang.Object> tests = new LinkedList<>();
-
-        for (Variable v : variables) {
-            Test test = new VariableExistsTest(v);
-
-            if (!v.tests.isEmpty()) {
-                List<java.lang.Object> members = new LinkedList<>();
-                members.add(test);
-                members.add(new TestGroup(v.tests, 0, 0.0));
-
-                TestGroup group = new TestGroup(members, 1, 0.0);
-
-                tests.add(group);
-            } else {
-                tests.add(test);
-            }
-        }
-
-        for (Function f : functions) {
-            Test test = new FunctionExistsTest(f);
-
-            if (!f.tests.isEmpty()) {
-                List<java.lang.Object> members = new LinkedList<>();
-                members.add(test);
-                members.add(new TestGroup(f.tests, 0, 0.0));
-
-                TestGroup group = new TestGroup(members, 1, 0.0);
-
-                tests.add(group);
-            } else {
-                tests.add(test);
-            }
-        }
-
-        for (Class c : classes) {
-            Test classExistsTest = new ClassExistsTest(c);
-            List<java.lang.Object> subTests = new LinkedList<>();
-
-            if (!c.tests.isEmpty()) subTests.addAll(c.tests);
-
-            for (Method m : c.methods) {
-                Test methodExistsTest = new MethodExistsTest(m);
-                List<java.lang.Object> methodSubTests = new LinkedList<>();
-
-                if (!m.tests.isEmpty()) methodSubTests.addAll(m.tests);
-
-                List<java.lang.Object> decision2 = new ArrayList<>(2);
-                decision2.add(methodExistsTest);
-                decision2.add(new TestGroup(methodSubTests, 0, 0.0));
-
-                subTests.add(new TestGroup(decision2, 1, 0.0));
-            }
-
-            List<java.lang.Object> decision = new ArrayList<>(2);
-            decision.add(classExistsTest);
-            decision.add(new TestGroup(subTests, 0, 0.0));
-            tests.add(new TestGroup(decision, 1, 0.0));
-        }
-
-        TestGroup root = super.createTestRoot();
-
-        Test test = new ImportTest(this);
-
-        List<java.lang.Object> members = new LinkedList<>();
-        members.add(test);
-
-        if (!tests.isEmpty()) members.add(new TestGroup(tests, 0, 0.0));
-
-        TestGroup group = new TestGroup(members, 1, 0.0);
-
-        root.members.add(group);
-
-        return root;
+    /**
+     * Used by SnakeYAML.
+     */
+    public void setImportFailureDeduction(double importFailureDeduction) {
+        checkFrozen();
+        this.importFailureDeduction = importFailureDeduction;
     }
 
-    @Override
-    public String getFileTypeName() {
-        return "Python source code";
+    public List<Variable> getVariables() {
+        return Collections.unmodifiableList(variables);
     }
 
-    public Variable getVariableForTest(VariableTest test) {
+    /**
+     * Used by SnakeYAML.
+     */
+    public void setVariables(List<Variable> variables) {
+        checkFrozen();
+        this.variables = variables;
+    }
+
+    public List<Function> getFunctions() {
+        return Collections.unmodifiableList(functions);
+    }
+
+    /**
+     * Used by SnakeYAML.
+     */
+    public void setFunctions(List<Function> functions) {
+        checkFrozen();
+        this.functions = functions;
+    }
+
+    public List<PythonClass> getClasses() {
+        return Collections.unmodifiableList(classes);
+    }
+
+    /**
+     * Used by SnakeYAML.
+     */
+    public void setClasses(List<PythonClass> classes) {
+        checkFrozen();
+        this.classes = classes;
+    }
+
+    public Variable getVariableForTest(VariableTestNode test) {
         for (Variable v : variables)
             if (hasTest(v.tests, test)) return v;
 
         return null;
     }
 
-    public Function getFunctionForTest(FunctionTest test) {
+    public Function getFunctionForTest(FunctionTestNode test) {
         for (Function f : functions)
             if (hasTest(f.tests, test)) return f;
 
         return null;
     }
 
-    public Class getClassContainingMethod(Method method) {
-        for (Class c : classes)
+    public PythonClass getClassContainingMethod(Method method) {
+        for (PythonClass c : classes)
             if (c.methods.contains(method)) return c;
 
         return null;
     }
 
-    public Method getMethodForTest(MethodTest test) {
-        for (Class c : classes)
+    public Method getMethodForTest(MethodTestNode test) {
+        for (PythonClass c : classes)
             for (Method m : c.methods)
                 if (hasTest(m.tests, test)) return m;
 
@@ -164,9 +127,35 @@ public final class PythonFile extends File implements PostConstructionAction {
     }
 
     public String getModuleName() {
-        Path p = Paths.get(path);
+        Path p = Paths.get(getPath());
         String fileName = p.getFileName().toString();
         String[] parts = fileName.split("\\.");
         return parts[parts.length - 2];
+    }
+
+    public String toString() {
+        return "PythonFile(" +
+                "path=" + getPath() + ", " +
+                "pointValue=" + getPointValue() + ", " +
+                "tests=" + getTests() + ", " +
+                "variables=" + variables + ", " +
+                "functions=" + functions + ", " +
+                "classes=" + classes +
+                ")";
+    }
+
+    /**
+     * Freezes this PythonFile object, its tests, and the tests written for its variables,
+     * functions, classes, and methods on each class.
+     */
+    @Override
+    public void freeze() {
+        variables.forEach(v -> v.tests.forEach(Node::freezeAll));
+        functions.forEach(f -> f.tests.forEach(Node::freezeAll));
+        classes.forEach(c -> {
+            c.tests.forEach(Node::freezeAll);
+            c.methods.forEach(m -> m.tests.forEach(Node::freezeAll));
+        });
+        super.freeze();
     }
 }

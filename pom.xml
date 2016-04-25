@@ -87,18 +87,38 @@
         </dependency>
 
         <dependency>
-            <groupId>com.threecrickets.jygments</groupId>
-            <artifactId>jygments</artifactId>
-            <version>0.9.3</version>
+            <groupId>org.fxmisc.richtext</groupId>
+            <artifactId>richtextfx</artifactId>
+            <version>0.6.10</version>
         </dependency>
     </dependencies>
 
     <properties>
-
+        <name>${project.name}</name>
+        <version>${project.version}</version>
     </properties>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>write-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>
+                                ${project.build.outputDirectory}/app.properties
+                            </outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -116,48 +136,33 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>8.1.4</version>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>io.breen.socrates.Socrates</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-
+                    <mainClass>io.breen.socrates.Socrates</mainClass>
+                    <identifier>Socrates</identifier>
+                    <appName>Socrates</appName>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
+                        <!-- required before build-native -->
+                        <id>create-jfxjar</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>build-jar</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>create-native</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build-native</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
-
-        <!--
-        <resources>
-            <resource>
-                <directory>src/main/java/io/breen/socrates</directory>
-                <includes>
-                    <include>*.py</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/java/io/breen/socrates/view</directory>
-                <includes>
-                    <include>**/*.form</include>
-                </includes>
-            </resource>
-        </resources>
-        -->
-
     </build>
 
     <!--
@@ -168,10 +173,14 @@
     <description>A grading toolkit for computer science courses.</description>
     <url>http://github.com/abreen/Socrates</url>
 
+    <organization>
+        <name>Alexander Breen</name>
+        <url>http://breen.io</url>
+    </organization>
+
     <!--
     <inceptionYear>...</inceptionYear>
     <licenses>...</licenses>
-    <organization>...</organization>
     <developers>...</developers>
     <contributors>...</contributors>
 

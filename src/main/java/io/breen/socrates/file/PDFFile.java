@@ -10,12 +10,5 @@ public class PDFFile extends File {
     /**
      * This empty constructor is used by SnakeYAML.
      */
-    public PDFFile() {
-        contentsArePlainText = false;
-    }
-
-    @Override
-    public String getFileTypeName() {
-        return "PDF file";
-    }
+    public PDFFile() {}
 }

@@ -3,36 +3,21 @@ package io.breen.socrates;
 import io.breen.pyfinder.PythonFinder;
 import io.breen.pyfinder.PythonInterpreter;
 import io.breen.pyfinder.PythonVersion;
-import io.breen.socrates.controller.MainController;
-import io.breen.socrates.controller.SetupController;
 import io.breen.socrates.criteria.Criteria;
 import io.breen.socrates.criteria.InvalidCriteriaException;
 import io.breen.socrates.submission.AlreadyGradedException;
 import io.breen.socrates.submission.ReceiptFormatException;
-import io.breen.socrates.submission.Submission;
-import io.breen.socrates.view.View;
+import io.breen.socrates.util.Pair;
+import io.breen.socrates.view.ExceptionAlert;
+import io.breen.socrates.view.SessionStage;
+import io.breen.socrates.view.SubmissionsErrorsAlert;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Modality;
+import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
-import org.apache.commons.cli.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -41,7 +26,9 @@ public class Socrates extends Application {
     private static Logger logger = Logger.getLogger(Socrates.class.getName());
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage primaryStage) {
+        Thread.currentThread().setUncaughtExceptionHandler(Socrates::crash);
+
         String userHome = System.getProperty("user.home");
         Path localPropPath = null;
 
@@ -114,11 +101,19 @@ public class Socrates extends Application {
         }
 
         Parameters params = getParameters();
+
+        for (String s : params.getUnnamed()) {
+            if (s.equals("-h") || s.equals("--help")) {
+                System.out.println("usage: socrates [--criteria=/path/to/criteria.yml [--submissions=dir1,dir2,dir3]]");
+                System.exit(0);
+            }
+        }
+
         Map<String, String> namedParams = params.getNamed();
 
         logger.info("command line arguments: " + namedParams);
 
-        Path criteriaPath = null;
+        Path criteriaPath;
         Criteria criteria = null;
         if (namedParams.containsKey("criteria")) {
             try {
@@ -132,98 +127,96 @@ public class Socrates extends Application {
             }
         }
 
-        List<Submission> submissions = null;
+        List<Path> submissions = new ArrayList<>();
         if (namedParams.containsKey("submissions")) {
             String pathsStr = namedParams.get("submissions");
-            String[] paths = pathsStr.split("\\s+");
+            String[] paths = pathsStr.split(",");
 
-            submissions = new ArrayList<>(paths.length);
             for (String str : paths) {
-                Path p = null;
                 try {
-                    p = Paths.get(str);
-                    submissions.add(Submission.fromDirectory(p));
+                    submissions.add(Paths.get(str));
                 } catch (InvalidPathException x) {
                     logger.warning("invalid submission: '" + str + "' is not a valid path");
-                } catch (IllegalArgumentException x) {
-                    logger.warning("invalid submission: '" + p + "' " + x);
-                } catch (IOException x) {
-                    logger.warning("IOException occurred adding submission: " + x);
-                } catch (ReceiptFormatException x) {
-                    logger.warning("invalid receipt for submission '" + p + "'");
-                } catch (AlreadyGradedException x) {
-                    logger.warning("skipping submission: already has a grade file: '" + p + "'");
                 }
-            }
-
-            if (submissions.size() == 0) {
-                submissions = null;
             }
         } else {
             logger.info("no submissions specified in command line arguments");
         }
 
-        //MainController main = new MainController();
-        //SetupController setup = new SetupController(main);
-        //setup.start(criteriaPath, criteria, submissions);
-
         try {
-            new View().showStage();
+//            FileViewerStage viewer = new FileViewerStage(new java.io.File("/Users/abreen/Desktop/foo.txt"));
+//            viewer.show();
 
-        } catch (Exception x) {
-            ButtonType exitButton;
-            if (Globals.operatingSystem == Globals.OS.OSX)
-                exitButton = new ButtonType("Quit");
-            else
-                exitButton = new ButtonType("Exit");
+            SessionStage stage = new SessionStage();
 
-            Alert alert = new Alert(
-                    AlertType.ERROR,
-                    "An internal error occurred, and Socrates must be closed. Click Show Details for detailed " +
-                            "information about the error.",
-                    exitButton
-            );
-
-            alert.getDialogPane().setPrefSize(500, 300);
-
-            StringBuilder sb = new StringBuilder();
-            for (StackTraceElement el : x.getStackTrace()) {
-                sb.append(el);
-                sb.append("\n");
-            }
-
-            String stackTrace = sb.toString();
-
-            String exceptionStr = x.getClass().getSimpleName();
-
-            if (Arrays.asList('A', 'E', 'I', 'O', 'U').indexOf(exceptionStr.charAt(0)) != -1) {
-                exceptionStr = "An " + exceptionStr;
+            if (criteria != null) {
+                stage.getPresenter().setCriteria(criteria);
+                stage.show();
             } else {
-                exceptionStr = "A " + exceptionStr;
+                stage.show();
+                stage.getPresenter().openCriteria();
             }
 
-            Label label = new Label(exceptionStr + " exception was thrown.");
+            if (!submissions.isEmpty()) {
+                List<Pair<Path, String>> errors = stage.getPresenter().addAllSubmissions(submissions);
 
-            TextArea textArea = new TextArea(stackTrace);
-            textArea.setEditable(false);
-            textArea.setStyle(
-                    "-fx-font-family: monospace"
-            );
+                if (!errors.isEmpty()) {
+                    int numAdded = stage.getPresenter().getAddedSubmissionsUnmodifiable().size();
+                    SubmissionsErrorsAlert a = new SubmissionsErrorsAlert(numAdded, errors);
+                    a.showAndWait();
+                }
+            }
 
-            GridPane.setVgrow(textArea, Priority.ALWAYS);
-            GridPane.setHgrow(textArea, Priority.ALWAYS);
+//            WatchService watcher = FileSystems.getDefault().newWatchService();
+//            Map<WatchKey, DynamicFileTreeItem> map = new HashMap<>();
+//
+//            DynamicFileTreeItem root = new DynamicFileTreeItem(
+//                    Paths.get("/Users/abreen/Desktop"),
+//                    false,
+//                    watcher,
+//                    map
+//            );
+//            TreeView<Path> treeView = new TreeView<>(root);
+//            root.setExpanded(true);
+//
+//            treeView.setCellFactory(view -> new TreeCell<Path>() {
+//                @Override
+//                protected void updateItem(Path item, boolean empty) {
+//                    super.updateItem(item, empty);
+//
+//                    if (empty || item == null) {
+//                        setText(null);
+//                        setGraphic(null);
+//                    } else {
+//                        setText(item.getFileName().toString());
+//                    }
+//                }
+//            });
+//
+//            Stage stage = new Stage();
+//            VBox vbox = new VBox(10, treeView);
+//
+//            stage.setScene(new Scene(vbox, 200, 400));
+//
+//            Thread th = new Thread(new FileTreeWatcherTask(watcher, map));
+//            th.setDaemon(true);
+//            th.start();
+//
+//            stage.show();
 
-            GridPane pane = new GridPane();
-            pane.setVgap(10);
-
-            pane.add(label, 0, 0);
-            pane.add(textArea, 0, 1);
-
-            alert.getDialogPane().setExpandableContent(pane);
-
-            alert.showAndWait();
-            Platform.exit();
+        } catch (Throwable t) {
+            crash(Thread.currentThread(), t);
         }
+    }
+
+    private static void crash(Thread t, Throwable x) {
+        ExceptionAlert a = new ExceptionAlert(
+                x,
+                "An error occurred, and Socrates must be closed. For more information about the error, see the " +
+                        "details below."
+        );
+        a.showAndWait();
+        Platform.exit();
     }
 
     public static void main(String[] args) {

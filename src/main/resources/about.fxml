@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox alignment="TOP_CENTER" minHeight="250" minWidth="300" spacing="10.0" styleClass="about"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="io.breen.socrates.presenter.AboutPresenter"
+      fx:id="root">
+    <children>
+        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" styleClass="icon">
+            <image>
+                <Image url="icon256.png"/>
+            </image>
+        </ImageView>
+        <Label text="Socrates">
+            <font>
+                <Font name="System Bold" size="20.0"/>
+            </font>
+        </Label>
+        <VBox>
+            <children>
+                <HBox prefHeight="100.0" prefWidth="200.0" styleClass="key-val">
+                    <children>
+                        <Label styleClass="key" text="Version"/>
+                        <Label fx:id="socratesVersion" text="0.0"/>
+                    </children>
+                </HBox>
+                <HBox layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" styleClass="key-val">
+                    <children>
+                        <Label styleClass="key" text="Java"/>
+                        <Label fx:id="javaVersion" text="0.0"/>
+                    </children>
+                </HBox>
+                <HBox prefHeight="100.0" prefWidth="200.0" styleClass="key-val">
+                    <children>
+                        <Label styleClass="key" text="Author"/>
+                        <Label text="Alexander Breen"/>
+                    </children>
+                </HBox>
+                <HBox layoutX="10.0" layoutY="33.0" prefHeight="100.0" prefWidth="200.0" styleClass="key-val">
+                    <children>
+                        <Label styleClass="key" text="Web"/>
+                        <Hyperlink styleClass="github-link" text="github.com/abreen/Socrates"/>
+                    </children>
+                </HBox>
+            </children>
+            <VBox.margin>
+                <Insets top="15.0"/>
+            </VBox.margin>
+        </VBox>
+    </children>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+    </padding>
+</VBox>

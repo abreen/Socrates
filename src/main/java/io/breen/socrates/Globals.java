@@ -16,6 +16,22 @@ import java.util.*;
 
 public class Globals {
 
+    /**
+     * Given a path to a directory, this method returns true if the current operating system views the directory
+     * as an opaque file based on its file name. On OS X, for example, directories whose names end in .app are
+     * considered opaque.
+     */
+    public static boolean directoryIsOpaque(Path p) {
+        String name = p.getFileName().toString();
+
+        if (operatingSystem == OS.OSX) {
+            if (name.endsWith(".app"))
+                return true;
+        }
+
+        return false;
+    }
+
     public enum OS {
         WINDOWS, OSX, LINUX, OTHER
     }
@@ -30,7 +46,7 @@ public class Globals {
     public static final SimpleDateFormat ISO8601_UTC;
     public static final SimpleDateFormat ISO8601;
 
-    public static final String DEFAULT_GRADE_FILE_NAME = "grade.txt";
+    public static final String DEFAULT_REPORT_FILE_NAME = "grade.txt";
 
     public static final Properties defaultProperties;
 

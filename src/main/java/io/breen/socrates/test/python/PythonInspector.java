@@ -2,7 +2,7 @@ package io.breen.socrates.test.python;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.breen.socrates.Globals;
-import io.breen.socrates.file.python.Object;
+import io.breen.socrates.file.python.PythonObject;
 import io.breen.socrates.util.Pair;
 
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class PythonInspector {
         process = builder.start();
     }
 
-    private static boolean equals(java.lang.Object expected, ResultObject other) {
+    private static boolean equals(Object expected, ResultObject other) {
         if (expected == null) {
             return other.value == null;
 
@@ -97,7 +97,7 @@ public class PythonInspector {
             return list.equals(otherList);
 
         } else if (expected.getClass().isArray()) {
-            java.lang.Object[] arr = (java.lang.Object[])expected;
+            Object[] arr = (Object[])expected;
 
             if (other == null || !other.type.equals("list")) return false;
 
@@ -125,15 +125,15 @@ public class PythonInspector {
         throw new IllegalArgumentException();
     }
 
-    private static boolean isPrimitive(java.lang.Object object) {
+    private static boolean isPrimitive(Object object) {
         return object instanceof String || object instanceof Number || object instanceof Boolean
                 || object instanceof Map;
     }
 
-    public static String toPythonString(java.lang.Object o) {
+    public static String toPythonString(Object o) {
         if (o == null) return "None";
 
-        if (o instanceof Object) {
+        if (o instanceof PythonObject) {
             /*
              * The case when this object was created using a !python:object definition in a
              * a criteria file. We display this object as if it were a call to the constructor
@@ -141,15 +141,15 @@ public class PythonInspector {
              * since this constructor may not exist. However, this string is not being eval()'d
              * by any Python code --- it's just for illustration.)
              */
-            Object pyObj = (Object)o;
+            PythonObject pyObj = (PythonObject)o;
             StringBuilder builder = new StringBuilder();
             builder.append(pyObj.type.typeName);
             builder.append("(");
 
             int i = 0;
             int numEntries = pyObj.fields.size();
-            for (Map.Entry<String, java.lang.Object> entry : pyObj.fields.entrySet()) {
-                builder.append(entry.getKey() + "=" + toPythonString(entry.getValue()));
+            for (Map.Entry<String, Object> entry : pyObj.fields.entrySet()) {
+                builder.append(entry.getKey()).append("=").append(toPythonString(entry.getValue()));
                 if (++i != numEntries) builder.append(", ");
             }
 
@@ -169,14 +169,14 @@ public class PythonInspector {
             else return "False";
 
         } else if (o instanceof List) {
-            List<java.lang.Object> l = (List)o;
+            List<Object> l = (List)o;
 
             StringBuilder builder = new StringBuilder();
             builder.append("[");
 
             int i = 0;
             int numItems = l.size();
-            for (java.lang.Object item : l) {
+            for (Object item : l) {
                 builder.append(toPythonString(item));
                 if (++i != numItems) builder.append(", ");
             }
@@ -185,18 +185,15 @@ public class PythonInspector {
             return builder.toString();
 
         } else if (o instanceof Map) {
-            Map<java.lang.Object, java.lang.Object> m = (Map)o;
+            Map<Object, Object> m = (Map)o;
 
             StringBuilder builder = new StringBuilder();
             builder.append("{");
 
             int i = 0;
             int numEntries = m.size();
-            for (Map.Entry<java.lang.Object, java.lang.Object> entry : m.entrySet()) {
-                builder.append(
-                        toPythonString(entry.getKey()) + ": " +
-                                toPythonString(entry.getValue())
-                );
+            for (Map.Entry<Object, Object> entry : m.entrySet()) {
+                builder.append(toPythonString(entry.getKey())).append(": ").append(toPythonString(entry.getValue()));
 
                 if (++i != numEntries) builder.append(", ");
             }
@@ -205,12 +202,10 @@ public class PythonInspector {
             return builder.toString();
         }
 
-        throw new IllegalArgumentException(
-                "cannot make Python string for: " + o
-        );
+        throw new IllegalArgumentException("cannot make Python string for: " + o);
     }
 
-    public static String callToString(String functionName, List<java.lang.Object> args) {
+    public static String callToString(String functionName, List<Object> args) {
         StringBuilder builder = new StringBuilder(functionName);
 
         builder.append("(");
@@ -226,29 +221,29 @@ public class PythonInspector {
         return builder.toString();
     }
 
-    private Map<String, java.lang.Object> newRequestMap() {
-        Map<String, java.lang.Object> request = new HashMap<>();
+    private Map<String, Object> newRequestMap() {
+        Map<String, Object> request = new HashMap<>();
         request.put("name", moduleName);
         return request;
     }
 
-    private boolean isErrorResponse(Map<String, java.lang.Object> response) {
+    private boolean isErrorResponse(Map<String, Object> response) {
         return response.containsKey("error") && (boolean)response.get("error");
     }
 
-    private PythonError errorFromResponse(Map<String, java.lang.Object> response) {
+    private PythonError errorFromResponse(Map<String, Object> response) {
         return new PythonError(
                 (String)response.get("error_type"), (String)response.get("error_message")
         );
     }
 
-    private ResultObject toPythonObject(Map<String, java.lang.Object> response) {
+    private ResultObject toResultObject(Map<String, Object> response) {
         return new ResultObject(response.get("value"), (String)response.get("type"));
     }
 
     public boolean variableExists(String variableName) throws IOException, PythonError {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, java.lang.Object> request = newRequestMap();
+        Map<String, Object> request = newRequestMap();
         request.put("type", "exists");
 
         Map<String, String> targetMap = new HashMap<>();
@@ -259,7 +254,7 @@ public class PythonInspector {
 
         mapper.writeValue(process.getOutputStream(), request);
 
-        Map<String, java.lang.Object> response = mapper.readValue(
+        Map<String, Object> response = mapper.readValue(
                 process.getInputStream(),
                 Map.class
         );
@@ -269,11 +264,11 @@ public class PythonInspector {
         return (boolean)response.get("value");
     }
 
-    public boolean variableEquals(String variableName, java.lang.Object value)
+    public boolean variableEquals(String variableName, Object value)
             throws IOException, PythonError
     {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, java.lang.Object> request = newRequestMap();
+        Map<String, Object> request = newRequestMap();
         request.put("type", "eval");
 
         Map<String, String> targetMap = new HashMap<>();
@@ -284,14 +279,14 @@ public class PythonInspector {
 
         mapper.writeValue(process.getOutputStream(), request);
 
-        Map<String, java.lang.Object> response = mapper.readValue(
+        Map<String, Object> response = mapper.readValue(
                 process.getInputStream(),
                 Map.class
         );
 
         if (isErrorResponse(response)) throw errorFromResponse(response);
 
-        return equals(value, toPythonObject(response));
+        return equals(value, toResultObject(response));
     }
 
     /**
@@ -307,12 +302,12 @@ public class PythonInspector {
      */
     public Pair<Boolean, String> canImportModule() throws IOException, PythonError {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, java.lang.Object> request = newRequestMap();
+        Map<String, Object> request = newRequestMap();
         request.put("type", "load");
 
         mapper.writeValue(process.getOutputStream(), request);
 
-        Map<String, java.lang.Object> response = mapper.readValue(
+        Map<String, Object> response = mapper.readValue(
                 process.getInputStream(),
                 Map.class
         );
@@ -341,7 +336,7 @@ public class PythonInspector {
      */
     public boolean functionExists(String functionName) throws IOException, PythonError {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, java.lang.Object> request = newRequestMap();
+        Map<String, Object> request = newRequestMap();
         request.put("type", "exists");
 
         Map<String, String> targetMap = new HashMap<>();
@@ -352,7 +347,7 @@ public class PythonInspector {
 
         mapper.writeValue(process.getOutputStream(), request);
 
-        Map<String, java.lang.Object> response = mapper.readValue(
+        Map<String, Object> response = mapper.readValue(
                 process.getInputStream(),
                 Map.class
         );
@@ -372,7 +367,7 @@ public class PythonInspector {
      */
     public boolean classExists(String className) throws IOException, PythonError {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, java.lang.Object> request = newRequestMap();
+        Map<String, Object> request = newRequestMap();
         request.put("type", "exists");
 
         Map<String, String> targetMap = new HashMap<>();
@@ -383,7 +378,7 @@ public class PythonInspector {
 
         mapper.writeValue(process.getOutputStream(), request);
 
-        Map<String, java.lang.Object> response = mapper.readValue(
+        Map<String, Object> response = mapper.readValue(
                 process.getInputStream(),
                 Map.class
         );
@@ -407,7 +402,7 @@ public class PythonInspector {
             throws IOException, PythonError
     {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, java.lang.Object> request = newRequestMap();
+        Map<String, Object> request = newRequestMap();
         request.put("type", "exists");
 
         Map<String, String> targetMap = new HashMap<>();
@@ -419,7 +414,7 @@ public class PythonInspector {
 
         mapper.writeValue(process.getOutputStream(), request);
 
-        Map<String, java.lang.Object> response = mapper.readValue(
+        Map<String, Object> response = mapper.readValue(
                 process.getInputStream(),
                 Map.class
         );
@@ -442,9 +437,9 @@ public class PythonInspector {
      * @throws IOException If a low-level error occurs communicating with the interpreter
      * @throws PythonError If a Python error occurs evaluating the function
      */
-    public Pair<Boolean, String> functionProduces(String functionName, List<java.lang.Object> args,
-                                                  Map<String, java.lang.Object> kwargs,
-                                                  String input, java.lang.Object returnValue,
+    public Pair<Boolean, String> functionProduces(String functionName, List<Object> args,
+                                                  Map<String, Object> kwargs,
+                                                  String input, Object returnValue,
                                                   String output) throws IOException, PythonError
     {
         return methodProduces(functionName, null, args, kwargs, input, null, returnValue, output);
@@ -464,14 +459,14 @@ public class PythonInspector {
      * @throws IOException If a low-level error occurs communicating with the interpreter
      * @throws PythonError If a Python error occurs evaluating the function
      */
-    public Pair<Boolean, String> methodProduces(String methodName, Object before,
-                                                List<java.lang.Object> args,
-                                                Map<String, java.lang.Object> kwargs, String input,
-                                                Object after, java.lang.Object returnValue,
+    public Pair<Boolean, String> methodProduces(String methodName, PythonObject before,
+                                                List<Object> args,
+                                                Map<String, Object> kwargs, String input,
+                                                PythonObject after, Object returnValue,
                                                 String output) throws IOException, PythonError
     {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, java.lang.Object> request = newRequestMap();
+        Map<String, Object> request = newRequestMap();
         request.put("type", "eval");
 
         Map<String, String> targetMap = new HashMap<>();
@@ -484,25 +479,25 @@ public class PythonInspector {
         request.put("target", targetMap);
 
         // parameters of the test, not to the function
-        Map<String, java.lang.Object> parametersMap = new HashMap<>();
+        Map<String, Object> parametersMap = new HashMap<>();
 
         if (args != null && !args.isEmpty()) {
             // keep track of the indices of arguments that should be constructed in Python
             List<Integer> indices = new ArrayList<>(args.size());
-            List<java.lang.Object> argsList = new ArrayList<>(args.size());
+            List<Object> argsList = new ArrayList<>(args.size());
 
             for (int i = 0; i < args.size(); i++) {
-                java.lang.Object o = args.get(i);
+                Object o = args.get(i);
 
-                if (o instanceof Object) {
-                    Object obj = (Object)o;
+                if (o instanceof PythonObject) {
+                    PythonObject obj = (PythonObject)o;
 
-                    Map<String, java.lang.Object> fieldsMap = new HashMap<>();
-                    for (Map.Entry<String, java.lang.Object> field : obj.fields.entrySet())
+                    Map<String, Object> fieldsMap = new HashMap<>();
+                    for (Map.Entry<String, Object> field : obj.fields.entrySet())
                         // TODO should recursively convert field value
                         fieldsMap.put(field.getKey(), field.getValue());
 
-                    Map<String, java.lang.Object> objMap = new HashMap<>();
+                    Map<String, Object> objMap = new HashMap<>();
                     objMap.put("class_name", obj.type.typeName);
                     objMap.put("fields", fieldsMap);
 
@@ -522,7 +517,7 @@ public class PythonInspector {
         if (input != null) parametersMap.put("input", input);
 
         if (before != null) {
-            Map<String, java.lang.Object> beforeMap = new HashMap<>();
+            Map<String, Object> beforeMap = new HashMap<>();
             beforeMap.put("class_name", before.type.typeName);
             beforeMap.put("fields", before.fields);
             parametersMap.put("before", beforeMap);
@@ -532,7 +527,7 @@ public class PythonInspector {
 
         mapper.writeValue(process.getOutputStream(), request);
 
-        Map<String, java.lang.Object> response = mapper.readValue(
+        Map<String, Object> response = mapper.readValue(
                 process.getInputStream(),
                 Map.class
         );
@@ -551,9 +546,9 @@ public class PythonInspector {
                 return new Pair<>(false, str);
 
         if (after != null) {
-            Map<String, java.lang.Object> fields = (Map)response.get("after");
-            for (Map.Entry<String, java.lang.Object> field : after.fields.entrySet()) {
-                java.lang.Object afterValue = fields.get(field.getKey());
+            Map<String, Object> fields = (Map)response.get("after");
+            for (Map.Entry<String, Object> field : after.fields.entrySet()) {
+                Object afterValue = fields.get(field.getKey());
                 if (!afterValue.equals(field.getValue())) {
                     // TODO should not compare with object equals
                     // object state after method call does not match expected state
@@ -562,15 +557,15 @@ public class PythonInspector {
             }
         }
 
-        return new Pair<>(equals(returnValue, toPythonObject(response)), str);
+        return new Pair<>(equals(returnValue, toResultObject(response)), str);
     }
 
     public class ResultObject {
 
-        public final java.lang.Object value;
+        public final Object value;
         public final String type;
 
-        public ResultObject(java.lang.Object value, String type) {
+        public ResultObject(Object value, String type) {
             this.value = value;
             this.type = type;
         }

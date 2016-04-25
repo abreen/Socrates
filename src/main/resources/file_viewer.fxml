@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.layout.VBox?>
+<?import org.fxmisc.richtext.CodeArea?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Button?>
+<VBox fx:id="root" minHeight="500" minWidth="500" xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.breen.socrates.presenter.FileViewerPresenter">
+    <children>
+
+        <HBox alignment="CENTER" styleClass="button-row" VBox.vgrow="NEVER">
+            <children>
+                <Button fx:id="open" mnemonicParsing="false" text="Clear" onAction="#openExternal"/>
+            </children>
+        </HBox>
+
+        <CodeArea fx:id="codeArea" maxHeight="Infinity" maxWidth="Infinity" wrapText="true"
+                  VBox.vgrow="ALWAYS" editable="false"/>
+    </children>
+</VBox>

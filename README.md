@@ -31,7 +31,7 @@ reads criteria files that are incompatible with the older version.
 Socrates can be built with Maven. Its exact dependencies are listed in
 the `pom.xml` file. Most of the dependencies will be automatically retrieved
 from Maven Central when you first run `mvn` from within this repository,
-with the exception of two:
+with the exception of one:
 
 1.  [`pyfinder`](http://github.com/abreen/pyfinder), a Java library that can
     be built with Maven. Use `git clone` to obtain the code, Maven to build a
@@ -42,18 +42,8 @@ with the exception of two:
         mvn package
         mvn install:install-file -Dfile=target/pyfinder-0.1.1.jar -DpomFile=pom.xml
 
-2.  [Jygments](https://github.com/tliron/jygments), a Java library that
-    can be built with [Apache Ant](http://ant.apache.org). Its source code is
-    available on GitHub. Use Ant to build a JAR, then ask Maven to "install"
-    the JAR into your local Maven repository:
-
-        git clone https://github.com/tliron/jygments.git
-        cd jygments/build
-        ant
-        mvn install:install-file -Dfile=distribution/content/libraries/jars/com.threecrickets.jygments/jygments/0.9.3/jygments.jar -DgroupId=com.threecrickets.jygments -DartifactId=jygments -Dversion=0.9.3 -Dpackaging=jar
-
-Note that with both of these dependencies, you may need to change the version
-numbers in the above commands to match the most recent releases.
+Note that you may need to change the version number in the above command to
+match the most recent release.
 
 Once these dependencies are installed, run `mvn test` from this repository
 to run Socrates' unit tests.

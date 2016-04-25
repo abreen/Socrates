@@ -19,38 +19,36 @@ public final class Receipt {
 
     private final PriorityQueue<Date> dates;
 
-    public Receipt(List<Date> dates) {
+    private Receipt(List<Date> dates) {
         this.dates = new PriorityQueue<>(6, Collections.reverseOrder());
         this.dates.addAll(dates);
     }
 
     /**
-     * @throws IOException
-     * @throws ReceiptFormatException
+     * Given a path to a submitted file, this method attempts to locate and open the receipt for the file, returning
+     * an instance of Receipt with the loaded dates, or null if a receipt file doesn't exist, or if it is empty.
+     *
+     * @throws ParseException if a receipt file is present, but it has an invalid date format
      */
-    public static Receipt fromReceiptFile(Path path) throws IOException, ReceiptFormatException
-    {
+    public static Receipt forFile(Path path) throws IOException, ParseException {
+        if (!Files.exists(path))
+            return null;
+
         List<Date> list = new LinkedList<>();
         BufferedReader reader = Files.newBufferedReader(path, Charset.defaultCharset());
 
         String line;
         while ((line = reader.readLine()) != null) {
-            Date ldt;
-            try {
-                ldt = Globals.ISO8601.parse(line);
-            } catch (ParseException e) {
-                throw new ReceiptFormatException(
-                        "receipt has invalid timestamp: " + line
-                );
-            }
-
-            list.add(ldt);
+            list.add(Globals.ISO8601.parse(line));
         }
 
-        if (list.isEmpty()) throw new ReceiptFormatException("receipt file is empty");
-
         reader.close();
-        return new Receipt(list);
+
+        if (list.isEmpty()) {
+            return null;
+        } else {
+            return new Receipt(list);
+        }
     }
 
     public String toString() {

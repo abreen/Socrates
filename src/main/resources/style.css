@@ -1,0 +1,73 @@
+.root {
+
+}
+
+.console, .stacktrace, .transcript, .code-area {
+    -fx-font-family: monospace;
+    -fx-font-size: 14;
+}
+
+.titled-pane > .title {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.titled-pane > *.content {
+    -fx-background-color: null;
+    -fx-border-color: null;
+    -fx-border-insets: 0;
+}
+
+.vbox {
+/*    -fx-box-border: transparent;*/
+}
+
+.accordion {
+    -fx-box-border: transparent;
+}
+
+.key {
+    -fx-font-weight: bold;
+}
+
+.key-val {
+    -fx-padding: 3;
+    -fx-alignment: TOP_CENTER;
+    -fx-spacing: 10;
+    -fx-pref-height: -1;
+}
+
+.about {
+
+}
+
+.github-link {
+    -fx-padding: 0;
+}
+
+.button-row {
+    -fx-alignment: CENTER;
+    -fx-pref-height: 50;
+    -fx-spacing: 10;
+}
+
+.titled-pane .titled-pane .title {
+    -fx-background-color: #999;
+    -fx-padding: 0.2em 0.5em 0.2em 0.5em;
+}
+
+.titled-pane .titled-pane .title .text {
+    -fx-fill: #fff;
+}
+
+.console {
+
+}
+
+.preview {
+    -fx-font-size: 11;
+}
+
+.stacktrace {
+
+}

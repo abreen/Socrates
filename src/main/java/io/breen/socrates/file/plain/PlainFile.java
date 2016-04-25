@@ -1,7 +1,7 @@
 package io.breen.socrates.file.plain;
 
-import io.breen.socrates.PostConstructionAction;
 import io.breen.socrates.file.File;
+import io.breen.socrates.test.Node;
 
 import java.util.*;
 
@@ -12,29 +12,14 @@ import java.util.*;
  *
  * @see File
  */
-public final class PlainFile extends File implements PostConstructionAction {
+public class PlainFile extends File {
 
     /**
      * This empty constructor is used by SnakeYAML.
      */
-    public PlainFile() {
-        language = null;
-        contentsArePlainText = true;
-    }
+    public PlainFile() {}
 
-    public PlainFile(String path, double pointValue, Map<Date, Double> dueDates,
-                     List<Object> tests)
-    {
+    public PlainFile(String path, double pointValue, Map<Date, Double> dueDates, List<Node> tests) {
         super(path, pointValue, dueDates, tests);
-    }
-
-    @Override
-    public void afterConstruction() {
-        super.afterConstruction();
-    }
-
-    @Override
-    public String getFileTypeName() {
-        return "plain text file";
     }
 }

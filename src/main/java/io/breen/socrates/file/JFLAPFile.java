@@ -9,12 +9,5 @@ public class JFLAPFile extends File {
     /**
      * This empty constructor is used by SnakeYAML.
      */
-    public JFLAPFile() {
-        contentsArePlainText = false;
-    }
-
-    @Override
-    public String getFileTypeName() {
-        return "JFLAP file";
-    }
+    public JFLAPFile() {}
 }

@@ -6,69 +6,44 @@ import java.nio.CharBuffer;
 import java.nio.charset.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.logging.Logger;
 
-/**
- * Class representing immutable objects storing information about a single file found on the file
- * system that represents one part of a student's submission.
- */
+
 public class SubmittedFile {
 
-    private static Logger logger = Logger.getLogger(SubmittedFile.class.getName());
-
     /**
-     * This file's location on the file system.
+     * The absolute path to the file on the file system.
      */
-    public final Path fullPath;
-
-    /**
-     * This file's location relative to the submission directory. This path should match the path
-     * specified in a criteria file, if this SubmittedFile is indeed relevant to grading.
-     */
-    public final Path localPath;
-
-    /**
-     * This file's size in bytes.
-     */
-    public final long size;
+    private Path path;
 
     /**
      * This file's receipt, storing the submission timestamps. If there was no receipt for this
      * file, this is null.
      */
-    public final Receipt receipt;
+    private Receipt receipt;
 
-    public SubmittedFile(Path fullPath, Path localPath) throws IOException {
-        this.fullPath = fullPath;
-        this.localPath = localPath;
-        this.size = Files.size(fullPath);
-        this.receipt = null;
+
+    public SubmittedFile(Path path, boolean ignoreReceipt) throws IOException, ParseException {
+        this.path = path.toAbsolutePath();
+
+        if (!ignoreReceipt)
+            receipt = Receipt.forFile(this.path);
     }
 
-    public SubmittedFile(Path fullPath, Path localPath, Path receipt)
-            throws IOException, ReceiptFormatException
-    {
-        this.fullPath = fullPath;
-        this.localPath = localPath;
-        this.size = Files.size(fullPath);
-
-        Receipt r = null;
-        if (receipt != null) {
-            r = Receipt.fromReceiptFile(receipt);
-        }
-
-        this.receipt = r;
+    public SubmittedFile(Path path) throws IOException, ParseException {
+        this(path, false);
     }
 
     public String toString() {
         return "SubmittedFile(" +
-                "path=" + localPath + ", " +
+                "path=" + path + ", " +
                 "receipt=" + receipt +
                 ")";
     }
 
     public String getContentsMixedUTF8() throws IOException {
-        FileInputStream inStream = new FileInputStream(fullPath.toFile());
+        FileInputStream inStream = new FileInputStream(path.toFile());
         StringBuilder builder = new StringBuilder();
 
         CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
@@ -92,7 +67,7 @@ public class SubmittedFile {
 
     public String getContentsUTF8() throws IOException {
         StringBuilder builder = new StringBuilder();
-        BufferedReader reader = Files.newBufferedReader(fullPath, StandardCharsets.UTF_8);
+        BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
 
         String line;
         while ((line = reader.readLine()) != null) {
@@ -109,5 +84,13 @@ public class SubmittedFile {
         } catch (IOException ignored) {}
 
         return getContentsMixedUTF8();
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public Receipt getReceipt() {
+        return receipt;
     }
 }

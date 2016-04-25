@@ -1,5 +1,7 @@
 package io.breen.socrates.file.python;
 
+import io.breen.socrates.test.Node;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -10,7 +12,7 @@ public class Variable {
 
     public String name;
     public double pointValue;
-    public List<java.lang.Object> tests;
+    public List<Node> tests;
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -20,6 +22,6 @@ public class Variable {
     public Variable(String name, double pointValue) {
         this.name = name;
         this.pointValue = pointValue;
-        this.tests = Collections.emptyList();
+        tests = Collections.emptyList();
     }
 }

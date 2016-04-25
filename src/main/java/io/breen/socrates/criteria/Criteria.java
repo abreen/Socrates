@@ -2,12 +2,18 @@ package io.breen.socrates.criteria;
 
 import io.breen.socrates.file.*;
 import io.breen.socrates.file.java.JavaFile;
+import io.breen.socrates.file.java.JavaObject;
 import io.breen.socrates.file.logicly.LogiclyFile;
 import io.breen.socrates.file.plain.PlainFile;
 import io.breen.socrates.file.python.PythonFile;
-import io.breen.socrates.test.TestGroup;
-import io.breen.socrates.test.any.ReviewTest;
-import io.breen.socrates.test.any.ScriptTest;
+import io.breen.socrates.file.python.PythonObject;
+import io.breen.socrates.test.GroupNode;
+import io.breen.socrates.test.any.ReviewTestNode;
+import io.breen.socrates.test.any.ScriptTestNode;
+import io.breen.socrates.test.java.MethodEvalTestNode;
+import io.breen.socrates.test.logicly.CircuitEvalTestNode;
+import io.breen.socrates.test.python.node.FunctionEvalTestNode;
+import io.breen.socrates.test.python.node.VariableEvalTestNode;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -37,9 +43,20 @@ public class Criteria {
     private static Logger logger = Logger.getLogger(Criteria.class.getName());
 
     /**
+     * The absolute path to the file from which this object was created (e.g., a .yml file).
+     */
+    private Path path;
+
+    /**
      * Human-readable assignment name (e.g., "Problem Set 1"). Cannot be null.
      */
     public String assignmentName;
+
+    /**
+     * The file name that should be used when saving a grade report file. This name can contain %-sequences that are
+     * substituted when saving a submission's grade report. See formatReportFileName().
+     */
+    public String reportFileName;
 
     /**
      * File objects created from the criteria file. These will all be instances of subclasses of
@@ -57,6 +74,7 @@ public class Criteria {
      * location to which the archive was "unzipped".
      */
     private Path tempDir;
+
 
     /**
      * This empty constructor is used by SnakeYAML.
@@ -151,23 +169,21 @@ public class Criteria {
         if (c == null) throw new InvalidCriteriaException("criteria file is empty");
     }
 
-    private static Criteria loadCriteriaFileFromPath(Path path)
-            throws IOException, InvalidCriteriaException
-    {
-        return loadCriteriaFileFromReader(Files.newBufferedReader(path, Charset.defaultCharset()));
+    private static Criteria loadCriteriaFileFromPath(Path path) throws IOException, InvalidCriteriaException {
+        Criteria c = loadCriteriaFileFromReader(Files.newBufferedReader(path, Charset.defaultCharset()));
+        c.setPath(path);
+        return c;
     }
 
-    private static Criteria loadCriteriaFileFromReader(Reader reader)
-            throws IOException, InvalidCriteriaException
-    {
+    private static Criteria loadCriteriaFileFromReader(Reader reader) throws IOException, InvalidCriteriaException {
         Constructor cons = new Constructor(Criteria.class);
 
         cons.addTypeDescription(new TypeDescription(Criteria.class, "!criteria"));
-        cons.addTypeDescription(new TypeDescription(TestGroup.class, "!group"));
+        cons.addTypeDescription(new TypeDescription(GroupNode.class, "!group"));
 
-        cons.addTypeDescription(new TypeDescription(ReviewTest.class, "!test:review"));
+        cons.addTypeDescription(new TypeDescription(ReviewTestNode.class, "!test:review"));
 
-        cons.addTypeDescription(new TypeDescription(ScriptTest.class, "!test:script"));
+        cons.addTypeDescription(new TypeDescription(ScriptTestNode.class, "!test:script"));
 
         /*
          * Plain text file type and supported tests
@@ -180,12 +196,12 @@ public class Criteria {
         cons.addTypeDescription(new TypeDescription(PythonFile.class, "!file:python"));
         cons.addTypeDescription(
                 new TypeDescription(
-                        io.breen.socrates.test.python.VariableEvalTest.class, "!test:python:eval:variable"
+                        VariableEvalTestNode.class, "!test:python:eval:variable"
                 )
         );
         cons.addTypeDescription(
                 new TypeDescription(
-                        io.breen.socrates.test.python.FunctionEvalTest.class, "!test:python:eval:function"
+                        FunctionEvalTestNode.class, "!test:python:eval:function"
                 )
         );
         cons.addTypeDescription(
@@ -195,12 +211,12 @@ public class Criteria {
         );
         cons.addTypeDescription(
                 new TypeDescription(
-                        io.breen.socrates.file.python.Object.class, "!python:object"
+                        PythonObject.class, "!python:object"
                 )
         );
         cons.addTypeDescription(
                 new TypeDescription(
-                        io.breen.socrates.test.python.MethodEvalTest.class, "!test:python:eval:method"
+                        io.breen.socrates.test.python.node.MethodEvalTestNode.class, "!test:python:eval:method"
                 )
         );
 
@@ -210,7 +226,7 @@ public class Criteria {
         cons.addTypeDescription(new TypeDescription(JavaFile.class, "!file:java"));
         cons.addTypeDescription(
                 new TypeDescription(
-                        io.breen.socrates.test.java.MethodEvalTest.class, "!test:java:eval:method"
+                        MethodEvalTestNode.class, "!test:java:eval:method"
                 )
         );
         cons.addTypeDescription(
@@ -225,7 +241,7 @@ public class Criteria {
         );
         cons.addTypeDescription(
                 new TypeDescription(
-                        io.breen.socrates.file.java.Object.class, "!java:object"
+                        JavaObject.class, "!java:object"
                 )
         );
 
@@ -240,7 +256,7 @@ public class Criteria {
         cons.addTypeDescription(new TypeDescription(LogiclyFile.class, "!file:logicly"));
         cons.addTypeDescription(
                 new TypeDescription(
-                        io.breen.socrates.test.logicly.CircuitEvalTest.class, "!test:logicly:eval"
+                        CircuitEvalTestNode.class, "!test:logicly:eval"
                 )
         );
 
@@ -259,8 +275,9 @@ public class Criteria {
             throw new InvalidCriteriaException(x.toString());
         }
 
-        for (File f : c.files)
-            f.afterConstruction();
+        c.files.forEach(File::freeze);
+
+        c.files.forEach(f -> logger.info("loaded & froze file " + f));
 
         return c;
     }
@@ -287,7 +304,7 @@ public class Criteria {
 
     public File getFileByLocalPath(Path path) {
         for (File f : files) {
-            Path p = Paths.get(f.path);
+            Path p = Paths.get(f.getPath());
             if (p.equals(path)) return f;
         }
 
@@ -300,5 +317,21 @@ public class Criteria {
                 "\tstaticResources=" + staticResources + "\n" +
                 "\tscripts=" + scripts + "\n" +
                 "\tfiles=" + files + ")";
+    }
+
+    /*
+     * Note: if you change this, don't forget to update the dialog that allows users to change the default file name.
+     * See the ReportFileNameDialog class.
+     */
+    public static String formatReportFileName(String fileName, String userName, String assignmentName) {
+        return fileName.replace("%u", userName).replace("%a", assignmentName);
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public void setPath(Path path) {
+        this.path = path;
     }
 }

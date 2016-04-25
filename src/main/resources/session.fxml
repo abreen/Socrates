@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.breen.socrates.view.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.fxmisc.richtext.*?>
+<BorderPane fx:id="root" minHeight="500" minWidth="800" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.breen.socrates.presenter.SessionPresenter">
+    <top>
+        <MenuBar useSystemMenuBar="true">
+            <menus>
+                <Menu text="Session">
+                    <items>
+                        <MenuItem fx:id="newSession" accelerator="Shortcut+N" onAction="#newSession"
+                                  text="New Session..."/>
+                        <MenuItem fx:id="saveSession" accelerator="Shortcut+S" onAction="#saveSession"
+                                  text="Save Session..."/>
+                        <MenuItem fx:id="openSession" accelerator="Shortcut+O" onAction="#openSession"
+                                  text="Open Session..."/>
+                    </items>
+                </Menu>
+                <Menu text="Submissions">
+                    <items>
+                        <MenuItem fx:id="addSubmissions" accelerator="Shortcut+A" onAction="#addSubmissions"
+                                  text="Add Submissions..."/>
+                        <MenuItem fx:id="addSubmissionsFromZIP" accelerator="Shortcut+Shift+A"
+                                  text="Add Submissions from ZIP..."/>
+                        <SeparatorMenuItem/>
+                        <MenuItem fx:id="nextSubmission" accelerator="Shortcut+Shift+J" text="Next Submission"/>
+                        <MenuItem fx:id="previousSubmission" accelerator="Shortcut+Shift+K" text="Previous Submission"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem fx:id="removeSubmission" text="Remove Submission" onAction="#removeSubmission"/>
+                        <MenuItem fx:id="revealSubmission" accelerator="Shortcut+Shift+V" text="Reveal Submission"/>
+                    </items>
+                </Menu>
+                <Menu text="Report">
+                    <items>
+                        <CheckMenuItem fx:id="autoSaveReports" text="Automatically Save Reports"/>
+                        <MenuItem fx:id="changeReportName" text="Change Report File Name..."
+                                  onAction="#changeReportName"/>
+                        <MenuItem fx:id="saveReport" accelerator="Shortcut+Shift+S" text="Save Grade Report"/>
+                        <MenuItem fx:id="saveReportAs" text="Save Grade Report As..."/>
+                        <SeparatorMenuItem/>
+                        <MenuItem fx:id="openReport" accelerator="Shortcut+Shift+E"
+                                  text="Open Report in Default Application"/>
+                    </items>
+                </Menu>
+                <Menu text="File">
+                    <items>
+                        <MenuItem fx:id="nextFile" accelerator="Shortcut+Alt+J" text="Next File"/>
+                        <MenuItem fx:id="previousFile" accelerator="Shortcut+Alt+K" text="Previous File"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem fx:id="openFile" accelerator="Shortcut+E" text="Open File in Default Application"
+                                  onAction="#openCurrentFile"/>
+                    </items>
+                </Menu>
+                <Menu text="Test">
+                    <items>
+                        <MenuItem fx:id="passTest" accelerator="Shortcut+D" text="Pass Test"/>
+                        <MenuItem fx:id="failTest" accelerator="Shortcut+F" text="Fail Test"/>
+                        <MenuItem fx:id="resetTest" accelerator="Shortcut+R" text="Reset Test"/>
+                        <MenuItem fx:id="resetAllTests" accelerator="Shortcut+Shift+R" text="Reset All Tests for File"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem fx:id="nextTest" accelerator="Shortcut+J" text="Next Test"/>
+                        <MenuItem fx:id="previousTest" accelerator="Shortcut+K" text="Previous Test"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem fx:id="clearNotes" text="Clear Notes"/>
+                    </items>
+                </Menu>
+                <Menu text="Window">
+                    <items>
+                        <MenuItem fx:id="about" onAction="#showAbout" text="About Socrates"/>
+                        <MenuItem fx:id="console" text="Developer Console" onAction="#showConsole"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+
+    <center>
+        <SplitPane fx:id="splitPane" dividerPositions="0.25, 0.75" BorderPane.alignment="CENTER" disable="true">
+            <items>
+                <SplitPane dividerPositions="0.6" orientation="VERTICAL" prefWidth="250">
+                    <items>
+                        <TitledPane fx:id="submissionsTitledPane" animated="false" collapsible="false" maxHeight="Infinity" maxWidth="Infinity"
+                                    text="Submissions">
+                            <content>
+                                <ListView fx:id="submissionList" minWidth="200.0" prefHeight="200" prefWidth="200"/>
+                            </content>
+                        </TitledPane>
+                        <TitledPane animated="false" collapsible="false" maxHeight="Infinity" maxWidth="Infinity"
+                                    text="Files">
+                            <content>
+                                <TreeView fx:id="fileTree" minWidth="200"/>
+                            </content>
+                        </TitledPane>
+                    </items>
+                </SplitPane>
+                <VBox maxHeight="Infinity">
+                    <children>
+                        <CodeArea fx:id="codeArea" maxHeight="Infinity" maxWidth="Infinity" wrapText="true"
+                                  editable="false" VBox.vgrow="ALWAYS" styleClass="code-area"/>
+                        <TitledPane animated="false" expanded="false" maxHeight="Infinity" text="Transcript"
+                                    VBox.vgrow="NEVER">
+                            <content>
+                                <TextArea fx:id="transcriptArea" editable="false" wrapText="true" styleClass="transcript"/>
+                            </content>
+                        </TitledPane>
+                    </children>
+                </VBox>
+                <VBox maxHeight="Infinity" minWidth="250.0" prefWidth="250.0" styleClass="vbox">
+                    <children>
+                        <TitledPane animated="false" collapsible="false" maxHeight="Infinity" maxWidth="Infinity"
+                                    text="Tests" VBox.vgrow="ALWAYS">
+                            <content>
+                                <TreeView fx:id="testTree" maxHeight="Infinity" VBox.vgrow="ALWAYS"/>
+                            </content>
+                        </TitledPane>
+                        <TabPane tabClosingPolicy="UNAVAILABLE">
+                            <tabs>
+                                <Tab closable="false" text="Controls">
+                                    <content>
+                                        <VBox alignment="CENTER" prefHeight="200" prefWidth="100" spacing="10">
+                                            <children>
+                                                <Button fx:id="passButton" text="Pass"
+                                                                  maxWidth="Infinity" mnemonicParsing="false"/>
+                                                <Button fx:id="failButton" text="Fail"
+                                                                  maxWidth="Infinity" mnemonicParsing="false"/>
+                                                <Button fx:id="resetButton" text="Reset"
+                                                                  maxWidth="Infinity" mnemonicParsing="false"/>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10" left="10" right="10" top="10"/>
+                                            </padding>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+                                <Tab text="Versions">
+                                    <content>
+                                        <VBox>
+                                            <children>
+                                                <ListView fx:id="versions" prefHeight="200.0" VBox.vgrow="ALWAYS">
+                                                    <VBox.margin>
+                                                        <Insets bottom="5" left="5" right="5" top="5"/>
+                                                    </VBox.margin>
+                                                </ListView>
+                                                <HBox prefHeight="50.0" styleClass="button-row" VBox.vgrow="NEVER">
+                                                    <children>
+                                                        <Button fx:id="openVersion" mnemonicParsing="false"
+                                                                text="Open"/>
+                                                    </children>
+                                                    <VBox.margin>
+                                                        <Insets bottom="5" left="5" right="5" top="5"/>
+                                                    </VBox.margin>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+                                <Tab text="Info">
+                                    <content>
+                                        <VBox prefHeight="200" prefWidth="100">
+                                            <children>
+                                                <GridPane>
+                                                    <children>
+                                                        <Label styleClass="key" text="Kind"/>
+                                                        <RevertableLabel fx:id="testKind" defaultText="—"
+                                                                         GridPane.rowIndex="1"/>
+                                                        <Label styleClass="key" text="Deduction" GridPane.rowIndex="2">
+                                                            <GridPane.margin>
+                                                                <Insets top="10"/>
+                                                            </GridPane.margin>
+                                                        </Label>
+                                                        <RevertableLabel fx:id="testPoints" defaultText="—"
+                                                                         GridPane.rowIndex="3"/>
+                                                        <Label styleClass="key" text="Automated" GridPane.rowIndex="4">
+                                                            <GridPane.margin>
+                                                                <Insets top="10"/>
+                                                            </GridPane.margin>
+                                                        </Label>
+                                                        <RevertableLabel fx:id="testIsAutomated" defaultText="—"
+                                                                         GridPane.rowIndex="5"/>
+                                                    </children>
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10"
+                                                                           prefWidth="100"/>
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints vgrow="SOMETIMES"/>
+                                                        <RowConstraints vgrow="SOMETIMES"/>
+                                                        <RowConstraints vgrow="SOMETIMES"/>
+                                                        <RowConstraints/>
+                                                        <RowConstraints/>
+                                                        <RowConstraints/>
+                                                    </rowConstraints>
+                                                    <padding>
+                                                        <Insets bottom="10" left="10" right="10" top="10"/>
+                                                    </padding>
+                                                </GridPane>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+                                <Tab text="Notes">
+                                    <content>
+                                        <VBox prefHeight="200" prefWidth="100">
+                                            <children>
+                                                <TextArea fx:id="notesArea" prefHeight="200" prefWidth="200"
+                                                          VBox.vgrow="ALWAYS">
+                                                    <VBox.margin>
+                                                        <Insets bottom="5" left="5" right="5" top="5"/>
+                                                    </VBox.margin>
+                                                </TextArea>
+                                                <HBox alignment="CENTER" styleClass="button-row" VBox.vgrow="NEVER">
+                                                    <children>
+                                                        <Button fx:id="notesClear" mnemonicParsing="false"
+                                                                text="Clear"/>
+                                                        <Button fx:id="notesSave" mnemonicParsing="false" text="Save"/>
+                                                    </children>
+                                                    <VBox.margin>
+                                                        <Insets bottom="5" left="5" right="5" top="5"/>
+                                                    </VBox.margin>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+                            </tabs>
+                        </TabPane>
+                    </children>
+                </VBox>
+            </items>
+        </SplitPane>
+    </center>
+</BorderPane>

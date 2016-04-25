@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.fxmisc.richtext.StyleClassedTextArea?>
+<VBox fx:id="root" minHeight="200" minWidth="500" xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.breen.socrates.presenter.ConsolePresenter">
+    <children>
+        <StyleClassedTextArea fx:id="textArea" editable="false" maxHeight="Infinity" maxWidth="Infinity" wrapText="true"
+                  VBox.vgrow="ALWAYS" styleClass="console"/>
+    </children>
+</VBox>
