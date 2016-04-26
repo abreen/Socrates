@@ -13,6 +13,9 @@ import io.breen.socrates.view.SessionStage;
 import io.breen.socrates.view.SubmissionsErrorsAlert;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
 
@@ -79,7 +82,12 @@ public class Socrates extends Application {
                 } else {
                     logger.warning("could not find a Python interpreter");
 
-                    // TODO prompt user
+                    new Alert(
+                            AlertType.ERROR,
+                            "A Python 3 interpreter could not be located. " +
+                                    "Socrates requires Python 3.2 or newer.",
+                            ButtonType.CLOSE
+                    ).showAndWait();
                     return;
                 }
 
@@ -144,9 +152,6 @@ public class Socrates extends Application {
         }
 
         try {
-//            FileViewerStage viewer = new FileViewerStage(new java.io.File("/Users/abreen/Desktop/foo.txt"));
-//            viewer.show();
-
             SessionStage stage = new SessionStage();
 
             if (criteria != null) {
@@ -166,43 +171,6 @@ public class Socrates extends Application {
                     a.showAndWait();
                 }
             }
-
-//            WatchService watcher = FileSystems.getDefault().newWatchService();
-//            Map<WatchKey, DynamicFileTreeItem> map = new HashMap<>();
-//
-//            DynamicFileTreeItem root = new DynamicFileTreeItem(
-//                    Paths.get("/Users/abreen/Desktop"),
-//                    false,
-//                    watcher,
-//                    map
-//            );
-//            TreeView<Path> treeView = new TreeView<>(root);
-//            root.setExpanded(true);
-//
-//            treeView.setCellFactory(view -> new TreeCell<Path>() {
-//                @Override
-//                protected void updateItem(Path item, boolean empty) {
-//                    super.updateItem(item, empty);
-//
-//                    if (empty || item == null) {
-//                        setText(null);
-//                        setGraphic(null);
-//                    } else {
-//                        setText(item.getFileName().toString());
-//                    }
-//                }
-//            });
-//
-//            Stage stage = new Stage();
-//            VBox vbox = new VBox(10, treeView);
-//
-//            stage.setScene(new Scene(vbox, 200, 400));
-//
-//            Thread th = new Thread(new FileTreeWatcherTask(watcher, map));
-//            th.setDaemon(true);
-//            th.start();
-//
-//            stage.show();
 
         } catch (Throwable t) {
             crash(Thread.currentThread(), t);
