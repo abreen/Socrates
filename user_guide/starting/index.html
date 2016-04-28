@@ -91,6 +91,13 @@
 <li>
           
             <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../../faq/">Frequently Asked Questions</a>
+        
+    </li>
+<li>
+          
+            <li>
     <ul class="subnav">
     <li><span>User Guide</span></li>
 
@@ -107,6 +114,9 @@
         <a class="current" href="./">Starting Socrates</a>
         
             <ul>
+            
+                <li class="toctree-l3"><a href="#starting-via-the-command-line">Starting via the command line</a></li>
+                
             
             </ul>
         
@@ -156,7 +166,73 @@
           <div role="main">
             <div class="section">
               
-                <p>Test 2</p>
+                <p>Depending on how you <a href="../../installation/">acquired Socrates</a>, you should have
+downloaded either a JAR file or a <code>.app</code> package.</p>
+<p>To start Socrates, simply double-click on the file you downloaded.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you see an error dialog about needing a Java runtime or a Python
+interpreter, see the <a href="../../installation/">installation instructions</a> and
+be sure you have the necessary prerequisites.</p>
+</div>
+<h1 id="starting-via-the-command-line">Starting via the command line</h1>
+<p>Socrates may also be started via the command line. For all platforms, Socrates
+accepts the same command line arguments:</p>
+<ul>
+<li>
+<p>The <code>--criteria</code> argument, after which you must include a single <code>=</code>, then
+    the path to a criteria file (or criteria package). For example:</p>
+<div class="codehilite"><pre>--criteria=/home/ajb/ps0/criteria.yml
+</pre></div>
+
+
+</li>
+<li>
+<p>The <code>--submissions</code> argument, after which you must include a single <code>=</code>,
+    then a comma-separated list of <em>directories</em> (folders) containing student
+    submissions. For example, if I have submission directories for the students
+    <code>ajsmith</code>, <code>kjones</code> and <code>lixen</code> in <code>/home/ajb/ps0</code>, I could specify:</p>
+<div class="codehilite"><pre>--submissions=/home/ajb/ps0/ajsmith,/home/ajb/ps0/kjones,/home/ajb/ps0/lixen
+</pre></div>
+
+
+<p>This would cause those submissions to be added to the window Socrates opens
+when it loads a criteria file. <strong>If <code>--criteria</code> is not specified, or there
+is an error opening the criteria file, this argument does nothing.</strong></p>
+</li>
+</ul>
+<p>Before specifying the above command line arguments, you&rsquo;ll need to direct your
+command line environment to the JAR file or <code>.app</code> package. This varies depending
+on your operating system:</p>
+<ul>
+<li>
+<p><strong>Mac OS X</strong>. Open the Terminal application by using Spotlight to search
+    for it, finding it in the Utilities folder in your Applications folder, or
+    in the Other folder from Launchpad.</p>
+<p>Once Terminal is open, type</p>
+<div class="codehilite"><pre>java -jar /path/to/Socrates.jar
+</pre></div>
+
+
+<p>followed by any Socrates command line arguments. Replace
+<code>/path/to/Socrates.jar</code> with the path to the JAR you downloaded. Or,
+instead, click and drag the icon from a Finder window onto the Terminal
+window after typing <code>java -jar</code> and OS X will insert the absolute path for
+you.</p>
+</li>
+<li>
+<p><strong>Windows</strong>. Open the Command Prompt program by finding it in the Start
+    menu, or by typing the key combination Windows + R to open the Run prompt,
+    and typing <code>cmd.exe</code> in the prompt.</p>
+<p>Once the Command Prompt program is open, type</p>
+<div class="codehilite"><pre>java.exe -jar path\to\Socrates.jar
+</pre></div>
+
+
+<p>followed by any Socrates command line arguments. Replace
+<code>path\to\Socrates.jar</code> with the path to the JAR you downloaded.</p>
+</li>
+</ul>
               
             </div>
           </div>
