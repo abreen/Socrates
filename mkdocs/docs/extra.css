@@ -1,0 +1,76 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,400italic,500,500italic|Roboto+Mono:400,700);
+
+body,
+h1, h2, h3, h4, h5, h6,
+input[type="text"], input[type="password"], input[type="email"],
+input[type="url"], input[type="date"], input[type="month"],
+input[type="time"], input[type="datetime"], input[type="datetime-local"],
+input[type="week"], input[type="number"], input[type="search"],
+input[type="tel"], input[type="color"],
+.btn, .rst-versions {
+    font-family: Roboto, 'Myriad Pro', 'Trebuchet MS', Helvetica, Arial, sans-serif;
+}
+
+html {
+    font-size: 100%;
+}
+
+body {
+}
+
+h3, h4, h5, h6 {
+    font-weight: inherit;
+}
+
+.btn, .btn:active {
+    padding: 6px 12px;
+    border-radius: 0;
+    transition: none;
+    box-shadow: none;
+}
+
+.btn:active {
+    background-color: #999 !important;
+}
+
+code, .rst-content tt {
+    background: inherit;
+    color: inherit;
+    border: none;
+    padding: inherit;
+    font-size: inherit;
+}
+
+pre, code, tt {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 90%;
+}
+
+pre {
+    background-color: #eee;
+    padding: 8px 12px;
+}
+
+.wy-breadcrumbs li a {
+    padding: inherit;
+}
+
+.wy-menu-vertical li.on a,
+.wy-menu-vertical li.current > a,
+.wy-menu-vertical li.current a {
+    border: none;
+}
+
+.wy-nav-top {
+    line-height: inherit;
+}
+
+.wy-nav-top i, .wy-nav-top a {
+    display: block;
+    padding: 12px 0;
+}
+
+.wy-nav-top a {
+    font-size: 24px;
+}
+

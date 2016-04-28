@@ -1,0 +1,23 @@
+site_name: Socrates Documentation
+repo_url: https://github.com/abreen/Socrates
+site_description: Documentation for Socrates, the grading automation program.
+theme: readthedocs
+
+markdown_extensions:
+  - def_list
+  - footnotes
+  - headerid
+  - codehilite
+  - admonition
+  - smarty:
+      smart_ellipses: False
+
+pages:
+  - Home: index.md
+  - Installation: installation.md
+  - Building: building.md
+  - Issues: issues.md
+  - License: license.md
+  - User Guide:
+      - Getting Started: user_guide/index.md
+      - Starting Socrates: user_guide/starting.md
