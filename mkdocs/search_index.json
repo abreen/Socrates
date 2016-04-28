@@ -1,0 +1,64 @@
+{
+    "docs": [
+        {
+            "location": "/", 
+            "text": "Home\n\n\nWelcome to the documentation site for Socrates, the grading automation program.\nHere you can find information about how to use the program, how to design\ncriteria files for the program, and other information.\n\n\n\n\n\n\nIf you\nre new to Socrates, skip to the next section.\n\n\n\n\n\n\nIf you\nre a grader who\ns been asked to grade using Socrates, see the\n    \nUser Guide\n.\n\n\n\n\n\n\nIf you\nre an instructor or a teaching staff member who needs to create\n    criteria files for graders to use, see the \nFor instructors\n category\n    on the left.\n\n\n\n\n\n\nIf you\nre a developer who wants to contribute to Socrates, good news!\n    Socrates is open source and welcomes contributions.\n    See our \nGitHub page\n.\n\n\n\n\n\n\nAbout Socrates\n\n\nSocrates is a Java program that was written to make grading easier. It provides\na single-window environment that allows graders to navigate the files that\nconstitute a student submission. It also supports automating repetitive or\nprogrammable tasks that are ordinarily done by hand (for example, evaluating\nfunctions and checking their return value, output, etc.).\n\n\nTo this end, the program provides tools to run pre-programmed tests defined by\na grading coordinator in a criteria. A criteria is a file that describes the\nrequired parts of a submission (the names of files that should be graded), and\nany number of tests designed by the coordinator, which may be automatable or\nmanual. Reading this file, Socrates determines which parts of a submission are\npresent, and runs automated tests for the parts of a submission that are\npresent. Missing parts of a submission or failed tests constitute the\ndeductions for a particular submission.\n\n\nObviously, there are some cases in which a test for Socrates cannot be feasibly\ndesigned. For example, examining a solution for proper code style or comments\nmust be done by a human grader. In this case, a \ntest\n is written that requires\nthe human grader to make the pass/fail decision. These manual tests will have\noutcomes until the human grader makes the pass/fail decision.\n\n\nThe current version of Socrates is a port of the\n\noriginal Python version\n to Java, and\nreads criteria files that are incompatible with the older version.", 
+            "title": "Home"
+        }, 
+        {
+            "location": "/#home", 
+            "text": "Welcome to the documentation site for Socrates, the grading automation program.\nHere you can find information about how to use the program, how to design\ncriteria files for the program, and other information.    If you re new to Socrates, skip to the next section.    If you re a grader who s been asked to grade using Socrates, see the\n     User Guide .    If you re an instructor or a teaching staff member who needs to create\n    criteria files for graders to use, see the  For instructors  category\n    on the left.    If you re a developer who wants to contribute to Socrates, good news!\n    Socrates is open source and welcomes contributions.\n    See our  GitHub page .", 
+            "title": "Home"
+        }, 
+        {
+            "location": "/#about-socrates", 
+            "text": "Socrates is a Java program that was written to make grading easier. It provides\na single-window environment that allows graders to navigate the files that\nconstitute a student submission. It also supports automating repetitive or\nprogrammable tasks that are ordinarily done by hand (for example, evaluating\nfunctions and checking their return value, output, etc.).  To this end, the program provides tools to run pre-programmed tests defined by\na grading coordinator in a criteria. A criteria is a file that describes the\nrequired parts of a submission (the names of files that should be graded), and\nany number of tests designed by the coordinator, which may be automatable or\nmanual. Reading this file, Socrates determines which parts of a submission are\npresent, and runs automated tests for the parts of a submission that are\npresent. Missing parts of a submission or failed tests constitute the\ndeductions for a particular submission.  Obviously, there are some cases in which a test for Socrates cannot be feasibly\ndesigned. For example, examining a solution for proper code style or comments\nmust be done by a human grader. In this case, a  test  is written that requires\nthe human grader to make the pass/fail decision. These manual tests will have\noutcomes until the human grader makes the pass/fail decision.  The current version of Socrates is a port of the original Python version  to Java, and\nreads criteria files that are incompatible with the older version.", 
+            "title": "About Socrates"
+        }, 
+        {
+            "location": "/installation/", 
+            "text": "Socrates is a Java program, so it can run wherever a JRE can be installed (Mac\nOS X, Linux, and Windows). If you\nd like to build Socrates from source, see\n\nBuilding Socrates\n.\n\n\nPrerequisites\n\n\n\n\n\n\nYou must have a Java Runtime Environment (JRE) installed (\nversion 8\n or\n    newer). If you\nve downloaded a Java Development Kit (JDK) for writing your\n    own Java applications, you already have a JRE.\n\n\nYou can obtain Oracle\ns JRE from\n\nOracle\ns site\n.\nIt may also be possible to use \nOpenJDK\n, but this\nhas not been extensively tested.\n\n\n\n\n\n\nYou must have Python 3 installed (version 3.2 or newer). If you don\nt have\n    a Python interpreter installed, or you only have a Python 2 interpreter\n    installed, Socrates will show you an error message on startup.\n\n\nYou can obtain Python 3 from \nthe Python project\ns\nsite\n.\n\n\n\n\n\n\nIf you have both of the above, continue to the next section.\n\n\nDownloading\n\n\nCompiled binaries in JAR or OS X \n.app\n form are available from the \nReleases\npage on GitHub\n. Simply click the\nappropriate download link for the most recent release and double-click the\ndownloaded file to start Socrates.\n\n\nUninstalling\n\n\nTo uninstall Socrates, delete the JAR or \n.app\n package. Apart from files in\nyour operating system\ns temporary directory (which you do not need to remove\nyourself), Socrates may create a \n.socrates.properties\n file in your home\ndirectory. This file saves any preferences you may have set using the\napplication, as well as the location of the Python 3 interpreter on your\nsystem.\n\n\n\n\n\n\nOn OS X or Linux, the \n.socrates.properties\n file is in your home\n    directory. To remove this file, type\n\n\nrm ~/.socrates.properties\n\n\n\n\n\nin your favorite shell.\n\n\n\n\n\n\nOn Windows, the \n.socrates.properties\n file is in your \nUsers\n folder.\n    For example, for the user \nAlexander\n, the file is located at\n    \nC:\\Users\\Alexander\\.socrates.properties\n. You may need to\n    \nshow hidden\n    files\n to be\n    able to select the file.", 
+            "title": "Installation"
+        }, 
+        {
+            "location": "/installation/#prerequisites", 
+            "text": "You must have a Java Runtime Environment (JRE) installed ( version 8  or\n    newer). If you ve downloaded a Java Development Kit (JDK) for writing your\n    own Java applications, you already have a JRE.  You can obtain Oracle s JRE from Oracle s site .\nIt may also be possible to use  OpenJDK , but this\nhas not been extensively tested.    You must have Python 3 installed (version 3.2 or newer). If you don t have\n    a Python interpreter installed, or you only have a Python 2 interpreter\n    installed, Socrates will show you an error message on startup.  You can obtain Python 3 from  the Python project s\nsite .    If you have both of the above, continue to the next section.", 
+            "title": "Prerequisites"
+        }, 
+        {
+            "location": "/installation/#downloading", 
+            "text": "Compiled binaries in JAR or OS X  .app  form are available from the  Releases\npage on GitHub . Simply click the\nappropriate download link for the most recent release and double-click the\ndownloaded file to start Socrates.", 
+            "title": "Downloading"
+        }, 
+        {
+            "location": "/installation/#uninstalling", 
+            "text": "To uninstall Socrates, delete the JAR or  .app  package. Apart from files in\nyour operating system s temporary directory (which you do not need to remove\nyourself), Socrates may create a  .socrates.properties  file in your home\ndirectory. This file saves any preferences you may have set using the\napplication, as well as the location of the Python 3 interpreter on your\nsystem.    On OS X or Linux, the  .socrates.properties  file is in your home\n    directory. To remove this file, type  rm ~/.socrates.properties  in your favorite shell.    On Windows, the  .socrates.properties  file is in your  Users  folder.\n    For example, for the user  Alexander , the file is located at\n     C:\\Users\\Alexander\\.socrates.properties . You may need to\n     show hidden\n    files  to be\n    able to select the file.", 
+            "title": "Uninstalling"
+        }, 
+        {
+            "location": "/building/", 
+            "text": "Socrates can be built with Maven. Its exact dependencies are listed in\nthe \npom.xml\n file. Most of the dependencies will be automatically retrieved\nfrom Maven Central when you first run \nmvn\n from within this repository,\nwith the exception of one:\n\n\n\n\npyfinder\n, a Java library that can\n    be built with Maven. Use \ngit clone\n to obtain the code, Maven to build a\n    JAR, then \ninstall\n the JAR into your local Maven repository:\ngit clone https://github.com/abreen/pyfinder.git\ncd pyfinder\nmvn package\nmvn install:install-file -Dfile=target/pyfinder-0.1.1.jar -DpomFile=pom.xml\n\n\n\n\n\n\n\n\n\nNote that you may need to change the version number in the above command to\nmatch the most recent release.\n\n\nOnce these dependencies are installed, run \nmvn test\n from this repository\nto run Socrates\n unit tests.", 
+            "title": "Building"
+        }, 
+        {
+            "location": "/issues/", 
+            "text": "If you are a Socrates user who needs help using the program, consult the\n\nFAQ\n and \nUser guide\n first for a possible\nsolution.\n\n\nTo report a crash, error, or other issue, use the \nIssues system on\nGitHub\n. Be sure to check that your\nparticular issue is not already listed. If it is, be sure to add to the\ndiscussion of the issue.", 
+            "title": "Issues"
+        }, 
+        {
+            "location": "/license/", 
+            "text": "Socrates is open source software. Contributors to its source code hold\nthe copyright for their individual contributions. Your use of the source code\nand documentation is permitted under \nThe MIT\nLicense\n.\n\n\nIt uses a number of other open source software projects as dependencies:\n\n\n\n\npyfinder\n. MIT.\n\n\nJUnit\n. Eclipse Public License.\n\n\nJANINO\n, an in-memory Java compiler. BSD.\n\n\nApache Commons Lang\n.\n    Apache.\n\n\nApache Commons IO\n.\n    Apache.\n\n\nSnakeYAML\n. Apache.\n\n\nJackson\n. Apache.\n\n\nRichTextFX\n. BSD.", 
+            "title": "License"
+        }, 
+        {
+            "location": "/user_guide/", 
+            "text": "Test", 
+            "title": "Getting Started"
+        }, 
+        {
+            "location": "/user_guide/starting/", 
+            "text": "Test 2", 
+            "title": "Starting Socrates"
+        }
+    ]
+}
