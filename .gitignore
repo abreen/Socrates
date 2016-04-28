@@ -7,3 +7,5 @@ src/main/java/META-INF/
 .classpath
 .project
 .settings
+
+mkdocs/site
