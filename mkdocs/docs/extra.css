@@ -74,3 +74,9 @@ pre {
     font-size: 24px;
 }
 
+.wy-plain-list-disc li p:last-child,
+.rst-content .section ul li p:last-child,
+.rst-content .toctree-wrapper ul li p:last-child,
+article ul li p:last-child {
+    margin-bottom: 1em;
+}
