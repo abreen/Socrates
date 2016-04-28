@@ -1,9 +1,3 @@
----
-layout: topic
-title: Installation
-authors: [Alexander Breen]
----
-
 Socrates is a Java program, so it can run wherever a JRE can be installed (Mac
 OS X, Linux, and Windows). If you'd like to build Socrates from source, see
 [Building Socrates](building.html).

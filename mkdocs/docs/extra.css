@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto:400,400italic,500,500italic|Roboto+Mono:400,700);
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,400italic,500,500italic,700,700italic|Roboto+Mono:400,700);
 
 body,
 h1, h2, h3, h4, h5, h6,
@@ -74,9 +74,14 @@ pre {
     font-size: 24px;
 }
 
-.wy-plain-list-disc li p:last-child,
-.rst-content .section ul li p:last-child,
-.rst-content .toctree-wrapper ul li p:last-child,
-article ul li p:last-child {
-    margin-bottom: 1em;
+li p:last-child {
+    margin-bottom: 1em !important;
+}
+
+pre {
+    overflow: scroll;
+}
+
+.admonition-title {
+    padding: 12px !important;
 }

@@ -1,9 +1,3 @@
----
-layout: topic
-title: License
-authors: [Alexander Breen]
----
-
 Socrates is open source software. Contributors to its source code hold
 the copyright for their individual contributions. Your use of the source code
 and documentation is permitted under [The MIT

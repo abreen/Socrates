@@ -1,9 +1,3 @@
----
-layout: topic
-title: Building Socrates
-authors: [Alexander Breen]
----
-
 Socrates can be built with Maven. Its exact dependencies are listed in
 the `pom.xml` file. Most of the dependencies will be automatically retrieved
 from Maven Central when you first run `mvn` from within this repository,

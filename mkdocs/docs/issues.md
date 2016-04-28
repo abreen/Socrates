@@ -1,11 +1,5 @@
----
-layout: topic
-title: Issues and bugs
-authors: [Alexander Breen]
----
-
 If you are a Socrates user who needs help using the program, consult the
-[FAQ](faq.html) and [User guide](user_guide.html) first for a possible
+[FAQ](faq.html) and [User Guide](/user_guide/) first for a possible
 solution.
 
 To report a crash, error, or other issue, use the [Issues system on
